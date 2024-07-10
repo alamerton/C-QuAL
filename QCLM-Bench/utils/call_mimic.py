@@ -10,8 +10,10 @@ database_password = os.environ.get('DATABASE_PASSWORD')
 database_name = os.environ.get('DATABASE_NAME')
 database_port = os.environ.get('DATABASE_PORT')
 
-def save_data(df):
-    df.to_csv(f'QCLM-Bench/data/mimic-iii-subset.csv')
+def save_data(results): # Load query results into a dataframe containing subject_ids and notes
+    results_df = pd.DataFrame(results, columns=['subject_id', 'note'])
+    results_df.to_csv(f'QCLM-Bench/data/mimic-iii-subset.csv')
+
 
 def call_mimic():
     
@@ -25,23 +27,18 @@ def call_mimic():
     )
     cursor = connection.cursor()
 
-    # Define SQL Query
+    # Define and execute SQL Query
     query = """
     SELECT subject_id, text FROM mimiciii.noteevents
     ORDER BY row_id ASC LIMIT 1;
     """
-
-    # Query arbitrary patient
     cursor.execute(query)
 
-    # Load query results into a dataframe containing subject_ids and notes
-    results = cursor.fetchall()
-    results_df = pd.DataFrame(results, columns=['subject_id', 'note'])
-
+    results = cursor.fetchone() # previously using fetchall()
+    
     # Close the database connection
     cursor.close()
     connection.close()
 
-    # Do data things
-
-call_mimic()
+    # save_data(results)
+    return results[1] # returns discharge summary only
