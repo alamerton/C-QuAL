@@ -1,6 +1,8 @@
 import pandas as pd
 import psycopg2
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 database_host = os.environ.get('DATABASE_HOST')
 database_username = os.environ.get('DATABASE_USERNAME')
@@ -25,10 +27,8 @@ def call_mimic():
     patient_id = 123
 
     query = """
-    SELECT subject_id, note
-    FROM mimiciii.noteevents
-    WHERE itemid IN (39, 40, 41) AND category = 'DISCHARGE SUMMARY' AND subject_id = 123
-    ORDER BY charttime DESC;
+    SELECT subject_id, text FROM mimiciii.noteevents
+    ORDER BY row_id ASC LIMIT 100;
     """
 
     # Query arbitrary patient
@@ -43,4 +43,7 @@ def call_mimic():
     connection.close()
 
     # Do data things
+    print(results_df)
     return results_df
+
+call_mimic()
