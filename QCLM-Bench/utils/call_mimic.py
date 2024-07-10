@@ -10,6 +10,9 @@ database_password = os.environ.get('DATABASE_PASSWORD')
 database_name = os.environ.get('DATABASE_NAME')
 database_port = os.environ.get('DATABASE_PORT')
 
+def save_data(df):
+    df.to_csv(f'QCLM-Bench/data/mimic-iii-subset.csv')
+
 def call_mimic():
     
     # Set up DB connection
@@ -25,7 +28,7 @@ def call_mimic():
     # Define SQL Query
     query = """
     SELECT subject_id, text FROM mimiciii.noteevents
-    ORDER BY row_id ASC LIMIT 100;
+    ORDER BY row_id ASC LIMIT 1;
     """
 
     # Query arbitrary patient
@@ -40,7 +43,5 @@ def call_mimic():
     connection.close()
 
     # Do data things
-    print(results_df)
-    return results_df
 
 call_mimic()

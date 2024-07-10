@@ -1,6 +1,6 @@
-# given a note or multiple notes
-# pass notes to GPT as context
-# prompt model to generate a question and answer based on the context
+# Given a note or multiple notes
+# Pass notes to GPT as context
+# Prompt model to generate a question and answer based on the context
 # with specifications and requirements for the type of question
 
 # %%
@@ -18,24 +18,21 @@ client = AzureOpenAI(
 
 model_name = "gpt-35-turbo-16k"
 
-# %%
 
 patient_note = "note"
 question = "tell me about blah"
 
-# %%
 
 prompt = [{
     "role": "user",
     "content": (
 			"Discharge Summary :\n"
 			f"{patient_note}\n\n"
-			f"Question : {question}\n\n"
+			f"Request : {question}\n\n"
 			"Answer :"
         )
 }]
 
-# %%
 
 response = client.chat.completions.create(
     model=model_name,
@@ -45,4 +42,3 @@ response = client.chat.completions.create(
 )
 
 print(response.to_json())
-# %%
