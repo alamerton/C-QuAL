@@ -10,14 +10,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
-azure_openai_key = os.getenv("AZURE_OPENAI_KEY")
-azure_api_version = os.getenv("AZURE_API_VERSION")
-
 client = AzureOpenAI(
-    azure_endpoint=azure_endpoint,
-    api_key=azure_openai_key,
-    api_version=azure_api_version,
+    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"), 
+    api_key=os.getenv("AZURE_OPENAI_KEY"),
+    api_version=os.getenv("AZURE_API_VERSION")
 )
 
 model_name = "gpt-35-turbo-16k"
@@ -25,20 +21,23 @@ model_name = "gpt-35-turbo-16k"
 # %%
 
 patient_note = "note"
-
 question = "tell me about blah"
 
 # %%
 
-prompt = {
+# prompt = [{
+#     "role": "user",
+#     f"content": "Discharge Summary: \n: {patient_note}\n\n Question: {question}\n\n Answer: "
+# }]
+prompt = [{
     "role": "user",
-    "content": {
-        "Discharge Summary: \n:"
-        "{patient_note}\n\n"
-        "Question: {question}"
-        "Answer: "
-    },
-}
+    "content": (
+			"Discharge Summary :\n"
+			f"{patient_note}\n\n"
+			f"Question : {question}\n\n"
+			"Answer :"
+        )
+}]
 
 # %%
 
@@ -49,5 +48,5 @@ response = client.chat.completions.create(
     temperature=0
 )
 
-print(response)
+print(response.to_json())
 # %%
