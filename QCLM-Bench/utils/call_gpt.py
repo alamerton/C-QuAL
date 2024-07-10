@@ -25,10 +25,6 @@ question = "tell me about blah"
 
 # %%
 
-# prompt = [{
-#     "role": "user",
-#     f"content": "Discharge Summary: \n: {patient_note}\n\n Question: {question}\n\n Answer: "
-# }]
 prompt = [{
     "role": "user",
     "content": (
