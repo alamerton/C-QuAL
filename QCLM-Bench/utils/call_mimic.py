@@ -2,6 +2,7 @@ import pandas as pd
 import psycopg2
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 database_host = os.environ.get('DATABASE_HOST')
@@ -15,8 +16,7 @@ def save_data(results): # Load query results into a dataframe containing subject
     results_df.to_csv(f'QCLM-Bench/data/mimic-iii-subset.csv')
 
 
-def call_mimic():
-    
+def call_mimic(): # Return a discharge summary from the MIMIC-III database
     # Set up DB connection
     connection = psycopg2.connect(
         host=database_host,
