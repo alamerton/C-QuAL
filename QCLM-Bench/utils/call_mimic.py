@@ -20,12 +20,9 @@ def call_mimic():
         database=database_name,
         port=database_port
     )
-
     cursor = connection.cursor()
 
     # Define SQL Query
-    patient_id = 123
-
     query = """
     SELECT subject_id, text FROM mimiciii.noteevents
     ORDER BY row_id ASC LIMIT 100;
