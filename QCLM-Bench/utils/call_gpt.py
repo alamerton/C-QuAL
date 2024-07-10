@@ -25,7 +25,7 @@ def call_gpt(discharge_summary):
         "role": "user",
         "content": (
                 "Discharge Summary :\n"
-                f"{patient_note}\n\n"
+                f"{discharge_summary}\n\n"
                 f"Request : {question}\n\n"
                 "Answer :"
             )
