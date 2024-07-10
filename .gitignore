@@ -1,1 +1,3 @@
+# Dependencies and environment variables
 hpc_requirements.txt
+.env
