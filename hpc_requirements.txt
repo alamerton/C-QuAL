@@ -1,0 +1,15 @@
+click @ file:///work/perseverance-python-buildout/croot/click_1698845879718/work
+joblib @ file:///croot/joblib_1713976767370/work
+nltk @ file:///work/perseverance-python-buildout/croot/nltk_1698870894961/work
+numpy==2.0.0
+pandas==2.2.2
+PyMySQL==1.1.1
+python-dateutil==2.9.0.post0
+pytz==2024.1
+regex @ file:///work/perseverance-python-buildout/croot/regex_1698863574928/work
+setuptools==69.5.1
+six==1.16.0
+tqdm @ file:///croot/tqdm_1716395931952/work
+tzdata==2024.1
+wheel==0.43.0
+xmltodict==0.13.0
