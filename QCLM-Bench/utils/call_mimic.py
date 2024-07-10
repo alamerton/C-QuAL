@@ -38,9 +38,9 @@ def call_mimic():
     results = cursor.fetchall()
     results_df = pd.DataFrame(results, columns=['subject_id', 'note'])
 
-    # Do data things
-    print(results_df)
-
     # Close the database connection
     cursor.close()
     connection.close()
+
+    # Do data things
+    return results_df
