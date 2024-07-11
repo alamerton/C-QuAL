@@ -19,7 +19,9 @@ def save_data(results): # Load query results into a dataframe containing subject
     results_df.to_csv(f'QCLM-Bench/data/mimic-iii-subset.csv')
 
 
-def call_mimic(num_queries): # Return a discharge summary from the MIMIC-III database
+def call_mimic(num_rows, destination): # Return a discharge summary from the MIMIC-III database
+    current_date = datetime.now()
+    
     # Set up DB connection
     connection = psycopg2.connect(
         host=database_host,
@@ -33,30 +35,18 @@ def call_mimic(num_queries): # Return a discharge summary from the MIMIC-III dat
     # Define and execute SQL Query
     query = f"""
     SELECT subject_id, text FROM mimiciii.noteevents
-    ORDER BY row_id ASC LIMIT {num_queries};
+    ORDER BY row_id ASC LIMIT {num_rows};
     """
     cursor.execute(query)
 
-    results = cursor.fetchone() # previously using fetchall()
-    
+    discharge_summaries = cursor.fetchall()
+    print(type(discharge_summaries))
     # Close the database connection
     cursor.close()
     connection.close()
 
     # save_data(results)
-    return results[1] # returns discharge summary only
-
-def get_summaries_for_generation(num_rows, destination):
-    start_time = time.time()
-    current_date = datetime.now()
-    discharge_summaries = []
-
-    for i in range(num_rows):
-        discharge_summary = call_mimic(num_queries=num_rows) 
-        discharge_summaries.append(discharge_summary)
-
-        print(f"{i+1}/{num_rows}")
-        # print("** %s seconds **" % round(time.time() - start_time, 1))
+    # return results[1] # returns discharge summary only
 
     if destination == 'file': # Save discharge summaries to file
         with open(f'QCLM-Bench/data/{num_rows}-discharge-summaries-{current_date}.json', 'w') as f:
