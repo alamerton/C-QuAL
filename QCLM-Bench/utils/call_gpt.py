@@ -19,7 +19,9 @@ def call_gpt(discharge_summary):
 
     model_name = "gpt-35-turbo-16k"
 
-    question = "Please create a question-answer pair out of this discharge summary to benchmark the capabilities of a question-answering large language model"
+    question = """
+    Please create a question-answer pair out of this discharge summary to benchmark the capabilities of a question-answering large language model
+    """
 
     prompt = [{
         "role": "user",
@@ -38,4 +40,4 @@ def call_gpt(discharge_summary):
         temperature=0
     )
 
-    return response.to_json()
+    return response.choices[0].message.content

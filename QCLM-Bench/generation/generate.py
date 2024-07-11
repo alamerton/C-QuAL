@@ -1,41 +1,61 @@
+from datetime import datetime
 import sys
 import os
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+import time
+from tqdm import tqdm
+
+parent_dir = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), os.pardir)
+)
 sys.path.insert(0, parent_dir)
 from utils.call_gpt import call_gpt
-from utils.call_mimic import call_mimic
+from utils.call_mimic import get_summaries_for_generation
+import pandas as pd
 
 NUMBER_OF_QA_PAIRS = 5
-SUMMARIES_DESTINATION = 'file'
+SUMMARIES_DESTINATION = "function"
+
 
 def main():
-    # discharge_summary = call_mimic()
+    # create dataframe with question and expected answer columns
+    # data = pd.DataFrame(columns=['Question', 'Correct Answer'])
+    data = pd.DataFrame(columns=['Question/Answer pair'])
 
+    print("Getting summaries for generation...")
+    discharge_summaries = get_summaries_for_generation(
+        NUMBER_OF_QA_PAIRS, SUMMARIES_DESTINATION
+    )
 
+    # For loop for generating x qa pairs
+    print("Generating QA pairs...")
+    for row in tqdm(range(NUMBER_OF_QA_PAIRS)):
+        date = datetime.now()
+        start_time = time.time()
 
-        
+        # Call LLM with discharge summary and prompt
+        question_answer_pair = call_gpt(
+            discharge_summaries[row]
+        )
 
-    question_answer_pair = call_gpt(discharge_summary)
+        # Parse the json to get the question and answer as variables
+        parts = question_answer_pair.split('\n\n')
 
-    # Probably add for loop for generating x qa pairs
-    """
-    [amount of Q-A pairs to generate = number of discharge summaries loaded from mimic]
-    this could be its own function somewhere else
-    or call_mimic could take an integer as an argument, specifying the number of discharge
-    summaries to load. Another consideration for the future is whether to feed the LLM more
-    than one discharge summary.
+        # Add Q-A pair to dataframe
+        data = pd.concat(
+            [data, pd.DataFrame([question_answer_pair])], 
+            ignore_index=True
+        )
 
-    1. for x in [amount of Q-A pairs to generate]:
-    2.      get discharge summary with call_mimic/or iterate through premade df containing discharge summaries
-    3.      call LLM with discharge summary and prompt
-    4.      add Q-A pair to dataframe
-    """
-
+        print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
+        time.sleep(10)
     
-    # Probably write dataset to output directory
+    print("Complete")
+    print(data)
 
-
-    return question_answer_pair
+    # Write dataset to output directory
+    output_path = f'QCLM-Bench/data/{NUMBER_OF_QA_PAIRS}-QA-pairs-{date}'
+    data.to_csv(f"{output_path}.csv")
+    print("Dataset saved")
 
 
 if __name__ == "__main__":

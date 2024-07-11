@@ -55,8 +55,8 @@ def get_summaries_for_generation(num_rows, destination):
         discharge_summary = call_mimic()
         discharge_summaries.append(discharge_summary)
 
-        print(f"{i}/{num_rows}")
-        print("** %s seconds" % round(time.time() - start_time, 1))
+        print(f"{i+1}/{num_rows}")
+        # print("** %s seconds" % round(time.time() - start_time, 1))
 
     if destination == 'file': # Save discharge summaries to file
         with open(f'QCLM-Bench/data/{num_rows}-discharge-summaries-{current_date}.json', 'w') as f:
