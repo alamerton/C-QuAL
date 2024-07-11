@@ -12,14 +12,15 @@ from utils.call_gpt import call_gpt
 from utils.call_mimic import get_summaries_for_generation
 import pandas as pd
 
-NUMBER_OF_QA_PAIRS = 5
+NUMBER_OF_QA_PAIRS = 2
 SUMMARIES_DESTINATION = "function"
-
 
 def main():
     # create dataframe with question and expected answer columns
     # data = pd.DataFrame(columns=['Question', 'Correct Answer'])
-    data = pd.DataFrame(columns=['Question/Answer pair'])
+    data = pd.DataFrame(
+        columns=['Discharge Summary', 'Question', 'Expected Answer']
+    )
 
     print("Getting summaries for generation...")
     discharge_summaries = get_summaries_for_generation(
@@ -30,24 +31,22 @@ def main():
     print("Generating QA pairs...")
     for row in tqdm(range(NUMBER_OF_QA_PAIRS)):
         date = datetime.now()
-        start_time = time.time()
+        
+        data_item = [discharge_summaries[row]]
 
         # Call LLM with discharge summary and prompt
-        question_answer_pair = call_gpt(
+        question_answer_string = call_gpt(
             discharge_summaries[row]
         )
 
         # Parse the json to get the question and answer as variables
-        parts = question_answer_pair.split('\n\n')
+        data_item.append(question_answer_string.split('\n'))
 
         # Add Q-A pair to dataframe
-        data = pd.concat(
-            [data, pd.DataFrame([question_answer_pair])], 
-            ignore_index=True
-        )
+        data.loc[row] = data_item
 
         print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
-        time.sleep(10)
+        time.sleep(10) 
     
     print("Complete")
     print(data)
