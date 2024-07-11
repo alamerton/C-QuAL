@@ -15,7 +15,6 @@ SUMMARIES_DESTINATION = "function"
 
 def main():
     # create dataframe with question and expected answer columns
-    # data = pd.DataFrame(columns=['Question', 'Correct Answer'])
     data = pd.DataFrame(
         columns=['Discharge Summary', 'Question', 'Expected Answer']
     )
@@ -33,18 +32,18 @@ def main():
         data_item = [discharge_summaries[row]]
 
         # Call LLM with discharge summary and prompt
-        question_answer_string = call_gpt(
+        qa_string = call_gpt(
             discharge_summaries[row]
         )
 
         # Parse the json to get the question and answer as variables
-        data_item.extend(question_answer_string.split('\n'))
+        data_item.extend(qa_string.split('\n'))
 
         # Add Q-A pair to dataframe
         data.loc[row] = data_item
 
         print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
-        # time.sleep(10) 
+        time.sleep(5)
     
     print("Complete")
     print(data)
