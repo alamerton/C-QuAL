@@ -2,6 +2,8 @@ import pandas as pd
 import psycopg2
 import os
 from dotenv import load_dotenv
+import time
+import datetime
 
 load_dotenv()
 
@@ -42,3 +44,16 @@ def call_mimic(): # Return a discharge summary from the MIMIC-III database
 
     # save_data(results)
     return results[1] # returns discharge summary only
+
+def get_summaries_for_generation(num_rows):
+    start_time = time.time()
+    d_summaries_df = pd.DataFrame()
+    
+    for i in num_rows:
+        d_summary = call_mimic()
+        d_summaries_df.add(d_summary)
+
+        print(f"{i}/{num_rows}")
+        print("** %s seconds" % round(time.time() - start_time, 1))
+
+    d_summaries_df.to_json(f'QCLM-Bench/data/{num_rows}-discharge-summaries-{datetime.now}')

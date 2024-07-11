@@ -5,16 +5,17 @@ sys.path.insert(0, parent_dir)
 from utils.call_gpt import call_gpt
 from utils.call_mimic import call_mimic
 
+NUMBER_OF_QA_PAIRS = 5
+
 def main():
     discharge_summary = call_mimic()
-    print(discharge_summary)
-    print("hello world")
-    question_answer_pair = call_gpt(discharge_summary)
-    print(question_answer_pair)
-    return question_answer_pair
-    # Probably add for loop for generating x qa pairs
-    # Probably write dataset to output directory
 
+
+        
+
+    question_answer_pair = call_gpt(discharge_summary)
+
+    # Probably add for loop for generating x qa pairs
     """
     [amount of Q-A pairs to generate = number of discharge summaries loaded from mimic]
     this could be its own function somewhere else
@@ -27,6 +28,13 @@ def main():
     3.      call LLM with discharge summary and prompt
     4.      add Q-A pair to dataframe
     """
+
+    
+    # Probably write dataset to output directory
+
+
+    return question_answer_pair
+
 
 if __name__ == "__main__":
     main()
