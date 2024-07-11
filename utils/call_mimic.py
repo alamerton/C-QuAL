@@ -14,12 +14,15 @@ database_password = os.environ.get('DATABASE_PASSWORD')
 database_name = os.environ.get('DATABASE_NAME')
 database_port = os.environ.get('DATABASE_PORT')
 
+# Flag 
+SUMMARIES_DESTINATION = "function"
+
 def save_data(results): # Load query results into a dataframe containing subject_ids and notes
     results_df = pd.DataFrame(results, columns=['subject_id', 'note'])
     results_df.to_csv(f'QCLM-Bench/data/mimic-iii-subset.csv')
 
 
-def call_mimic(num_rows, destination): # Return a discharge summary from the MIMIC-III database
+def call_mimic(num_rows): # Return a discharge summary from the MIMIC-III database
     current_date = datetime.now()
     
     # Set up DB connection
@@ -34,13 +37,13 @@ def call_mimic(num_rows, destination): # Return a discharge summary from the MIM
 
     # Define and execute SQL Query
     query = f"""
-    SELECT subject_id, text FROM mimiciii.noteevents
+    SELECT text FROM mimiciii.noteevents
     ORDER BY row_id ASC LIMIT {num_rows};
     """
+    
     cursor.execute(query)
-
     discharge_summaries = cursor.fetchall()
-    print(type(discharge_summaries))
+
     # Close the database connection
     cursor.close()
     connection.close()
@@ -48,11 +51,11 @@ def call_mimic(num_rows, destination): # Return a discharge summary from the MIM
     # save_data(results)
     # return results[1] # returns discharge summary only
 
-    if destination == 'file': # Save discharge summaries to file
+    if SUMMARIES_DESTINATION == 'file': # Save discharge summaries to file
         with open(f'QCLM-Bench/data/{num_rows}-discharge-summaries-{current_date}.json', 'w') as f:
             json.dump(discharge_summaries, f)
     
-    elif destination == 'function': # Send discharge summaries to calling function
+    elif SUMMARIES_DESTINATION == 'function': # Send discharge summaries to calling function
         return discharge_summaries
     
     else:

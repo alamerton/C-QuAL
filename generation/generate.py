@@ -10,8 +10,7 @@ sys.path.insert(0, parent_dir)
 from utils.call_gpt import call_gpt
 from utils.call_mimic import call_mimic
 
-NUMBER_OF_QA_PAIRS = 10
-SUMMARIES_DESTINATION = "function"
+NUMBER_OF_QA_PAIRS = 2
 
 def main():
     # create dataframe with question and expected answer columns
@@ -20,12 +19,9 @@ def main():
     )
 
     print("Getting summaries for generation...")
-    discharge_summaries = call_mimic(
-        NUMBER_OF_QA_PAIRS, SUMMARIES_DESTINATION
-    )
-
+    discharge_summaries = call_mimic(NUMBER_OF_QA_PAIRS)
     # For loop for generating x qa pairs
-    print("Generating QA pairs...")
+    print("Done\n\nGenerating QA pairs...")
     for row in tqdm(range(NUMBER_OF_QA_PAIRS)):
         date = datetime.now()
         
