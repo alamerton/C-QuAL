@@ -46,19 +46,23 @@ def call_mimic(): # Return a discharge summary from the MIMIC-III database
     # save_data(results)
     return results[1] # returns discharge summary only
 
-def get_summaries_for_generation(num_rows):
+def get_summaries_for_generation(num_rows, destination):
     start_time = time.time()
     current_date = datetime.now()
     discharge_summaries = []
 
     for i in range(num_rows):
         discharge_summary = call_mimic()
-        discharge_summaries.append(discharge_summary, ignore_index=True)
+        discharge_summaries.append(discharge_summary)
 
         print(f"{i}/{num_rows}")
         print("** %s seconds" % round(time.time() - start_time, 1))
 
-    with open(f'QCLM-Bench/data/{num_rows}-discharge-summaries-{current_date}.json', 'w') as f:
-        json.dump(discharge_summaries, f)
+    if destination == 'file': # Save discharge summaries to file
+        with open(f'QCLM-Bench/data/{num_rows}-discharge-summaries-{current_date}.json', 'w') as f:
+            json.dump(discharge_summaries, f)
+    
+    elif destination == 'function': # Send discharge summaries to calling function
+        return discharge_summaries
 
-get_summaries_for_generation(5)
+get_summaries_for_generation(5, 'file')
