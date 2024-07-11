@@ -15,5 +15,18 @@ def main():
     # Probably add for loop for generating x qa pairs
     # Probably write dataset to output directory
 
+    """
+    [amount of Q-A pairs to generate = number of discharge summaries loaded from mimic]
+    this could be its own function somewhere else
+    or call_mimic could take an integer as an argument, specifying the number of discharge
+    summaries to load. Another consideration for the future is whether to feed the LLM more
+    than one discharge summary.
+
+    1. for x in [amount of Q-A pairs to generate]:
+    2.      get discharge summary with call_mimic/or iterate through premade df containing discharge summaries
+    3.      call LLM with discharge summary and prompt
+    4.      add Q-A pair to dataframe
+    """
+
 if __name__ == "__main__":
     main()
