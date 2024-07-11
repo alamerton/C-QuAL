@@ -64,5 +64,6 @@ def get_summaries_for_generation(num_rows, destination):
     
     elif destination == 'function': # Send discharge summaries to calling function
         return discharge_summaries
-
-get_summaries_for_generation(5, 'file')
+    
+    else:
+        raise ValueError("Destination value must be either 'file' or 'function'")

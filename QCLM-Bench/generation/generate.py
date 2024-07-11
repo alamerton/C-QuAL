@@ -6,9 +6,11 @@ from utils.call_gpt import call_gpt
 from utils.call_mimic import call_mimic
 
 NUMBER_OF_QA_PAIRS = 5
+SUMMARIES_DESTINATION = 'file'
 
 def main():
-    discharge_summary = call_mimic()
+    # discharge_summary = call_mimic()
+
 
 
         
