@@ -19,7 +19,7 @@ def save_data(results): # Load query results into a dataframe containing subject
     results_df.to_csv(f'QCLM-Bench/data/mimic-iii-subset.csv')
 
 
-def call_mimic(): # Return a discharge summary from the MIMIC-III database
+def call_mimic(num_queries): # Return a discharge summary from the MIMIC-III database
     # Set up DB connection
     connection = psycopg2.connect(
         host=database_host,
@@ -31,9 +31,9 @@ def call_mimic(): # Return a discharge summary from the MIMIC-III database
     cursor = connection.cursor()
 
     # Define and execute SQL Query
-    query = """
+    query = f"""
     SELECT subject_id, text FROM mimiciii.noteevents
-    ORDER BY row_id ASC LIMIT 1;
+    ORDER BY row_id ASC LIMIT {num_queries};
     """
     cursor.execute(query)
 
@@ -52,7 +52,7 @@ def get_summaries_for_generation(num_rows, destination):
     discharge_summaries = []
 
     for i in range(num_rows):
-        discharge_summary = call_mimic()
+        discharge_summary = call_mimic(num_queries=num_rows) 
         discharge_summaries.append(discharge_summary)
 
         print(f"{i+1}/{num_rows}")
