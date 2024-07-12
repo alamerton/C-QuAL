@@ -53,8 +53,7 @@ def call_mimic(num_rows): # Return a discharge summary from the MIMIC-III databa
         discharge_summary = cursor.fetchone()
         discharge_summaries.append(discharge_summary)
 
-        print(f"{i+1}/{num_rows}")
-        print("** %s seconds **" % round(time.time() - start_time, 1))
+        print(f"{i+1}/{num_rows} ** %s seconds **" % round(time.time() - start_time, 1))
 
     # Close the database connection
     cursor.close()
