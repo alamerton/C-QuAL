@@ -1,13 +1,14 @@
 import tiktoken
 from call_mimic import call_mimic
 
-NUMBER_OF_QA_PAIRS = 3
-MODEL_NAME = "gpt-3.5-turbo"
+NUMBER_OF_QA_PAIRS = 1000
+MODEL_NAME = "gpt-4"
 
 def count_tokens(text, model):
-    encoder = tiktoken.encoding_for_model(model)
-    encoded_text = encoder.encode(text)
-    # print(encoded_text)
+    if "gpt-4o" in model:
+        encoder = tiktoken.get_encoding("o200k_base") # GPT-4o
+    else:
+        encoder = tiktoken.encoding_for_model(model) # GPT-3
     return len(encoder.encode(text))
 
 def calculate_average_tokens(strings):

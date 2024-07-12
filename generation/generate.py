@@ -10,7 +10,7 @@ sys.path.insert(0, parent_dir)
 from utils.call_gpt import call_gpt
 from utils.call_mimic import call_mimic
 
-NUMBER_OF_QA_PAIRS = 2
+NUMBER_OF_QA_PAIRS = 10
 
 def main():
     # create dataframe with question and expected answer columns
@@ -28,10 +28,8 @@ def main():
         data_item = [discharge_summaries[row]]
 
         # Call LLM with discharge summary and prompt
-        qa_string = call_gpt(
-            discharge_summaries[row]
-        )
-
+        qa_string = call_gpt(discharge_summaries[row])
+        
         # Parse the json to get the question and answer as variables
         data_item.extend(qa_string.split('\n'))
 
