@@ -20,18 +20,22 @@ def main():
 
     print("Getting summaries for generation...")
     discharge_summaries = call_mimic(NUMBER_OF_QA_PAIRS)
+
     # For loop for generating x qa pairs
     print("Done\n\nGenerating QA pairs...")
     for row in tqdm(range(NUMBER_OF_QA_PAIRS)):
         date = datetime.now()
         
         data_item = [discharge_summaries[row]]
-
+        print("length of data item:", len(data_item))
         # Call LLM with discharge summary and prompt
-        qa_string = call_gpt(discharge_summaries[row])
+        qa_string = call_gpt(data_item)
         
         # Parse the json to get the question and answer as variables
-        data_item.extend(qa_string.split('\n'))
+
+        #TODO: this is not robust, need to split on answer
+        # data_item.extend(qa_string.split('\n'))  
+        data_item.extend(qa_string.split('Answer'))  
 
         # Add Q-A pair to dataframe
         data.loc[row] = data_item

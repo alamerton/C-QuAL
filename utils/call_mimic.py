@@ -50,7 +50,7 @@ def call_mimic(num_rows): # Return a discharge summary from the MIMIC-III databa
     discharge_summaries = []
 
     for i in range(num_rows):
-        discharge_summary = cursor.fetchone()
+        discharge_summary = cursor.fetchone() # might be tuple
         discharge_summaries.append(discharge_summary)
 
         print(f"{i+1}/{num_rows} ** %s seconds **" % round(time.time() - start_time, 1))
