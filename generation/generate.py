@@ -35,13 +35,13 @@ def main():
         
         if INCLUDE_EXPLANATION:
             # Add Explanation column
-            data['Explanation'] = ''
+            data['Reason'] = ''
 
             # Parse the json to get the question and answer as variables
             qa_parts = qa_string.split("\n")
             question = qa_parts[0][10:]  # Remove "Question: "
             answer = qa_parts[1][8:]     # Remove "Answer: "
-            explanation = qa_parts[2][13:]  # Remove "Explanation: "
+            explanation = qa_parts[2][8:]  # Remove "Reason: " "Explanation: "
 
             # Add question and answer as tuple to data item
             data_item.extend((question, answer, explanation))
