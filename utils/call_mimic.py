@@ -38,6 +38,7 @@ def call_mimic(num_rows): # Return a discharge summary from the MIMIC-III databa
     cursor = connection.cursor()
 
     # Define and execute SQL Query
+    # TODO: could randomise sample for each generation
     query = f"""
     SELECT text FROM mimiciii.noteevents
     ORDER BY row_id ASC LIMIT {num_rows};
