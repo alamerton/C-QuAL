@@ -31,12 +31,12 @@ def main():
         data_item = [discharge_summaries[row]]
         
         # Call LLM with discharge summary and prompt
-        qa_string = call_gpt(data_item)
+        qa_string = call_gpt(data_item, INCLUDE_EXPLANATION)
         
         if INCLUDE_EXPLANATION:
             # Add Explanation column
             data['Explanation'] = ''
-            
+
             # Parse the json to get the question and answer as variables
             qa_parts = qa_string.split("\n")
             question = qa_parts[0][10:]  # Remove "Question: "

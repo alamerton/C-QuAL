@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def call_gpt(discharge_summary):
+def call_gpt(discharge_summary, include_explanation):
 
     client = AzureOpenAI(
         azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
@@ -40,11 +40,18 @@ def call_gpt(discharge_summary):
         6. Complications
         7. Abnormalities
         8. Tests the patient has undergone
+        
+        Do not create a question that is too easy to answer, only doctors 
+        should be able to answer the question. Do not create a question that 
+        can be answered without referring to the discharge summary. Your 
+        answer should also contain short rationale behind the answer.
 
         Please follow this format:
 
         Question: [Insert your clinical question here]
         Answer: [Insert the corresponding answer here]
+        {"Reason: [Explanation for your answer]" if include_explanation == True
+          else None}
 
         Examples of clinically relevant questions:
         - What was the primary diagnosis for the patient? (Diagnosis)
@@ -66,7 +73,6 @@ def call_gpt(discharge_summary):
         - What time was the patient admitted? (Unless it impacts clinical 
         decisions)
 
-        Do not create a question that is too easy to answer, only doctors should be able to answer the question. Do not create a question that can be answered without referring to the discharge summary.
 
         Here is the discharge summary for you to work on:
 
