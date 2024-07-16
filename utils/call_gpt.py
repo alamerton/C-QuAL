@@ -66,6 +66,8 @@ def call_gpt(discharge_summary):
         - What time was the patient admitted? (Unless it impacts clinical 
         decisions)
 
+        Do not create a question that is too easy to answer, only doctors should be able to answer the question. Do not create a question that can be answered without referring to the discharge summary.
+
         Here is the discharge summary for you to work on:
 
         {discharge_summary}

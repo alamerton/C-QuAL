@@ -10,7 +10,8 @@ sys.path.insert(0, parent_dir)
 from utils.call_gpt import call_gpt
 from utils.call_mimic import call_mimic
 
-NUMBER_OF_QA_PAIRS = 10
+NUMBER_OF_QA_PAIRS = 1
+INCLUDE_EXPLANATION = True
 
 def main():
     # create dataframe with question and expected answer columns
@@ -32,20 +33,40 @@ def main():
         # Call LLM with discharge summary and prompt
         qa_string = call_gpt(data_item)
         
-        # Parse the json to get the question and answer as variables
-        qa_parts = qa_string.split("\nAnswer: ")
-        question = qa_parts[0].replace("Question: ", "").strip()
-        answer = qa_parts[1].strip()
+        if INCLUDE_EXPLANATION:
+            # Add Explanation column
+            data['Explanation'] = ''
+            
+            # Parse the json to get the question and answer as variables
+            qa_parts = qa_string.split("\n")
+            question = qa_parts[0][10:]  # Remove "Question: "
+            answer = qa_parts[1][8:]     # Remove "Answer: "
+            explanation = qa_parts[2][13:]  # Remove "Explanation: "
 
-        # Add question and answer as tuple to data item
-        data_item.extend((question, answer))
+            # Add question and answer as tuple to data item
+            data_item.extend((question, answer, explanation))
 
-        # Add Q-A pair to dataframe
-        data.loc[row] = data_item
+            # Add Q-A pair to dataframe
+            data.loc[row] = data_item
 
-        # Output message to terminal
-        print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
-        time.sleep(5)
+            # Output message to terminal
+            print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
+            time.sleep(5)
+        else:
+            # Parse the json to get the question and answer as variables
+            qa_parts = qa_string.split("\nAnswer: ")
+            question = qa_parts[0].replace("Question: ", "").strip()
+            answer = qa_parts[1].strip()
+
+            # Add question and answer as tuple to data item
+            data_item.extend((question, answer))
+
+            # Add Q-A pair to dataframe
+            data.loc[row] = data_item
+
+            # Output message to terminal
+            print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
+            time.sleep(5)
     
     print("Complete")
     print(data)
