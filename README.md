@@ -1,5 +1,5 @@
 # MSc Individual Project - Production of a New Clinical QA Benchmarking Dataset
-This is the repo for my MSc individual project: _QCLM-Bench: a **Q**uestion answering **C**linical **L**arge language **M**odel **Bench**marking dataset_. This repo contains the code for generating the dataset.
+This is the repo for my MSc individual project: CQuAL: a **C**linical **Qu**estion **A**nswering **L**arge Language Model Benchmarking Dataset. This repo contains the code for generating the dataset.
 ## Broad Scope of the Project
 I am part of a team of 5 MSc students working on a project with the goal of developing a large language model (LLM) that can be deployed in clinical settings to assist with the decision reasoning of clinicians. Clinicians spend too much time manually reasoning about decisions when much of it can be automated thanks to the abundance of clinical data in electronic health records (EHR). An LLM can be fine-tuned to assist with that decision reasoning and decision making, reducing the amount of time clinicians would need to spend on it. At scale, this could significantly improve clinical processes.
 ## A Better Dataset Can be Created

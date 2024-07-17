@@ -11,7 +11,7 @@ from utils.call_gpt import call_gpt
 from utils.call_mimic import call_mimic
 
 NUMBER_OF_QA_PAIRS = 10
-INCLUDE_EXPLANATION = False
+INCLUDE_EXPLANATION = True
 
 def main():
     # create dataframe with question and expected answer columns
