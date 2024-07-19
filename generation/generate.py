@@ -10,6 +10,7 @@ sys.path.insert(0, parent_dir)
 from utils.call_gpt import call_gpt
 from utils.call_mimic import call_mimic
 
+# SAVE_TO_HF_NOT_LOCALLY = False #TODO
 NUMBER_OF_QA_PAIRS = 1
 INCLUDE_EXPLANATION = True
 
