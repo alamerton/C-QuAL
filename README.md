@@ -9,5 +9,5 @@ LLMs can be fine-tuned to be useful assistants in clinical decision reasoning, b
 1. Implementing a dataset generation framework roughly equivalent to the framework presented in the [EHRNoteQA paper](https://github.com/ji-youn-kim/EHRNoteQA)
 2. Modifying the framework to create a dataset using the MIMIC-III data
 3. Developing the dataset based on the comparative analysis of the other major clinical QA benchmarking datasets, addressing their flaws
-4. Augmenting and expanding the dataset using LLMs. Techniques I am currently considering for question-answer generation and annotation are retrieval-augmented generation (RAG) and scalable oversight
+4. Annotating the QA dataset (the plan being to partly leverage scalable oversight with GPT-4, and partly outsource expert annotation to clinicians, comparing the quality of the resulting annotations)
 5. Benchmarking the clinical QA capabilities of LLMs, in terms of decision reasoning using electronic health records, using the dataset
