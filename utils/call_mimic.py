@@ -19,7 +19,7 @@ SUMMARIES_DESTINATION = "function"
 
 def save_data(results): # Load query results into a dataframe containing subject_ids and notes
     results_df = pd.DataFrame(results, columns=['subject_id', 'note'])
-    results_df.to_csv(f'QCLM-Bench/data/mimic-iii-subset.csv')
+    results_df.to_csv(f'C-QuAL/data/mimic-iii-subset.csv')
 
 
 def call_mimic(num_rows): # Return a discharge summary from the MIMIC-III database
@@ -61,7 +61,7 @@ def call_mimic(num_rows): # Return a discharge summary from the MIMIC-III databa
     connection.close()
 
     if SUMMARIES_DESTINATION == 'file': # Save discharge summaries to file
-        with open(f'QCLM-Bench/data/{num_rows}-discharge-summaries-{current_date}.json', 'w') as f:
+        with open(f'C-QuAL/data/{num_rows}-discharge-summaries-{current_date}.json', 'w') as f:
             json.dump(discharge_summaries, f)
     
     elif SUMMARIES_DESTINATION == 'function': # Send discharge summaries to calling function
