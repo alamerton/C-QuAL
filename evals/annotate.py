@@ -34,10 +34,14 @@ SAVE_LOCALLY = True
 #     ds = load_dataset(dataset_url)
 #     return ds
 
+#TODO: put in general utils instead
+
 def load_dataset_from_csv(path):
     df = pd.read_csv(path)
     # column names should already exist
     return df
+
+#TODO: put in general utils instead
 
 def save_dataset(dataset, local: bool):
     date = datetime.now()
@@ -48,8 +52,8 @@ def save_dataset(dataset, local: bool):
 
 
 def annotate_dataset(dataset_path, local: bool = False):
-    # TODO: make better conditional inference on local flag e.g. string parse
     print("Loading dataset")
+    # TODO: make better conditional inference on local flag e.g. string parse
     # if local == False:
     #     # not sure if I can make a type assignment like this since df is class
     #     dataset: pd.DataFrame = load_dataset_from_hf(dataset_path)
@@ -58,12 +62,10 @@ def annotate_dataset(dataset_path, local: bool = False):
 
     dataset: pd.DataFrame = load_dataset_from_csv(dataset_path)
 
-    # dataset['Annotation'] = None # can probably remove
-
     for _, row in tqdm(
         dataset.iterrows(),
         total = len(dataset),
-        desc=f'Annotating dataset'
+        desc='Annotating dataset'
         ):
         # Call the LLM with the row and prompt
         
