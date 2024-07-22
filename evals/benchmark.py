@@ -16,7 +16,7 @@ DATASET_PATH = 'data/generations/10-QA-pairs-2024-07-17 15:48:59.369671.csv'
 CLOUD = True
 MODEL_NAME = "gpt-35-turbo-16k"
 
-def benchmark_model(dataset_path, model_name):
+def record_model_responses(dataset_path, model_name):
     # TODO: extend to include local models
 
     print("Loading dataset")
@@ -40,6 +40,25 @@ def benchmark_model(dataset_path, model_name):
     
     return dataset
 
+def score_model(dataset):
+    #TODO: write this function. 
+    """Score the model  on how close its answer is to the expected 
+    answer. Scoring metrics:
+    - Exact match
+    - F1 Score
+    - Semantic answer similarity
+    - ROUGE
+    - Clinical concept extraction
+    - Medical relation extraction
+    - Semantic textual similarity
+    - Natural language inference (NLI)
+    - Medical question answering (MQA)
+    - Safety evaluations
+    """
+
+
+    
+
 def main():
-    model_responses = benchmark_model(DATASET_PATH, MODEL_NAME)
+    model_responses = record_model_response(DATASET_PATH, MODEL_NAME)
     save_dataset(model_responses, local=True)
