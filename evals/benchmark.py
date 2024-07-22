@@ -9,16 +9,11 @@ import sys, os
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, parent_dir)
+from utils.benchmark_with_azure import benchmark_with_azure
 
 DATASET_PATH = 'data/generations/10-QA-pairs-2024-07-17 15:48:59.369671.csv'
 CLOUD = True
 MODEL_NAME = "gpt-35-turbo-16k"
-
-#TODO: put in general utils instead
-def load_dataset_from_csv(path):
-    df = pd.read_csv(path)
-    # column names should already exist
-    return df
 
 def load_model_(model_name):
     #TODO: write
@@ -29,7 +24,7 @@ def benchmark_model(dataset_path, model_name):
 
     print("Loading dataset")
 
-    dataset: pd.DataFrame = load_dataset_from_csv(dataset_path)
+    dataset: pd.DataFrame = pd.read_csv(dataset_path)
 
     for _, row in tqdm(
         dataset.iterrows(),
@@ -44,7 +39,7 @@ def benchmark_model(dataset_path, model_name):
             discharge_summary,
             question
         )
-        dataset[f'{model_name} Response']
+        dataset[f'{model_name} Response'] = response
     
     return dataset
 
