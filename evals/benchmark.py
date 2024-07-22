@@ -55,8 +55,6 @@ def score_model(dataset):
     - Medical question answering (MQA)
     - Safety evaluations
     """
-
-
     
 
 def main():
