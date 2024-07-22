@@ -19,9 +19,10 @@ def call_gpt(discharge_summary, include_explanation):
         api_version=os.getenv("AZURE_API_VERSION"),
     )
 
-    system_message = """You are an expert medical professional tasked with 
-    creating clinically relevant question-answer pairs based on a discharge 
-    summary from the MIMIC-III database."""
+    system_message = """You are an expert medical professional tasked
+    with creating clinically relevant question-answer pairs based on a
+    discharge summary from the MIMIC-III database."""
+    
     if include_explanation:
         user_prompt = f"""
             You are given a discharge summary from the MIMIC-III database. 
@@ -137,9 +138,8 @@ def call_gpt(discharge_summary, include_explanation):
             above discharge summary.
         """
 
-
     response = client.chat.completions.create(
-        model=model_name,
+        model=QA_GENERATION_MODEL,
         messages=[
             {"role": "system", "content": system_message},
             {"role": "user", "content": user_prompt},

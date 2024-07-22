@@ -73,7 +73,7 @@ def main():
     print(data)
 
     # Write dataset to output directory
-    output_path = f'data/{NUMBER_OF_QA_PAIRS}-QA-pairs-{date}'
+    output_path = f'data/generations/{NUMBER_OF_QA_PAIRS}-QA-pairs-{date}'
     data.to_csv(f"{output_path}.csv")
     print("Dataset saved")
 
