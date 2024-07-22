@@ -9,7 +9,7 @@ import sys, os
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, parent_dir)
-from utils.benchmark_with_azure import benchmark_with_azure
+from utils.evals.benchmark_with_azure import benchmark_with_azure
 from utils.misc import save_dataset
 
 DATASET_PATH = 'data/generations/10-QA-pairs-2024-07-17 15:48:59.369671.csv'

@@ -1,5 +1,5 @@
 import tiktoken
-from call_mimic import call_mimic
+from utils.generation.call_mimic import call_mimic
 
 NUMBER_OF_QA_PAIRS = 1000
 MODEL_NAME = "gpt-4"
@@ -11,12 +11,12 @@ def count_tokens(text, model):
         encoder = tiktoken.encoding_for_model(model) # GPT-3
     return len(encoder.encode(text))
 
-def calculate_average_tokens(strings):
+def calculate_average_tokens(strings, model_name=MODEL_NAME):
     total_tokens = 0
     for string in strings:
         if type(string) == tuple: # Hacky way to stop the tuple problem
             string = str(string)
-        total_tokens += count_tokens(string, MODEL_NAME)
+        total_tokens += count_tokens(string, model_name)
     average_tokens = total_tokens / len(strings)
     return average_tokens
 

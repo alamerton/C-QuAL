@@ -24,7 +24,7 @@ from tqdm import tqdm
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, parent_dir)
-from utils.annotate_with_gpt import annotate_with_gpt
+from utils.evals.annotate_with_gpt import annotate_with_gpt
 from utils.misc import save_dataset
 
 #TODO: place in some environment variables place instead of in code
