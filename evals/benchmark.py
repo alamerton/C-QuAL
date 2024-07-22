@@ -10,14 +10,11 @@ import sys, os
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, parent_dir)
 from utils.benchmark_with_azure import benchmark_with_azure
+from utils.misc import save_dataset
 
 DATASET_PATH = 'data/generations/10-QA-pairs-2024-07-17 15:48:59.369671.csv'
 CLOUD = True
 MODEL_NAME = "gpt-35-turbo-16k"
-
-def load_model_(model_name):
-    #TODO: write
-    return True
 
 def benchmark_model(dataset_path, model_name):
     # TODO: extend to include local models
@@ -45,3 +42,4 @@ def benchmark_model(dataset_path, model_name):
 
 def main():
     model_responses = benchmark_model(DATASET_PATH, MODEL_NAME)
+    save_dataset(model_responses, local=True)
