@@ -21,7 +21,7 @@ def load_model_(model_name):
     return True
 
 def benchmark_model(dataset_path, model_name):
-    # TODO: make conditional inference for cloud or local model
+    # TODO: extend to include local models
 
     print("Loading dataset")
 
@@ -46,3 +46,4 @@ def benchmark_model(dataset_path, model_name):
 
 def main():
     model_responses = benchmark_model(DATASET_PATH, MODEL_NAME)
+    
