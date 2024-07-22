@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+model_name = "gpt-35-turbo-16k"
+
 def call_gpt(discharge_summary, include_explanation):
 
     client = AzureOpenAI(
@@ -16,8 +18,6 @@ def call_gpt(discharge_summary, include_explanation):
         api_key=os.getenv("AZURE_OPENAI_KEY"),
         api_version=os.getenv("AZURE_API_VERSION"),
     )
-
-    model_name = "gpt-35-turbo-16k"
 
     system_message = """You are an expert medical professional tasked with 
     creating clinically relevant question-answer pairs based on a discharge 

@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+ANNOTATION_MODELS = "gpt-35-turbo-16k"
+
 def annotate_with_gpt(
         discharge_summary,
         question,
