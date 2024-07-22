@@ -25,6 +25,7 @@ from tqdm import tqdm
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, parent_dir)
 from utils.annotate_with_gpt import annotate_with_gpt
+from utils.misc import save_dataset
 
 #TODO: place in some environment variables place instead of in code
 DATASET_PATH = 'data/generations/10-QA-pairs-2024-07-17 15:48:59.369671.csv'
@@ -33,23 +34,6 @@ SAVE_LOCALLY = True
 # def load_dataset_from_hf(dataset_url):
 #     ds = load_dataset(dataset_url)
 #     return ds
-
-#TODO: put in general utils instead
-
-def load_dataset_from_csv(path):
-    df = pd.read_csv(path)
-    # column names should already exist
-    return df
-
-#TODO: put in general utils instead
-
-def save_dataset(dataset, local: bool):
-    date = datetime.now()
-    rows = len(dataset)
-    # TODO: add model name to file name
-    output_path = f'data/annotations/{rows}-QA-pairs-{date}'
-    dataset.to_csv(f"{output_path}.csv")
-
 
 def annotate_dataset(dataset_path, local: bool = False):
     print("Loading dataset")
@@ -60,7 +44,7 @@ def annotate_dataset(dataset_path, local: bool = False):
     # elif local == True:
     #     dataset: pd.DataFrame = load_dataset_from_csv(dataset_path)
 
-    dataset: pd.DataFrame = load_dataset_from_csv(dataset_path)
+    dataset: pd.DataFrame = pd.read_csv(dataset_path)
 
     for _, row in tqdm(
         dataset.iterrows(),
