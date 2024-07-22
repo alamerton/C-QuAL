@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-model_name = "gpt-35-turbo-16k"
+QA_GENERATION_MODEL = "gpt-35-turbo-16k"
 
 def call_gpt(discharge_summary, include_explanation):
 
