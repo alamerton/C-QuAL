@@ -5,6 +5,10 @@ the answer to a copy of the dataset with a model answer column.
 """
 import pandas as pd
 from tqdm import tqdm
+import sys, os
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, parent_dir)
 
 DATASET_PATH = 'data/generations/10-QA-pairs-2024-07-17 15:48:59.369671.csv'
 CLOUD = True
@@ -46,4 +50,3 @@ def benchmark_model(dataset_path, model_name):
 
 def main():
     model_responses = benchmark_model(DATASET_PATH, MODEL_NAME)
-    
