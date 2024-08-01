@@ -45,9 +45,10 @@ def call_gpt(discharge_summary, include_explanation):
             The question should also be one of the following types:
             1. Yes/No/Maybe
             2. Unanswerable
-            3. Factual
-            4. Diagnostic
-            5. Treatment
+            3. Temporal
+            4. Factual
+            5. Summarisation
+            6. Identification
 
             Do not create a question that is too easy to answer, only doctors 
             should be able to answer the question. Do not create a question that 
