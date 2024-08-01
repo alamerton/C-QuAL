@@ -18,7 +18,10 @@ def main():
         columns=['Discharge Summary', 'Question', 'Expected Answer']
     )
 
-    print("Getting summaries for generation...")
+    print(f"Getting summaries for generation of {
+        NUMBER_OF_QA_PAIRS
+        } Q-A pairs...")
+    
     discharge_summaries = call_mimic(NUMBER_OF_QA_PAIRS)
 
     # For loop for generating qa pairs
@@ -40,10 +43,16 @@ def main():
             qa_parts = qa_string.split("\n")
             question = qa_parts[0][10:]  # Remove "Question: "
             answer = qa_parts[1][8:]     # Remove "Answer: "
-            explanation = qa_parts[2][8:]  # Remove "Reason: " "Explanation: "
+            explanation = qa_parts[2][8:]  # Remove "Reason: "
+            question_type = qa_parts[3][6:] # Remove "Type: "
 
             # Add question and answer as tuple to data item
-            data_item.extend((question, answer, explanation))
+            data_item.extend((
+                question,
+                answer,
+                explanation,
+                question_type
+                ))
 
             # Add Q-A pair to dataframe
             data.loc[row] = data_item
@@ -53,9 +62,10 @@ def main():
             time.sleep(5)
         else:
             # Parse the json to get the question and answer as variables
-            qa_parts = qa_string.split("\nAnswer: ")
-            question = qa_parts[0].replace("Question: ", "").strip()
-            answer = qa_parts[1].strip()
+            qa_parts = qa_string.split("\n")
+            question = qa_parts[0][10:]  # Remove "Question: "
+            answer = qa_parts[1][8:]     # Remove "Answer: "
+            question_type = qa_parts[2][6:] # Remove "Type: "
 
             # Add question and answer as tuple to data item
             data_item.extend((question, answer))

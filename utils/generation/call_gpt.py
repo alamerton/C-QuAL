@@ -41,17 +41,25 @@ def call_gpt(discharge_summary, include_explanation):
             6. Complications
             7. Abnormalities
             8. Tests the patient has undergone
-            
+
+            The question should also be one of the following types:
+            1. Yes/No/Maybe
+            2. Unanswerable
+            3. Factual
+            4. Diagnostic
+            5. Treatment
+
             Do not create a question that is too easy to answer, only doctors 
             should be able to answer the question. Do not create a question that 
             can be answered without referring to the discharge summary. Your 
-            answer should also contain short rationale behind the answer.
+            answer should also contain short rationale behind the answer.w
 
             Please follow this format:
 
             Question: [Insert your clinical question here]
             Answer: [Insert the corresponding answer here]
             Reason: [Explanation for your answer]
+            Type: [Your chosen question type from the list]
 
             Examples of clinically relevant questions:
             - What was the primary diagnosis for the patient? (Diagnosis)
@@ -108,6 +116,7 @@ def call_gpt(discharge_summary, include_explanation):
 
             Question: [Insert your clinical question here]
             Answer: [Insert the corresponding answer here]
+            Type: [Your chosen question type from the list]
             
             Examples of clinically relevant questions:
             - What was the primary diagnosis for the patient? (Diagnosis)

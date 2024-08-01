@@ -2,6 +2,9 @@
 This script should load an annotated or unannotated dataset, and perform
 analysis on the datasets to get scores for each analysis method, saving
 the analysis results to a CSV file.
+
+TODO: it could also be useful creating notebooks to run which display
+graphs quickly
 """
 
 import pandas as pd
@@ -21,80 +24,85 @@ READABILITY_METRIC = 'flesch_reading_ease'
 def get_number_of_qa_pairs(df: pd.DataFrame):
     return df.apply(len)
 
-def get_question_types(question: str):
-    if "how" in question.lower():
-        return "P"
-    elif "what" in question.lower():
-        return "F"
-    elif "why" in question.lower():
-        return "E"
-    else:
-        return "O"
+# def get_question_types(question: str):
+#     if "how" in question.lower():
+#         return "P"
+#     elif "what" in question.lower():
+#         return "F"
+#     elif "why" in question.lower():
+#         return "E"
+#     else:
+#         return "O"
     
-def get_readability(df: pd.DataFrame, method: str):
-    if method == 'flesch_reading_ease':
-        return df['Question'].apply(textstat.flesch_reading_ease).mean()
-    elif method == 'gunning-fog':
-        return df['Question'].apply(textstat.gunning_fog).mean()
-    elif method == 'smog':
-        return df['Question'].apply(textstat.smog_index).mean()
-    else:
-        return ValueError('Unknown readability metric')
+# def get_question_length(df: pd.DataFrame):
+#     return df['Question'].apply(len).mean()
 
-def get_question_length(df: pd.DataFrame):
-    return df['Question'].apply(len).mean()
 
-def get_topic_distribution(df: pd.DataFrame):
-    # Vectorize the text data
-    vectorizer = CountVectorizer(stop_words='english')
-    X = vectorizer.fit_transform(df['Discharge Summary'])
+def get_question_categories(df: pd.DataFrame):
+    """
+    Given a dataset, return the number of questions that fit into each
+    of the following categories: treatment, assessment, diagnosis, 
+    problem or complication, abnormality, etiology, and medical history
+    """
+    # for each question, add 1 to score of each category for categories
+    # the question fits into
+    
+    treatment, assessment, diagnosis, problem_complication, \
+    abnormality, etiology, medical_history = 0
 
-    # Apply LDA
-    lda = LatentDirichletAllocation(n_components=5, random_state=42)
-    lda.fit(X)
+    for question in df['Question']:
+        if 
 
-    # Assign topics
-    df['Topic'] = lda.transform(X).argmax(axis=1)
+def get_question_types(df: pd.DataFrame):
+    """
+    Given a datset, return the total number of rows for each question
+    type
+    """
+    return False
 
-    # Count the topics
-    topic_counts = df['Topic'].value_counts().mean()
-    return topic_counts
+def get_category_distribution():
+    """
+    Given a list of categories and a dataset, return the proportion of 
+    questions in the dataset that fit into each category
+    """
+    return False
 
-def return_dataset_metadata(dataset_path):
-    metadata = pd.DataFrame()
+# Return a dataframe containing analysis results for a given dataset
+
+def get_dataset_statistics(dataset_path):
+    statistics = pd.DataFrame()
     dataset = pd.read_csv(dataset_path)
     dataset_length = len(dataset)
     # size of QA pairs
-    metadata['Number of QA Pairs'] = dataset_length
-    metadata['Flesch Reading Ease'] = get_readability(
+    statistics['Number of QA Pairs'] = dataset_length
+    statistics['Flesch Reading Ease'] = get_readability(
         dataset,
         READABILITY_METRIC
     )
-    metadata['Question Length'] = get_question_length(dataset)
-    metadata['Topic Distribution'] = get_topic_distribution(dataset)
-    metadata["Procedural Questions"] = 0 #TODO: refactor
-    metadata["Factual Questions"] = 0
-    metadata["Explanatory Questions"] = 0
-    metadata['Other Questions'] = 0
+    statistics['Topic Distribution'] = get_topic_distribution(dataset) # use mesh
+    statistics["Procedural Questions"] = 0 #TODO: refactor
+    statistics["Factual Questions"] = 0
+    statistics["Explanatory Questions"] = 0
+    statistics['Other Questions'] = 0
     
     for _, row in tqdm(dataset.iterrows()):
         # TODO: how can I do this operation faster?
         # types of QA pairs
         if get_question_types(row['Question']) == "P":
-            metadata["Procedural Questions"] += 1
+            statistics["Procedural Questions"] += 1
         elif get_question_types(row['Question']) == "F":
-            metadata["Factual Questions"] += 1
+            statistics["Factual Questions"] += 1
         elif get_question_types(row['Question']) == "E":
-            metadata["Explanatory Questions"] += 1
+            statistics["Explanatory Questions"] += 1
         elif get_question_types(row['Question']) == "O":
-            metadata["Other Questions"] += 1
+            statistics["Other Questions"] += 1
         else:
             return ValueError("Unrecognised question type")
     
-    return metadata
+    return statistics
         
 def main():
-    data = return_dataset_metadata(DATASET_PATH)
+    data = return_dataset_statistics(DATASET_PATH)
     name = DATASET_PATH.split("/")[-1]
     output_path = f'data/analysis/dataset-{name}-analysed-at-{datetime.now()}'
     # data.to_csv(f"{output_path}.csv")

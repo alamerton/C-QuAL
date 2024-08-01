@@ -58,5 +58,5 @@ def score_model(dataset):
     
 
 def main():
-    model_responses = record_model_response(DATASET_PATH, MODEL_NAME)
-    save_dataset(model_responses, local=True)
+    model_responses = record_model_responses(DATASET_PATH, MODEL_NAME)
+    save_dataset(model_responses, local=True) #TODO: pass argument to save in model responses directory in data

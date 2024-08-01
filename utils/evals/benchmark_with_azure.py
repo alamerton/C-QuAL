@@ -24,7 +24,7 @@ def benchmark_with_azure(
 
     user_prompt = f"""
         Your task is to answer a clinical question based on the 
-        following discharge sumamry:\n{discharge_summary}\n\n
+        following discharge summary:\n{discharge_summary}\n\n
         You should give an answer and a reason for your answer in the 
         following format:
         Answer: [your answer]
