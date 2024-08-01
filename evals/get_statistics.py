@@ -113,7 +113,7 @@ def get_question_complexity(df: pd.DataFrame):
 # Return a dataframe containing analysis results for a given dataset
 
 
-def get_dataset_statistics(dataset_path):
+def get_statistics(dataset_path):
     dataset = pd.read_csv(dataset_path)
     dataset_length = len(dataset)
     dataset = get_question_types(dataset)
@@ -136,7 +136,7 @@ def get_dataset_statistics(dataset_path):
 
 
 def main():
-    data = get_dataset_statistics(DATASET_PATH)
+    data = get_statistics(DATASET_PATH)
     name = DATASET_PATH.split("/")[-1]
     output_path = f"data/analysis/dataset-{name}-analysed-at-{datetime.now()}"
     # data.to_csv(f"{output_path}.csv")
