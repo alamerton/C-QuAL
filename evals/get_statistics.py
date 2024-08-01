@@ -81,28 +81,6 @@ def get_question_categories(df: pd.DataFrame):
         medical_history,
     )
 
-
-def get_question_types(df: pd.DataFrame):
-    """
-    Given a datset, return the total number of rows for each question
-    type
-    """
-    question_types = [
-        "Yes/No/Maybe",
-        "Unanswerable",
-        "Temporal",
-        "Factual",
-        "Summarisation",
-        "Identification",
-    ]
-    for question_type in question_types:
-        df[f"Number of {question_type} Questions"] = df["Type"].str.count(
-            question_type
-        )
-    
-    return 
-
-
 def get_question_complexity(df: pd.DataFrame):
     """
     Use bleu ideally with a library and return mean
@@ -118,6 +96,13 @@ def get_statistics(dataset_path):
     dataset_length = len(dataset)
     dataset = get_question_types(dataset)
 
+    yes_no_maybe_qs = dataset["Question Types"].str.count("Yes/No/Maybe")
+    unanswerable_qs = dataset["Question Types"].str.count("Unanswerable")
+    temporal_qs = dataset["Question Types"].str.count("Temporal")
+    factual_qs = dataset["Question Types"].str.count("Factual")
+    summarisation_qs = dataset["Question Types"].str.count("Summarisation")
+    identification_qs = dataset["Question Types"].str.count("Identification")
+
     statistics = pd.DataFrame(
         {
             "Metric": [
@@ -126,9 +111,25 @@ def get_statistics(dataset_path):
                 "BLEU Complexity",
                 "Topic Distribution",
                 "Coverage of Clinical Concepts",
+                "Yes/No/Maybe Questions",
+                "Unanswerable Questions",
+                "Temporal Questions",
+                "Factual Questions",
+                "Summarisation Questions",
+                "Identification Questions",
             ],
             "Value": [
                 dataset_length,
+                0,
+                0,
+                0,
+                0,
+                yes_no_maybe_qs,
+                unanswerable_qs,
+                temporal_qs,
+                factual_qs,
+                summarisation_qs,
+                identification_qs,
             ],
         }
     )
