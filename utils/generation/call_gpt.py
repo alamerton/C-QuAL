@@ -49,10 +49,12 @@ def call_gpt(discharge_summary):
         5. Summarisation
         6. Identification
 
-        Do not create a question that is too easy to answer, only doctors 
+        Your response should also contain short rationale behind the answer 
+        detailing the reason why the answer is correct.
+
+        Do not create a question that is too easy to answer, only clinicians 
         should be able to answer the question. Do not create a question that 
-        can be answered without referring to the discharge summary. Your 
-        answer should also contain short rationale behind the answer.w
+        can be answered without referring to the discharge summary.
 
         Please follow this format:
 
@@ -96,7 +98,7 @@ def call_gpt(discharge_summary):
             {"role": "system", "content": system_message},
             {"role": "user", "content": user_prompt},
         ],
-        max_tokens=600,
+        max_tokens=800,
         temperature=0,
     )
 

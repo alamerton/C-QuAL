@@ -9,7 +9,7 @@ from utils.generation.call_gpt import call_gpt
 from utils.generation.call_mimic import call_mimic
 
 # SAVE_TO_HF_NOT_LOCALLY = False #TODO
-NUMBER_OF_QA_PAIRS = 10
+NUMBER_OF_QA_PAIRS = 3
 
 def main():
     # create dataframe with question and expected answer columns
@@ -35,6 +35,7 @@ def main():
 
         # Parse the json to get the question and answer as variables
         qa_parts = qa_string.split("\n")
+        print(qa_parts)
         question = qa_parts[0][10:]  # Remove "Question: "
         answer = qa_parts[1][8:]     # Remove "Answer: "
         explanation = qa_parts[2][8:]  # Remove "Reason: "
