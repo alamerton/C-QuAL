@@ -98,7 +98,7 @@ def call_gpt(discharge_summary):
             {"role": "system", "content": system_message},
             {"role": "user", "content": user_prompt},
         ],
-        max_tokens=800,
+        max_tokens=1024,
         temperature=0,
     )
 
