@@ -9,13 +9,13 @@ from utils.generation.call_gpt import call_gpt
 from utils.generation.call_mimic import call_mimic
 
 # SAVE_TO_HF_NOT_LOCALLY = False #TODO
-NUMBER_OF_QA_PAIRS = 1
+NUMBER_OF_QA_PAIRS = 10
 INCLUDE_EXPLANATION = True
 
 def main():
     # create dataframe with question and expected answer columns
     data = pd.DataFrame(
-        columns=['Discharge Summary', 'Question', 'Expected Answer']
+        columns=['Discharge Summary', 'Question', 'Expected Answer', 'Type']
     )
 
     print(f"Getting summaries for generation of {
@@ -25,7 +25,7 @@ def main():
     discharge_summaries = call_mimic(NUMBER_OF_QA_PAIRS)
 
     # For loop for generating qa pairs
-    print("Done\n\nGenerating QA pairs...")
+    print("Done\n\nGenerating Q-A pairs...")
     for row in tqdm(range(NUMBER_OF_QA_PAIRS)):
         date = datetime.now()
 
