@@ -38,8 +38,8 @@ def main():
         print(qa_parts)
         question = qa_parts[0][10:]  # Remove "Question: "
         answer = qa_parts[1][8:]     # Remove "Answer: "
-        explanation = qa_parts[2][8:]  # Remove "Reason: "
-        question_type = qa_parts[3][6:] # Remove "Type: "
+        question_type = qa_parts[2][6:] # Remove "Type: "
+        explanation = qa_parts[3][8:]  # Remove "Reason: "
 
         # Add question and answer as tuple to data item
         data_item.extend((

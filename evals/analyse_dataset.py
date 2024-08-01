@@ -14,7 +14,7 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
 from utils.evals.categorise_with_gpt import categorise_with_gpt
 
-DATASET_PATH = "data/generations/10-QA-pairs-2024-07-17 15:48:59.369671.csv"
+DATASET_PATH = "data/generations/3-QA-pairs-2024-08-01 13:49:15.609569.csv"
 
 
 def get_question_categories(df: pd.DataFrame):
@@ -99,6 +99,7 @@ def get_question_types(df: pd.DataFrame):
         df[f"Number of {question_type} Questions"] = df["Type"].str.count(
             question_type
         )
+    
     return 
 
 

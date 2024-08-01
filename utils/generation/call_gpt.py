@@ -49,8 +49,8 @@ def call_gpt(discharge_summary):
         5. Summarisation
         6. Identification
 
-        Your response should also contain short rationale behind the answer 
-        detailing the reason why the answer is correct.
+        Your response should also contain short, one-sentence rationale behind 
+        the answer detailing the reason why the answer is correct.
 
         Do not create a question that is too easy to answer, only clinicians 
         should be able to answer the question. Do not create a question that 
@@ -60,8 +60,8 @@ def call_gpt(discharge_summary):
 
         Question: [Insert your clinical question here]
         Answer: [Insert the corresponding answer here]
-        Reason: [Explanation for your answer]
-        Type: [Your chosen question type from the list]
+        Type: [Your chosen question type from the list, spelled the same]
+        Reason: [Short explanation for your answer]
 
         Examples of clinically relevant questions:
         - What was the primary diagnosis for the patient? (Diagnosis)
@@ -98,7 +98,7 @@ def call_gpt(discharge_summary):
             {"role": "system", "content": system_message},
             {"role": "user", "content": user_prompt},
         ],
-        max_tokens=1024,
+        max_tokens=999,
         temperature=0,
     )
 
