@@ -7,20 +7,23 @@ import nltk
 from sentence_transformers import SentenceTransformer, util
 from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu
+import spacy
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
 from utils.evals.benchmark_with_azure import benchmark_with_azure
 from utils.misc import save_dataset
 
+DATASET_PATH = "data/generations/3-QA-pairs-2024-08-01 14:04:41.574896.csv"
+MODEL_NAME = "gpt-35-turbo-16k"
+
 nltk.download("punkt")
 sas_model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
 rouge = Rouge()
+nlp = spacy.load("en_core_sci_md")
+nlp.add_pipe("scispacy_linker", config={"resolve_abbreviations": True, "linker_name": "umls"})
 
 
-DATASET_PATH = "data/generations/3-QA-pairs-2024-08-01 14:04:41.574896.csv"
-# CLOUD = True
-MODEL_NAME = "gpt-35-turbo-16k"
 
 
 def record_model_answers(dataset_path, model_name):
@@ -74,9 +77,9 @@ def get_bleu(expected_answer: str, model_answer: str):
     return sentence_bleu(expected_tokens, model_tokens)
 
 
-def get_clinical_concept_extraction(expected_answer: str, model_answer: str):
-    # might not need
-    return 0
+def get_clinical_concept_extraction(model_answer: str):
+    doc = nlp(model_answer)
+    return [e._.kb_ents for e in doc.ents]
 
 
 def get_medical_relation_extraction(expected_answer: str, model_answer: str):
@@ -137,11 +140,12 @@ def score_model(dataset):
 
 
 def main():
-    model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
-    save_dataset(model_answers, directory="model-answers")
-    benchmarking_results = score_model(model_answers)
-    save_dataset(benchmarking_results, directory="benchmarking-results")
-
+    # model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
+    # save_dataset(model_answers, directory="model-answers")
+    # benchmarking_results = score_model(model_answers)
+    # save_dataset(benchmarking_results, directory="benchmarking-results")
+    clinical_string = "hello my chest hurts from pain in the heart cancer"
+    print(get_clinical_concept_extraction(clinical_string))
 
 if __name__ == "__main__":
     main()
