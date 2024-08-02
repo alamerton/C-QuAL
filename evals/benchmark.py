@@ -8,6 +8,7 @@ import tensorflow_hub as hub
 import numpy as np
 from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu
+import sacrebleu
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
@@ -40,13 +41,9 @@ def record_model_answers(dataset_path, model_name):
 def get_exact_match(expected_answer: str, model_answer: str):
     return expected_answer == model_answer
 
-
+#TODO: implement f1 score
 def get_f1_score(expected_answer: str, model_answer: str):
-    expected_tokens = nltk.word_tokenize(expected_answer.lower)
-    model_tokens = nltk.word_tokenize(model_answer.lower)
-    score = f1_score(expected_tokens, model_tokens, average="weighted")
-    return score
-
+    return 0
 
 def get_sas(expected_answer: str, model_answer: str):
     embeddings = embed([expected_answer, model_answer])
@@ -55,21 +52,20 @@ def get_sas(expected_answer: str, model_answer: str):
 
 
 def get_rouge(expected_answer: str, model_answer: str):
-    return rouge.get_scores(expected_answer, model_answer)
+    print("rouge scores: ", rouge.get_scores(expected_answer, model_answer))
+    scores = rouge.get_scores(expected_answer, model_answer)[0]
+    return scores['rouge-1']['f']
 
-
+#TODO: implement bleu
 def get_bleu(expected_answer: str, model_answer: str):
-    expected_tokens = nltk.word_tokenize(expected_answer.lower)
-    model_tokens = nltk.word_tokenize(model_answer.lower)
-    return sentence_bleu(expected_tokens, model_tokens)
-
-
-def get_cce(model_answer: str):
     return 0
 
-def get_mre(expected_answer: str, model_answer: str):
+#TODO: implement clinical_concept_extraction
+def get_clinical_concept_extraction(model_answer: str):
     return 0
 
+def get_medical_relation_extraction(expected_answer: str, model_answer: str):
+    return 0
 
 def get_g_eval(expected_answer: str, model_answer: str):
     return 0
@@ -82,8 +78,8 @@ def score_model(dataset, model_name):
     sas_scores = []
     rouge_scores = []
     bleu_scores = []
-    cce_scores = []
-    mre_scores = []
+    clinical_concept_extraction_scores = []
+    medical_relation_extraction_scores = []
     g_eval_scores = []
 
     for row in tqdm(range(0, len(dataset))):
@@ -95,17 +91,18 @@ def score_model(dataset, model_name):
         sas_scores.append(get_sas(expected_answer, model_answer))
         rouge_scores.append(get_rouge(expected_answer, model_answer))
         bleu_scores.append(get_bleu(expected_answer, model_answer))
-        cce_scores.append(get_cce(expected_answer, model_answer))
-        mre_scores.append(get_mre(expected_answer, model_answer))
+        clinical_concept_extraction_scores.append(get_clinical_concept_extraction(model_answer))
+        medical_relation_extraction_scores.append(get_medical_relation_extraction(expected_answer, model_answer))
         g_eval_scores.append(get_g_eval(expected_answer, model_answer))
 
+    # np.mean better?
     exact_match = sum(em_scores) / len(em_scores)
     f1 = sum(f1_scores) / len(f1_scores)
     semantic_answer_similarity = sum(sas_scores) / len(sas_scores)
     rouge = sum(rouge_scores) / len(rouge_scores)
     bleu = sum(bleu_scores) / len(bleu_scores)
-    clinical_concept_extraction = sum(cce_scores) / len(cce_scores)
-    medical_relation_extraction = sum(mre_scores) / len(mre_scores)
+    clinical_concept_extraction = sum(clinical_concept_extraction_scores) / len(clinical_concept_extraction_scores)
+    medical_relation_extraction = sum(medical_relation_extraction_scores) / len(medical_relation_extraction_scores)
     g_eval = sum(g_eval_scores) / len(g_eval_scores)
 
     benchmarking_results = pd.DataFrame(
@@ -136,13 +133,15 @@ def score_model(dataset, model_name):
 
 
 def main():
-    model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
-    save_dataset(model_answers, directory="model-answers")
+    # model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
+    # save_dataset(model_answers, directory="model-answers")
+    model_answers = pd.read_csv("data/model-answers/3-QA-pairs-2024-08-02 14:03:57.715991.csv")
     benchmarking_results = score_model(model_answers, MODEL_NAME)
     save_dataset(benchmarking_results, directory="benchmarking-results")
+    print(benchmarking_results)
 
     # clinical_string = "hello my chest hurts from pain in the heart cancer"
-    # print(get_cce(clinical_string))
+    # print(get_clinical_concept_extraction(clinical_string))
 
 
 if __name__ == "__main__":
