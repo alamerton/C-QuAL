@@ -39,7 +39,7 @@ def benchmark_with_azure(
             {"role": "system", "content": system_message},
             {"role": "user", "content": user_prompt},
         ],
-        max_tokens=600,
+        max_tokens=999,
         temperature=0,
     )
 
