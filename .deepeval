@@ -2,7 +2,7 @@
     "AZURE_OPENAI_API_KEY": "4c7b240c48184df5a46226bc13fc77bc",
     "AZURE_OPENAI_ENDPOINT": "https://qa-instance.openai.azure.com/",
     "OPENAI_API_VERSION": "2023-03-15-preview",
-    "AZURE_DEPLOYMENT_NAME": "gpt-35-turbo-16k",
-    "AZURE_MODEL_VERSION": "0613",
+    "AZURE_DEPLOYMENT_NAME": "gpt-4o",
+    "AZURE_MODEL_VERSION": "2024-05-13",
     "USE_AZURE_OPENAI": "YES"
 }

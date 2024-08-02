@@ -7,8 +7,6 @@ import numpy as np
 from rouge import Rouge
 import numpy as np
 from nltk.util import ngrams
-import spacy
-import kindred
 from deepeval.metrics import GEval
 from deepeval.test_case import LLMTestCaseParams
 from deepeval.test_case import LLMTestCase
@@ -140,8 +138,12 @@ def get_bleu(expected_answer: str, model_answer: str):
 
 
 def get_g_eval(expected_answer: str, model_answer: str):
-    test_case = LLMTestCase(input=model_answer, actual_output=expected_answer)
+    # test_case = LLMTestCase(input=model_answer, actual_output=expected_answer)
+    test_case = LLMTestCase(input="Test input", actual_output="Expected output")
+    print(g_eval_metric.measure(test_case))  # Check if this returns a valid score
+    # print(f"Debug: test_case = {test_case}")
     score = g_eval_metric.measure(test_case)
+    # print(f"Debug: score = {score}")
     return score
 
 
@@ -152,9 +154,9 @@ def score_model(dataset, model_name):
     sas_scores = []
     rouge_scores = []
     bleu_scores = []
-    clinical_concept_extraction_scores = []
-    medical_relation_extraction_scores = []
-    g_eval_scores = []
+    # clinical_concept_extraction_scores = []
+    # medical_relation_extraction_scores = []
+    # g_eval_scores = []
 
     for row in tqdm(range(0, len(dataset))):
         expected_answer = dataset["Expected Answer"][row]
@@ -171,16 +173,17 @@ def score_model(dataset, model_name):
         # medical_relation_extraction_scores.append(
         #     get_medical_relation_extraction(expected_answer, model_answer)
         # )
-        g_eval_scores.append(get_g_eval(expected_answer, model_answer))
+        # g_eval_scores.append(get_g_eval(expected_answer, model_answer))
 
     exact_match = np.mean(em_scores)
     f1 = np.mean(f1_scores)
     semantic_answer_similarity = np.mean(sas_scores)
     rouge = np.mean(rouge_scores)
     bleu = np.mean(bleu_scores)
-    clinical_concept_extraction = np.mean(clinical_concept_extraction_scores)
-    medical_relation_extraction = np.mean(medical_relation_extraction_scores)
-    g_eval = np.mean(g_eval_scores)
+    # clinical_concept_extraction = np.mean(clinical_concept_extraction_scores)
+    # medical_relation_extraction = np.mean(medical_relation_extraction_scores)
+    # print("g_eval_scores: ", g_eval_scores)
+
 
     benchmarking_results = pd.DataFrame(
         {
@@ -190,9 +193,9 @@ def score_model(dataset, model_name):
                 "Semantic Answer Similarity",
                 "Rouge",
                 "BLEU",
-                "Clinical Concept Extraction",
-                "Medical Relation Extraction",
-                "G-Eval",
+                # "Clinical Concept Extraction",
+                # "Medical Relation Extraction",
+                # "G-Eval",
             ],
             f"{MODEL_NAME} Score": [
                 exact_match,
@@ -200,9 +203,9 @@ def score_model(dataset, model_name):
                 semantic_answer_similarity,
                 rouge,
                 bleu,
-                clinical_concept_extraction,
-                medical_relation_extraction,
-                g_eval,
+                # clinical_concept_extraction,
+                # medical_relation_extraction,
+                # g_eval,
             ],
         }
     )
@@ -218,9 +221,6 @@ def main():
     benchmarking_results = score_model(model_answers, MODEL_NAME)
     save_dataset(benchmarking_results, directory="benchmarking-results")
     print(benchmarking_results)
-
-    # clinical_string = "hello my chest hurts from pain in the heart cancer"
-    # print(get_clinical_concept_extraction(clinical_string))
 
 
 if __name__ == "__main__":
