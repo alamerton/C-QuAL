@@ -2,13 +2,11 @@ import pandas as pd
 from tqdm import tqdm
 import sys
 import os
-from sklearn.metrics import f1_score
-import nltk
 import tensorflow_hub as hub
 import numpy as np
 from rouge import Rouge
-from nltk.translate.bleu_score import sentence_bleu
-import sacrebleu
+import numpy as np
+from nltk.util import ngrams
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
@@ -41,9 +39,22 @@ def record_model_answers(dataset_path, model_name):
 def get_exact_match(expected_answer: str, model_answer: str):
     return expected_answer == model_answer
 
-#TODO: implement f1 score
+
 def get_f1_score(expected_answer: str, model_answer: str):
-    return 0
+    expected_answer_tokens = expected_answer.lower().split()
+    model_answer_tokens = model_answer.lower().split()
+
+    all_tokens = list(set(expected_answer_tokens + model_answer_tokens))
+    gt_vector = [1 if token in expected_answer_tokens else 0 for token in all_tokens]
+    model_vector = [1 if token in model_answer_tokens else 0 for token in all_tokens]
+
+    # Calculate precision, recall, and F1 score
+    precision = np.sum(np.array(gt_vector) * np.array(model_vector)) / np.sum(model_vector)
+    recall = np.sum(np.array(gt_vector) * np.array(model_vector)) / np.sum(gt_vector)
+    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) != 0 else 0
+
+    return f1
+
 
 def get_sas(expected_answer: str, model_answer: str):
     embeddings = embed([expected_answer, model_answer])
@@ -52,13 +63,36 @@ def get_sas(expected_answer: str, model_answer: str):
 
 
 def get_rouge(expected_answer: str, model_answer: str):
-    print("rouge scores: ", rouge.get_scores(expected_answer, model_answer))
     scores = rouge.get_scores(expected_answer, model_answer)[0]
     return scores['rouge-1']['f']
 
-#TODO: implement bleu
-def get_bleu(expected_answer: str, model_answer: str):
-    return 0
+def get_n_grams(expected_answer: str, model_answer:str, n: int):
+    expected_n_grams = set(ngrams(expected_answer.split(), n))
+    model_n_grams = set(ngrams(model_answer.split(), n))
+    return len(model_n_grams.intersection(expected_n_grams))
+
+def get_precision(expected_answer: str, model_answer:str, n: int):
+    n_grams = get_n_grams(model_answer, expected_answer, n)
+    total = len(list(ngrams(model_answer.split(), n)))
+    return n_grams / total
+
+def get_bleu(expected_answer: str, model_answer:str):
+    if not isinstance(expected_answer, list):
+        expected_answer = [expected_answer]
+    
+    precisions = []
+
+    for n in range(1, 4):
+        precision = sum(get_precision(model_answer, ans, n) for ans in expected_answer) / len(expected_answer)
+        precisions.append(precision)
+
+    if precisions:
+        score = np.prod(np.power(precisions, 1.0/len(precisions)))
+    else:
+        score = 0
+
+    return score
+
 
 #TODO: implement clinical_concept_extraction
 def get_clinical_concept_extraction(model_answer: str):
@@ -95,15 +129,14 @@ def score_model(dataset, model_name):
         medical_relation_extraction_scores.append(get_medical_relation_extraction(expected_answer, model_answer))
         g_eval_scores.append(get_g_eval(expected_answer, model_answer))
 
-    # np.mean better?
-    exact_match = sum(em_scores) / len(em_scores)
-    f1 = sum(f1_scores) / len(f1_scores)
-    semantic_answer_similarity = sum(sas_scores) / len(sas_scores)
-    rouge = sum(rouge_scores) / len(rouge_scores)
-    bleu = sum(bleu_scores) / len(bleu_scores)
-    clinical_concept_extraction = sum(clinical_concept_extraction_scores) / len(clinical_concept_extraction_scores)
-    medical_relation_extraction = sum(medical_relation_extraction_scores) / len(medical_relation_extraction_scores)
-    g_eval = sum(g_eval_scores) / len(g_eval_scores)
+    exact_match = np.mean(em_scores)
+    f1 = np.mean(f1_scores)
+    semantic_answer_similarity = np.mean(sas_scores)
+    rouge = np.mean(rouge_scores)
+    bleu = np.mean(bleu_scores)
+    clinical_concept_extraction = np.mean(clinical_concept_extraction_scores)
+    medical_relation_extraction = np.mean(medical_relation_extraction_scores)
+    g_eval = np.mean(g_eval_scores)
 
     benchmarking_results = pd.DataFrame(
         {
