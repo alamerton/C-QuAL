@@ -6,12 +6,17 @@
 import os
 from openai import AzureOpenAI
 from dotenv import load_dotenv
+from azure.core.exceptions import HttpResponseError
+import time
 
 load_dotenv()
 
 QA_GENERATION_MODEL = "gpt-35-turbo-16k"
 
 def call_gpt(discharge_summary):
+
+    max_retries = 10
+    retry_delay = 5
 
     client = AzureOpenAI(
         azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
@@ -92,14 +97,23 @@ def call_gpt(discharge_summary):
         above discharge summary.
     """
 
-    response = client.chat.completions.create(
-        model=QA_GENERATION_MODEL,
-        messages=[
-            {"role": "system", "content": system_message},
-            {"role": "user", "content": user_prompt},
-        ],
-        max_tokens=999,
-        temperature=0,
-    )
-
-    return response.choices[0].message.content
+    for i in range(0, max_retries):
+        try:
+            response = client.chat.completions.create(
+                model=QA_GENERATION_MODEL,
+                messages=[
+                    {"role": "system", "content": system_message},
+                    {"role": "user", "content": user_prompt},
+                ],
+                max_tokens=999,
+                temperature=0,
+            )
+            return response.choices[0].message.content
+        except HttpResponseError as e:
+            if '429' in str(e):  # 429 is the HTTP status code for Too Many Requests
+                print(f"Rate limit exceeded. Attempt {i + 1} of {max_retries}.")
+                time.sleep(retry_delay)  # Wait before retrying
+                retry_delay *= 2  # Exponential backoff
+            else:
+                raise
+        raise RuntimeError("Maximum retries exceeded.")
