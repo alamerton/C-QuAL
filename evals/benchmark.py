@@ -8,7 +8,6 @@ import tensorflow_hub as hub
 import numpy as np
 from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu
-import spacy
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
@@ -18,7 +17,6 @@ from utils.misc import save_dataset
 DATASET_PATH = "data/generations/3-QA-pairs-2024-08-01 14:04:41.574896.csv"
 MODEL_NAME = "gpt-35-turbo-16k"
 
-nltk.download("punkt")
 embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
 rouge = Rouge()
 
@@ -77,22 +75,20 @@ def get_g_eval(expected_answer: str, model_answer: str):
     return 0
 
 
-def score_model(dataset):
-    
-    (
-        em_scores,
-        f1_scores,
-        sas_scores,
-        rouge_scores,
-        bleu_scores,
-        cce_scores,
-        mre_scores,
-        g_eval_scores,
-    ) = []
+def score_model(dataset, model_name):
+
+    em_scores = []
+    f1_scores = []
+    sas_scores = []
+    rouge_scores = []
+    bleu_scores = []
+    cce_scores = []
+    mre_scores = []
+    g_eval_scores = []
 
     for row in tqdm(range(0, len(dataset))):
         expected_answer = dataset["Expected Answer"][row]
-        model_answer = dataset["Model Answer"][row]
+        model_answer = dataset[f"{model_name} Response"][row]
 
         em_scores.append(get_exact_match(expected_answer, model_answer))
         f1_scores.append(get_f1_score(expected_answer, model_answer))
@@ -142,7 +138,7 @@ def score_model(dataset):
 def main():
     model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
     save_dataset(model_answers, directory="model-answers")
-    benchmarking_results = score_model(model_answers)
+    benchmarking_results = score_model(model_answers, MODEL_NAME)
     save_dataset(benchmarking_results, directory="benchmarking-results")
 
     # clinical_string = "hello my chest hurts from pain in the heart cancer"
