@@ -40,6 +40,34 @@ def record_model_responses(dataset_path, model_name):
     
     return dataset
 
+# some of these might need the discharge summay, and some might not need the
+# expected response.
+
+def get_exact_match(expected_response: str, model_response: str):
+    return 0
+
+def get_f1_score(expected_response: str, model_response: str):
+    return 0
+
+def get_semantic_answer_similarity(expected_response: str, model_response: str):
+    return 0
+
+def get_rouge(expected_response: str, model_response: str):
+    return 0
+
+def get_bleu(expected_response: str, model_response: str):
+    return 0
+
+def get_clinical_concept_extraction(expected_response: str, model_response: str):
+    # might not need 
+    return 0
+
+def get_medical_relation_extraction(expected_response: str, model_response: str):
+    return 0
+
+def get_g_eval(expected_response: str, model_response: str):
+    return 0
+
 def score_model(dataset):
     #TODO: write this function. 
     """Score the model  on how close its answer is to the expected 

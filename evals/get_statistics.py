@@ -14,8 +14,7 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
 from utils.evals.categorise_with_gpt import categorise_with_gpt
 
-DATASET_PATH = "data/generations/3-QA-pairs-2024-08-01 13:49:15.609569.csv"
-
+DATASET_PATH = "data/generations/3-QA-pairs-2024-08-01 14:04:41.574896.csv"
 
 def get_question_categories(df: pd.DataFrame):
     """
@@ -94,14 +93,14 @@ def get_question_complexity(df: pd.DataFrame):
 def get_statistics(dataset_path):
     dataset = pd.read_csv(dataset_path)
     dataset_length = len(dataset)
-    dataset = get_question_types(dataset)
 
-    yes_no_maybe_qs = dataset["Question Types"].str.count("Yes/No/Maybe")
-    unanswerable_qs = dataset["Question Types"].str.count("Unanswerable")
-    temporal_qs = dataset["Question Types"].str.count("Temporal")
-    factual_qs = dataset["Question Types"].str.count("Factual")
-    summarisation_qs = dataset["Question Types"].str.count("Summarisation")
-    identification_qs = dataset["Question Types"].str.count("Identification")
+    yes_no_maybe_qs = dataset["Question Type"].str.count("Yes/No/Maybe").sum()
+    print(yes_no_maybe_qs)
+    unanswerable_qs = dataset["Question Type"].str.count("Unanswerable").sum()
+    temporal_qs = dataset["Question Type"].str.count("Temporal").sum()
+    factual_qs = dataset["Question Type"].str.count("Factual").sum()
+    summarisation_qs = dataset["Question Type"].str.count("Summarisation").sum()
+    identification_qs = dataset["Question Type"].str.count("Identification").sum()
 
     statistics = pd.DataFrame(
         {
