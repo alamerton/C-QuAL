@@ -7,6 +7,12 @@ import numpy as np
 from rouge import Rouge
 import numpy as np
 from nltk.util import ngrams
+import spacy
+import kindred
+from deepeval.metrics import GEval
+from deepeval.test_case import LLMTestCaseParams
+from deepeval.test_case import LLMTestCase
+
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
@@ -18,6 +24,23 @@ MODEL_NAME = "gpt-35-turbo-16k"
 
 embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
 rouge = Rouge()
+g_eval_metric = GEval(
+    name="g-eval",
+    criteria="""
+    Evaluate the quality of the generated text based on the ability of the LLM
+    to summarize, identify, and arrange text, and answer specific questions 
+    related to:
+        1. Patient’s medical history
+        2. Diagnoses made
+        3. Procedures that were done
+        4. Outcomes of procedures
+        5. Changes in medication
+        6. Complications
+        7. Abnormalities
+        8. Tests the patient has undergone
+    """,
+    evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT],
+)
 
 
 def record_model_answers(dataset_path, model_name):
@@ -49,9 +72,15 @@ def get_f1_score(expected_answer: str, model_answer: str):
     model_vector = [1 if token in model_answer_tokens else 0 for token in all_tokens]
 
     # Calculate precision, recall, and F1 score
-    precision = np.sum(np.array(gt_vector) * np.array(model_vector)) / np.sum(model_vector)
+    precision = np.sum(np.array(gt_vector) * np.array(model_vector)) / np.sum(
+        model_vector
+    )
     recall = np.sum(np.array(gt_vector) * np.array(model_vector)) / np.sum(gt_vector)
-    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) != 0 else 0
+    f1 = (
+        2 * (precision * recall) / (precision + recall)
+        if (precision + recall) != 0
+        else 0
+    )
 
     return f1
 
@@ -64,45 +93,56 @@ def get_sas(expected_answer: str, model_answer: str):
 
 def get_rouge(expected_answer: str, model_answer: str):
     scores = rouge.get_scores(expected_answer, model_answer)[0]
-    return scores['rouge-1']['f']
+    return scores["rouge-1"]["f"]
 
-def get_n_grams(expected_answer: str, model_answer:str, n: int):
+
+def get_n_grams(expected_answer: str, model_answer: str, n: int):
     expected_n_grams = set(ngrams(expected_answer.split(), n))
     model_n_grams = set(ngrams(model_answer.split(), n))
     return len(model_n_grams.intersection(expected_n_grams))
 
-def get_precision(expected_answer: str, model_answer:str, n: int):
+
+def get_precision(expected_answer: str, model_answer: str, n: int):
     n_grams = get_n_grams(model_answer, expected_answer, n)
     total = len(list(ngrams(model_answer.split(), n)))
     return n_grams / total
 
-def get_bleu(expected_answer: str, model_answer:str):
+
+def get_bleu(expected_answer: str, model_answer: str):
+    precisions = []
     if not isinstance(expected_answer, list):
         expected_answer = [expected_answer]
-    
-    precisions = []
 
     for n in range(1, 4):
-        precision = sum(get_precision(model_answer, ans, n) for ans in expected_answer) / len(expected_answer)
+        precision = sum(
+            get_precision(model_answer, ans, n) for ans in expected_answer
+        ) / len(expected_answer)
         precisions.append(precision)
 
     if precisions:
-        score = np.prod(np.power(precisions, 1.0/len(precisions)))
+        score = np.prod(np.power(precisions, 1.0 / len(precisions)))
     else:
         score = 0
-
     return score
 
 
-#TODO: implement clinical_concept_extraction
-def get_clinical_concept_extraction(model_answer: str):
-    return 0
+# # TODO: implement clinical_concept_extraction
+# def get_clinical_concept_extraction(model_answer: str):
+#     doc = nlp(model_answer)
+#     entities = [(ent.text, ent.label_) for ent in doc.ents]
+#     print(entities)
+#     return 0
 
-def get_medical_relation_extraction(expected_answer: str, model_answer: str):
-    return 0
+
+# def get_medical_relation_extraction(expected_answer: str, model_answer: str):
+#     train = kindred.bionlpst.load('2016-SeeDev-binary-train')
+#     dev = kindred.bionlpst.load('2016-SeeDev-binary-dev')
+
 
 def get_g_eval(expected_answer: str, model_answer: str):
-    return 0
+    test_case = LLMTestCase(input=model_answer, actual_output=expected_answer)
+    score = g_eval_metric.measure(test_case)
+    return score
 
 
 def score_model(dataset, model_name):
@@ -125,8 +165,12 @@ def score_model(dataset, model_name):
         sas_scores.append(get_sas(expected_answer, model_answer))
         rouge_scores.append(get_rouge(expected_answer, model_answer))
         bleu_scores.append(get_bleu(expected_answer, model_answer))
-        clinical_concept_extraction_scores.append(get_clinical_concept_extraction(model_answer))
-        medical_relation_extraction_scores.append(get_medical_relation_extraction(expected_answer, model_answer))
+        # clinical_concept_extraction_scores.append(
+        #     get_clinical_concept_extraction(model_answer)
+        # )
+        # medical_relation_extraction_scores.append(
+        #     get_medical_relation_extraction(expected_answer, model_answer)
+        # )
         g_eval_scores.append(get_g_eval(expected_answer, model_answer))
 
     exact_match = np.mean(em_scores)
@@ -168,7 +212,9 @@ def score_model(dataset, model_name):
 def main():
     # model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
     # save_dataset(model_answers, directory="model-answers")
-    model_answers = pd.read_csv("data/model-answers/3-QA-pairs-2024-08-02 14:03:57.715991.csv")
+    model_answers = pd.read_csv(
+        "data/model-answers/3-QA-pairs-2024-08-02 14:03:57.715991.csv"
+    )
     benchmarking_results = score_model(model_answers, MODEL_NAME)
     save_dataset(benchmarking_results, directory="benchmarking-results")
     print(benchmarking_results)
