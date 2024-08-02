@@ -4,6 +4,7 @@ import sys
 import os
 from sklearn.metrics import f1_score
 import nltk
+from sentence_transformers import SentenceTransformer, util
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
@@ -11,6 +12,8 @@ from utils.evals.benchmark_with_azure import benchmark_with_azure
 from utils.misc import save_dataset
 
 nltk.download('punkt')
+semantic_similarity_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+
 
 DATASET_PATH = "data/generations/3-QA-pairs-2024-08-01 14:04:41.574896.csv"
 # CLOUD = True
@@ -52,7 +55,13 @@ def get_f1_score(expected_answer: str, model_answer: str):
 
 
 def get_semantic_answer_similarity(expected_answer: str, model_answer: str):
-    return 0
+    expected_answer_embedded = semantic_similarity_model.encode(
+        expected_answer, convert_to_tensor=True)
+    model_answer_embedded = semantic_similarity_model.encode(
+        model_answer, convert_to_tensor=True)
+    similarity = util.pytorch_cos_sim(
+        expected_answer_embedded, model_answer_embedded)
+    return similarity.item()
 
 
 def get_rouge(expected_answer: str, model_answer: str):
@@ -80,14 +89,21 @@ def score_model(dataset):
 
     # loop through each row in the dataset:
         # save exact match scores to arrays
+    
+    exact_match_scores, f1_scores, semantic_answer_similarity_scores, \
+    rouge_scores, bleu_scores, clinical_concept_extraction_scores, \
+    medical_relation_extraction_scores, g_eval_scores = []
 
     for row in range(0, len(dataset)):
         expected_answer = dataset['Expected Answer'][row]
         model_answer = dataset['Model Answer'][row]
 
-        exact_match = get_exact_match(expected_answer, model_answer)
+        exact_match_scores.append(
+            get_exact_match(expected_answer, model_answer)
+            )
+        f1_scores.append(get_f1_score(expected_answer, model_answer))
+        # sematnic answer simliarity etc
 
-    
     # get average of arrays to get final scores
 
     benchmarking_results = pd.DataFrame(
