@@ -5,14 +5,17 @@ import os
 from sklearn.metrics import f1_score
 import nltk
 from sentence_transformers import SentenceTransformer, util
+from rouge import Rouge
+from nltk.translate.bleu_score import sentence_bleu
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
 from utils.evals.benchmark_with_azure import benchmark_with_azure
 from utils.misc import save_dataset
 
-nltk.download('punkt')
-semantic_similarity_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+nltk.download("punkt")
+sas_model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
+rouge = Rouge()
 
 
 DATASET_PATH = "data/generations/3-QA-pairs-2024-08-01 14:04:41.574896.csv"
@@ -50,26 +53,25 @@ def get_exact_match(expected_answer: str, model_answer: str):
 def get_f1_score(expected_answer: str, model_answer: str):
     expected_tokens = nltk.word_tokenize(expected_answer.lower)
     model_tokens = nltk.word_tokenize(model_answer.lower)
-    score = f1_score(expected_tokens, model_tokens, average='weighted')
+    score = f1_score(expected_tokens, model_tokens, average="weighted")
     return score
 
 
-def get_semantic_answer_similarity(expected_answer: str, model_answer: str):
-    expected_answer_embedded = semantic_similarity_model.encode(
-        expected_answer, convert_to_tensor=True)
-    model_answer_embedded = semantic_similarity_model.encode(
-        model_answer, convert_to_tensor=True)
-    similarity = util.pytorch_cos_sim(
-        expected_answer_embedded, model_answer_embedded)
+def get_sas(expected_answer: str, model_answer: str):
+    expected_answer = sas_model.encode(expected_answer, convert_to_tensor=True)
+    model_answer = sas_model.encode(model_answer, convert_to_tensor=True)
+    similarity = util.pytorch_cos_sim(expected_answer, model_answer)
     return similarity.item()
 
 
 def get_rouge(expected_answer: str, model_answer: str):
-    return 0
+    return rouge.get_scores(expected_answer, model_answer)
 
 
 def get_bleu(expected_answer: str, model_answer: str):
-    return 0
+    expected_tokens = nltk.word_tokenize(expected_answer.lower)
+    model_tokens = nltk.word_tokenize(model_answer.lower)
+    return sentence_bleu(expected_tokens, model_tokens)
 
 
 def get_clinical_concept_extraction(expected_answer: str, model_answer: str):
@@ -88,21 +90,29 @@ def get_g_eval(expected_answer: str, model_answer: str):
 def score_model(dataset):
 
     # loop through each row in the dataset:
-        # save exact match scores to arrays
-    
-    exact_match_scores, f1_scores, semantic_answer_similarity_scores, \
-    rouge_scores, bleu_scores, clinical_concept_extraction_scores, \
-    medical_relation_extraction_scores, g_eval_scores = []
+    # save exact match scores to arrays
+
+    (
+        em_scores,
+        f1_scores,
+        sas_scores,
+        rouge_scores,
+        bleu_scores,
+        cce_scores,
+        mre_scores,
+        g_eval_scores,
+    ) = []
 
     for row in range(0, len(dataset)):
-        expected_answer = dataset['Expected Answer'][row]
-        model_answer = dataset['Model Answer'][row]
+        expected_answer = dataset["Expected Answer"][row]
+        model_answer = dataset["Model Answer"][row]
 
-        exact_match_scores.append(
-            get_exact_match(expected_answer, model_answer)
-            )
+        em_scores.append(get_exact_match(expected_answer, model_answer))
         f1_scores.append(get_f1_score(expected_answer, model_answer))
-        # sematnic answer simliarity etc
+        sas_scores.append(get_sas(expected_answer, model_answer))
+        rouge_scores.append(get_rouge(expected_answer, model_answer))
+        bleu_scores.append(get_bleu(expected_answer, model_answer))
+
 
     # get average of arrays to get final scores
 
@@ -131,6 +141,7 @@ def main():
     save_dataset(model_answers, directory="model-answers")
     benchmarking_results = score_model(model_answers)
     save_dataset(benchmarking_results, directory="benchmarking-results")
+
 
 if __name__ == "__main__":
     main()
