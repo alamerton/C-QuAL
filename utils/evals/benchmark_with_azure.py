@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def benchmark_with_azure(
+def benchmark_gpt_with_azure(
         model_name,
         discharge_summary,
         question,
@@ -44,3 +44,6 @@ def benchmark_with_azure(
     )
 
     return response.choices[0].message.content
+
+def benchmark_llama_with_azure():
+    return 0

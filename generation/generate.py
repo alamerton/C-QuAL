@@ -41,14 +41,21 @@ def main():
 
     # For loop for generating qa pairs
     print("Done\n\nGenerating Q-A pairs...")
-    for row in tqdm(range(NUMBER_OF_QA_PAIRS)):
+    #TODO: Remove hacky part
+    for row in tqdm(range(90, NUMBER_OF_QA_PAIRS)):
         date = datetime.now()
+
+        
 
         # Create data item starting with discharge summary
         data_item = [discharge_summaries[row]]
 
         # Call LLM with discharge summary and prompt
         qa_string = call_gpt(data_item, INCLUDE_EXPLANATION)
+
+        # Check correct columns are in response, regenerate until true
+        while not all(x in qa_string for x in ["Question", "Answer", "Type"]):
+            qa_string = call_gpt(data_item)
 
         # Parse the json to get the question and answer as variables
         qa_parts = qa_string.split("\n")
@@ -71,7 +78,8 @@ def main():
         # time.sleep(5)
 
         if (row + 1) % 10 == 0:
-            checkpoint_path =f"data/generations/checkpoints/{NUMBER_OF_QA_PAIRS}-QA-pairs-{date}-{row+1}-rows"
+            checkpoint_path =f"data/generations/checkpoints/ \
+            {NUMBER_OF_QA_PAIRS}-QA-pairs-{date}-{row+1}-rows"
             data.to_csv(f"{checkpoint_path}.csv")
         
     print("Complete")

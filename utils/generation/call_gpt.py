@@ -70,7 +70,7 @@ def call_gpt(discharge_summary, include_explanation):
             Type: [Your chosen question type from the list, spelled the same]
             Reason: [Short explanation for the answer, based on the discharge 
             summary]
-            
+
             Here is the discharge summary for you to work on:
 
             {discharge_summary}
