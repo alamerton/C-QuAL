@@ -143,11 +143,11 @@ def call_gpt(discharge_summary, include_explanation):
         raise RuntimeError("Maximum retries exceeded.")
     
 
-def parse_discharge_summaries(discharge_summaries):
+def prepare_discharge_summaries(discharge_summaries):
     discharge_summary_string = ""
     for i in discharge_summaries:
-        start_string = f"Discharge summary {i} start:"
-        end_string = f"Discharge summary {i} end."
+        start_string = f"[Discharge summary {i} start]"
+        end_string = f"[Discharge summary {i} end]"
         discharge_summary = discharge_summaries[i]
         ds_string += start_string + discharge_summary + end_string
     return discharge_summary_string
@@ -164,7 +164,7 @@ def call_gpt_with_multiple_discharge_summaries(discharge_summaries):
         api_version=os.getenv("AZURE_API_VERSION"),
     )
 
-    discharge_summaries = parse_discharge_summaries(discharge_summaries)
+    discharge_summaries = prepare_discharge_summaries(discharge_summaries)
 
     system_message = """You are an expert medical professional tasked
     with creating clinically relevant question-answer pairs based on a
@@ -204,7 +204,12 @@ def call_gpt_with_multiple_discharge_summaries(discharge_summaries):
         Answer: [Insert the corresponding answer here]
         Type: [Your chosen question type from the list, spelled the same]
 
-        Here are the discharge summaries for you to work on:
+        The discharge summaries are provided between [Discharge summary 
+        n start] and [Discharge summary n end] where n is the number 
+        corresponding to the discharge summary being passed. The 
+        discharge summaries are provided in chronological order.
+
+        Here are the discharge summaries for you to work on.
 
         {discharge_summaries}
 
