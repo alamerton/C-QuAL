@@ -52,13 +52,12 @@ def main():
 
         # Add Q-A pair to dataframe
         data.loc[row] = data_item
-
+        
         # Output message to terminal
         print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
         # time.sleep(5)
 
-        # save dataset as checkpoint when row+1 is a multiple of 10
-        if row + 1 % 10 == 0:
+        if (row + 1) % 10 == 0:
             checkpoint_path =f"data/generations/checkpoints/{NUMBER_OF_QA_PAIRS}-QA-pairs-{date}-{row+1}-rows"
             data.to_csv(f"{checkpoint_path}.csv")
         

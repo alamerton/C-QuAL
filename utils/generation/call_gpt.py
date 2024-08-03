@@ -66,7 +66,8 @@ def call_gpt(discharge_summary):
         Question: [Insert your clinical question here]
         Answer: [Insert the corresponding answer here]
         Type: [Your chosen question type from the list, spelled the same]
-        Reason: [Short explanation for your answer]
+        Reason: [Short explanation for the answer, based on the discharge 
+        summary]
 
         Examples of clinically relevant questions:
         - What was the primary diagnosis for the patient? (Diagnosis)
