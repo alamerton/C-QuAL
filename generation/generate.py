@@ -10,19 +10,30 @@ from utils.generation.call_mimic import call_mimic
 
 # SAVE_TO_HF_NOT_LOCALLY = False #TODO
 NUMBER_OF_QA_PAIRS = 1000
-
+INCLUDE_EXPLANATION = False
 
 def main():
     # create dataframe with question and expected answer columns
-    data = pd.DataFrame(
-        columns=[
-            "Discharge Summary",
-            "Question",
-            "Expected Answer",
-            "Reason",
-            "Question Type",
-        ]
-    )
+
+    if INCLUDE_EXPLANATION:
+        data = pd.DataFrame(
+            columns=[
+                "Discharge Summary",
+                "Question",
+                "Expected Answer",
+                "Reason",
+                "Question Type",
+            ]
+        )
+    else:
+        data = pd.DataFrame(
+            columns=[
+                "Discharge Summary",
+                "Question",
+                "Expected Answer",
+                "Question Type",
+            ]
+        )
 
     print("Getting summaries for generation")
 
@@ -37,7 +48,7 @@ def main():
         data_item = [discharge_summaries[row]]
 
         # Call LLM with discharge summary and prompt
-        qa_string = call_gpt(data_item)
+        qa_string = call_gpt(data_item, INCLUDE_EXPLANATION)
 
         # Parse the json to get the question and answer as variables
         qa_parts = qa_string.split("\n")
@@ -45,11 +56,13 @@ def main():
         question = qa_parts[0][10:]  # Remove "Question: "
         answer = qa_parts[1][8:]  # Remove "Answer: "
         question_type = qa_parts[2][6:]  # Remove "Type: "
-        explanation = qa_parts[3][8:]  # Remove "Reason: "
 
-        # Add question and answer as tuple to data item
-        data_item.extend((question, answer, explanation, question_type))
+        if INCLUDE_EXPLANATION:
+            explanation = qa_parts[3][8:]  # Remove "Reason: "
+            # Add question and answer as tuple to data item
+            data_item.extend((question, answer, explanation, question_type))
 
+        data_item.extend((question, answer, question_type))
         # Add Q-A pair to dataframe
         data.loc[row] = data_item
         
