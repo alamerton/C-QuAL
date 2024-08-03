@@ -32,22 +32,19 @@ def call_gpt(discharge_summary, include_explanation):
     if include_explanation:
         # Prompt asking for a rationale behind the answer
         user_prompt = f"""
-            You are given a discharge summary from the MIMIC-III database. 
-            Your task is to generate a question and answer pair that is relevant 
-            to clinical practice, focusing on important aspects like diagnosis, 
-            treatment, prognosis, patient management, or follow-up care. The 
-            answer should be specific and extracted directly from the summary.
+            You are given a discharge summary from the MIMIC-III 
+            database. Your task is to generate a question and answer pair that is relevant 
+            to clinical practice.
 
             Clinically relevant questions should test the ability to summarize, 
             identify, and arrange text, and answer specific questions related to:
-            1. Patient’s medical history
-            2. Diagnoses made
-            3. Procedures that were done
-            4. Outcomes of procedures
-            5. Changes in medication
-            6. Complications
-            7. Abnormalities
-            8. Tests the patient has undergone
+            1. Treatment
+            2. Assessment
+            3. Diagnosis
+            4. Problems or complications
+            5. Abnormalities
+            6. Etiology
+            7. Medical history
 
             The question should also be one of the following types:
             1. Yes/No/Maybe
@@ -62,7 +59,8 @@ def call_gpt(discharge_summary, include_explanation):
 
             Do not create a question that is too easy to answer, only clinicians 
             should be able to answer the question. Do not create a question that 
-            can be answered without referring to the discharge summary.
+            can be answered without referring to the discharge summary. Do not
+            create a question-answer pair with exactly matching details.
 
             Please follow this format:
 
@@ -82,22 +80,19 @@ def call_gpt(discharge_summary, include_explanation):
         # Prompt not including rationale
     else:
         user_prompt = f"""
-            You are given a discharge summary from the MIMIC-III database. 
-            Your task is to generate a question and answer pair that is relevant 
-            to clinical practice, focusing on important aspects like diagnosis, 
-            treatment, prognosis, patient management, or follow-up care. The 
-            answer should be specific and extracted directly from the summary.
+            You are given a discharge summary from the MIMIC-III 
+            database. Your task is to generate a question and answer pair that is relevant 
+            to clinical practice.
 
             Clinically relevant questions should test the ability to summarize, 
             identify, and arrange text, and answer specific questions related to:
-            1. Patient’s medical history
-            2. Diagnoses made
-            3. Procedures that were done
-            4. Outcomes of procedures
-            5. Changes in medication
-            6. Complications
-            7. Abnormalities
-            8. Tests the patient has undergone
+            1. Treatment
+            2. Assessment
+            3. Diagnosis
+            4. Problems or complications
+            5. Abnormalities
+            6. Etiology
+            7. Medical history
 
             The question should also be one of the following types:
             1. Yes/No/Maybe
@@ -109,7 +104,8 @@ def call_gpt(discharge_summary, include_explanation):
 
             Do not create a question that is too easy to answer, only clinicians 
             should be able to answer the question. Do not create a question that 
-            can be answered without referring to the discharge summary.
+            can be answered without referring to the discharge summary. Do not
+            create a question-answer pair with exactly matching details.
 
             Please follow this format:
 
@@ -195,14 +191,12 @@ def call_gpt_with_multiple_discharge_summaries(discharge_summaries):
         3. Temporal
         4. Factual
         5. Summarisation
-        6. Identification
-
-        Your response should also contain short, one-sentence rationale behind 
-        the answer detailing the reason why the answer is correct.
+        6. Identification`
 
         Do not create a question that is too easy to answer, only clinicians 
         should be able to answer the question. Do not create a question that 
-        can be answered without referring to the discharge summary.
+        can be answered without referring to the discharge summary. Do not
+        create a question-answer pair with exactly matching details.
 
         Please follow this format:
 
