@@ -44,7 +44,7 @@ def main():
     print("Done\n\nGenerating Q-A pairs...")
 
     for row in tqdm(range(CHECKPOINT, NUMBER_OF_QA_PAIRS)):
-        date = datetime.now()
+        date = datetime.now().minute()
 
         # Create data item starting with discharge summary
         data_item = [discharge_summaries[row]]
@@ -77,15 +77,16 @@ def main():
         # time.sleep(5)
 
         if (row + 1) % 10 == 0:
-            checkpoint_path = f"data/generations/checkpoints/ \
-            {NUMBER_OF_QA_PAIRS}-QA-pairs-{date}-{row+1}-rows"
+            checkpoint_path = f"""data/generations/checkpoints/
+            {date}-{row+1}-rows"""
             data.to_csv(f"{checkpoint_path}.csv")
 
     print("Complete")
     print(data)
 
     # Write dataset to output directory
-    output_path = f"data/generations/{NUMBER_OF_QA_PAIRS}-QA-pairs-{date}"
+    output_path = f"""data/generations/
+    {NUMBER_OF_QA_PAIRS}-QA-pairs-{date}"""
     data.to_csv(f"{output_path}.csv")
     print("Dataset saved")
 

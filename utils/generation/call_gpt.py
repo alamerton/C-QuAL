@@ -140,7 +140,7 @@ def call_gpt(discharge_summary, include_explanation):
             if '429' in str(e):
                 print(f"Rate limit exceeded. Attempt {i + 1} of {max_retries}.")
                 time.sleep(retry_delay)
-                retry_delay *= 2 
+                retry_delay *= 2
             else:
                 raise
         raise RuntimeError("Maximum retries exceeded.")
