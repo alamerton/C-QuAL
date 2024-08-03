@@ -14,7 +14,10 @@ from deepeval.test_case import LLMTestCase
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
-from utils.evals.benchmark_with_azure import benchmark_gpt_with_azure
+from utils.evals.benchmark_with_azure import (
+    benchmark_gpt_with_azure,
+    benchmark_llama_with_azure,
+)
 from utils.misc import save_dataset
 
 DATASET_PATH = "data/generations/3-QA-pairs-2024-08-01 14:04:41.574896.csv"
@@ -52,10 +55,18 @@ def record_model_answers(dataset_path, model_name):
         discharge_summary = row["Discharge Summary"]
         question = row["Question"]
 
-        if 'gpt' in model_name:
-            response = benchmark_gpt_with_azure(model_name, discharge_summary, question)
-        elif 'Llama' in model_name:
-            
+        if "gpt" in model_name:
+            response = benchmark_gpt_with_azure(
+                model_name,
+                discharge_summary,
+                question
+            )
+        elif "Llama" in model_name:
+            response = benchmark_llama_with_azure(
+                model_name, discharge_summary, question
+            )
+        else:
+            raise ValueError("Model name not recognised by script.")
 
         dataset.at[index, f"{model_name} Response"] = response
     return dataset
@@ -187,7 +198,6 @@ def score_model(dataset, model_name):
     # clinical_concept_extraction = np.mean(clinical_concept_extraction_scores)
     # medical_relation_extraction = np.mean(medical_relation_extraction_scores)
     # print("g_eval_scores: ", g_eval_scores)
-
 
     benchmarking_results = pd.DataFrame(
         {

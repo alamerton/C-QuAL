@@ -8,9 +8,10 @@ sys.path.insert(0, parent_dir)
 from utils.generation.call_gpt import call_gpt
 from utils.generation.call_mimic import call_mimic
 
-# SAVE_TO_HF_NOT_LOCALLY = False #TODO
+# SAVE_TO_HF = False #TODO
 NUMBER_OF_QA_PAIRS = 1000
 INCLUDE_EXPLANATION = False
+CHECKPOINT = 90
 
 def main():
     # create dataframe with question and expected answer columns
@@ -41,11 +42,9 @@ def main():
 
     # For loop for generating qa pairs
     print("Done\n\nGenerating Q-A pairs...")
-    #TODO: Remove hacky part
-    for row in tqdm(range(90, NUMBER_OF_QA_PAIRS)):
-        date = datetime.now()
 
-        
+    for row in tqdm(range(CHECKPOINT, NUMBER_OF_QA_PAIRS)):
+        date = datetime.now()
 
         # Create data item starting with discharge summary
         data_item = [discharge_summaries[row]]
@@ -55,7 +54,7 @@ def main():
 
         # Check correct columns are in response, regenerate until true
         while not all(x in qa_string for x in ["Question", "Answer", "Type"]):
-            qa_string = call_gpt(data_item)
+            qa_string = call_gpt(data_item, INCLUDE_EXPLANATION)
 
         # Parse the json to get the question and answer as variables
         qa_parts = qa_string.split("\n")
@@ -72,16 +71,16 @@ def main():
         data_item.extend((question, answer, question_type))
         # Add Q-A pair to dataframe
         data.loc[row] = data_item
-        
+
         # Output message to terminal
         print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
         # time.sleep(5)
 
         if (row + 1) % 10 == 0:
-            checkpoint_path =f"data/generations/checkpoints/ \
+            checkpoint_path = f"data/generations/checkpoints/ \
             {NUMBER_OF_QA_PAIRS}-QA-pairs-{date}-{row+1}-rows"
             data.to_csv(f"{checkpoint_path}.csv")
-        
+
     print("Complete")
     print(data)
 
