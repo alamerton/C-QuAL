@@ -77,8 +77,12 @@ def main():
         # time.sleep(5)
 
         if (row + 1) % 10 == 0:
-            checkpoint_path = f"""data/generations/checkpoints/
-            {date}-{row+1}-rows"""
+            if CHECKPOINT > 0:
+                checkpoint_path = f"""data/generations/checkpoints/
+                {date}-rows-{CHECKPOINT}-{row+1}"""
+            else:
+                checkpoint_path = f"""data/generations/checkpoints/
+                {date}-{row+1}-rows"""
             data.to_csv(f"{checkpoint_path}.csv")
 
     print("Complete")
