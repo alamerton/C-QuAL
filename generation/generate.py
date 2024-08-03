@@ -11,7 +11,7 @@ from utils.generation.call_mimic import call_mimic
 # SAVE_TO_HF = False #TODO
 NUMBER_OF_QA_PAIRS = 1000
 INCLUDE_EXPLANATION = False
-CHECKPOINT = 90
+CHECKPOINT = 120
 
 def main():
     # create dataframe with question and expected answer columns
@@ -44,7 +44,7 @@ def main():
     print("Done\n\nGenerating Q-A pairs...")
 
     for row in tqdm(range(CHECKPOINT, NUMBER_OF_QA_PAIRS)):
-        date = datetime.now().minute()
+        date = datetime.now().minute
 
         # Create data item starting with discharge summary
         data_item = [discharge_summaries[row]]
