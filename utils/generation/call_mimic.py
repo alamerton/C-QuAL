@@ -25,7 +25,6 @@ def save_data(results): # Load query results into a dataframe containing subject
 def call_mimic(num_rows): # Return a discharge summary from the MIMIC-III database
     # Get date and time data for outputs
     current_date = datetime.now()
-    start_time = time.time()
 
     # Set up DB connection
     connection = psycopg2.connect(

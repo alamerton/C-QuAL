@@ -11,7 +11,7 @@ from utils.generation.call_mimic import call_mimic
 # SAVE_TO_HF = False #TODO
 NUMBER_OF_QA_PAIRS = 1000
 INCLUDE_EXPLANATION = False
-CHECKPOINT = 120
+CHECKPOINT = 160
 
 def main():
     # create dataframe with question and expected answer columns
@@ -44,7 +44,8 @@ def main():
     print("Done\n\nGenerating Q-A pairs...")
 
     for row in tqdm(range(CHECKPOINT, NUMBER_OF_QA_PAIRS)):
-        date = datetime.now().minute
+        date = datetime.now()
+        date = date.strftime("%Y-%m-%d %H:%M:%S")
 
         # Create data item starting with discharge summary
         data_item = [discharge_summaries[row]]
@@ -76,13 +77,14 @@ def main():
         print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
         # time.sleep(5)
 
+        checkpoint_directory_path = "data/generations/checkpoints/"
         if (row + 1) % 10 == 0:
             if CHECKPOINT > 0:
-                checkpoint_path = f"""data/generations/checkpoints/
-                {date}-rows-{CHECKPOINT}-{row+1}"""
+                checkpoint_name = f"{date}-rows-{CHECKPOINT}-{row+1}"
+                checkpoint_path = checkpoint_directory_path + checkpoint_name
             else:
-                checkpoint_path = f"""data/generations/checkpoints/
-                {date}-{row+1}-rows"""
+                checkpoint_name = f"{date}-{row+1}-rows"
+                checkpoint_path
             data.to_csv(f"{checkpoint_path}.csv")
 
     print("Complete")
