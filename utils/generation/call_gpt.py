@@ -133,7 +133,7 @@ def call_gpt(discharge_summary, include_explanation):
                     {"role": "user", "content": user_prompt},
                 ],
                 max_tokens=999,
-                temperature=0,
+                temperature=1,
             )
             return response.choices[0].message.content
         except HttpResponseError as e:
