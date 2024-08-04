@@ -1,5 +1,5 @@
 import tiktoken
-from utils.generation.call_mimic import call_mimic
+from utils.generation.call_mimic_iii import call_mimic_iii
 
 NUMBER_OF_QA_PAIRS = 1000
 MODEL_NAME = "gpt-4"
@@ -20,6 +20,6 @@ def calculate_average_tokens(strings, model_name=MODEL_NAME):
     average_tokens = total_tokens / len(strings)
     return average_tokens
 
-strings = call_mimic(NUMBER_OF_QA_PAIRS)
+strings = call_mimic_iii(NUMBER_OF_QA_PAIRS)
 average_tokens = calculate_average_tokens(strings)
 print(f"Average tokens: {average_tokens}")

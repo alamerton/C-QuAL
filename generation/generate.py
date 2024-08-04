@@ -12,13 +12,15 @@ from utils.generation.call_mimic_iii import call_mimic_iii
 # SAVE_TO_HF = False #TODO
 NUMBER_OF_QA_PAIRS: int = 1000
 INCLUDE_EXPLANATION: bool = False
-# Variable for starting the generation from a specific row in MIMIC-III
+
+# Variable for starting the generation from a specific row in MIMIC-III.
+# Default value is 0. Set to 0 if generating new dataset.
 CHECKPOINT: int = 0 
-MULTIPLE_SUMMARIES: bool = True
+MAX_SUMMARIES: int = 3
 
 def main():
     # create dataframe with question and expected answer columns
-    if MULTIPLE_SUMMARIES:
+    if MAX_SUMMARIES > 1:
         discharge_summary_string = "Discharge Summaries"
     else:
         discharge_summary_string = "Discharge Summary"
@@ -36,7 +38,7 @@ def main():
     else:
         data = pd.DataFrame(
             columns=[
-                "Discharge Summary",
+                discharge_summary_string,
                 "Question",
                 "Expected Answer",
                 "Question Type",
@@ -45,7 +47,10 @@ def main():
 
     print("Getting summaries for generation")
 
-    discharge_summaries = call_mimic_iii(NUMBER_OF_QA_PAIRS)
+    discharge_summaries = call_mimic_iii(
+        NUMBER_OF_QA_PAIRS,
+        MAX_SUMMARIES
+    )
 
     # For loop for generating qa pairs
     print("Done\n\nGenerating Q-A pairs...")
