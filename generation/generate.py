@@ -15,7 +15,7 @@ INCLUDE_EXPLANATION: bool = False
 
 # Variable for starting the generation from a specific row in MIMIC-III.
 # Default value is 0. Set to 0 if generating new dataset.
-CHECKPOINT: int = 120
+CHECKPOINT: int = 150
 QA_GENERATION_MODEL = "gpt-35-turbo-16k"
 MAX_SUMMARIES: int = 3
 
@@ -52,8 +52,7 @@ def main():
         NUMBER_OF_QA_PAIRS,
         MAX_SUMMARIES
     )
-    print("This is length! ", len(discharge_summaries))
-
+    
     # For loop for generating qa pairs
     print("Done\n\nGenerating Q-A pairs...")
 
