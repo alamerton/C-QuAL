@@ -1,5 +1,6 @@
 from datetime import datetime
-import sys, os, time
+import sys
+import os
 from tqdm import tqdm
 import pandas as pd
 
@@ -11,7 +12,8 @@ from utils.generation.call_mimic import call_mimic
 # SAVE_TO_HF = False #TODO
 NUMBER_OF_QA_PAIRS = 1000
 INCLUDE_EXPLANATION = False
-CHECKPOINT = 160
+# Variable for starting the generation from a specific row in MIMIC-III
+CHECKPOINT = 0 
 
 def main():
     # create dataframe with question and expected answer columns
@@ -54,7 +56,9 @@ def main():
         qa_string = call_gpt(data_item, INCLUDE_EXPLANATION)
 
         # Check correct columns are in response, regenerate until true
-        while not all(x in qa_string for x in ["Question", "Answer", "Type"]):
+        while "Question" not in qa_string \
+              or "Answer" not in qa_string \
+              or "Type" not in qa_string:
             qa_string = call_gpt(data_item, INCLUDE_EXPLANATION)
 
         # Parse the json to get the question and answer as variables
@@ -84,7 +88,7 @@ def main():
                 checkpoint_path = checkpoint_directory_path + checkpoint_name
             else:
                 checkpoint_name = f"{date}-{row+1}-rows"
-                checkpoint_path
+                checkpoint_path = checkpoint_directory_path + checkpoint_name
             data.to_csv(f"{checkpoint_path}.csv")
 
     print("Complete")
