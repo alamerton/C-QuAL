@@ -8,6 +8,8 @@ from openai import AzureOpenAI
 from dotenv import load_dotenv
 from azure.core.exceptions import HttpResponseError
 import time
+import re
+import nltk
 
 load_dotenv()
 
@@ -141,7 +143,12 @@ def call_gpt(discharge_summary, include_explanation):
             else:
                 raise
         raise RuntimeError("Maximum retries exceeded.")
-    
+
+def reduce_discharge_summary(discharge_summary):
+    # Remove whitespace
+    discharge_summary = re.sub(r'\s', ' ', discharge_summary).strip()
+    # Remove special characters and punctuation
+    discharge_summary = re.sub(r'[^\w\s]', '', discharge_summary)
 
 def prepare_discharge_summaries(discharge_summaries):
     discharge_summary_string = ""
@@ -149,6 +156,7 @@ def prepare_discharge_summaries(discharge_summaries):
         start_string = f"[Discharge summary {i} start]"
         end_string = f"[Discharge summary {i} end]"
         discharge_summary = discharge_summaries[i]
+        discharge_summary = reduce_discharge_summary(discharge_summary)
         ds_string += start_string + discharge_summary + end_string
     return discharge_summary_string
 
