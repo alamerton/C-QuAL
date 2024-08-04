@@ -142,7 +142,10 @@ def call_gpt(discharge_summary, include_explanation):
                 raise
         raise RuntimeError("Maximum retries exceeded.")
 
-def call_gpt_with_multiple_discharge_summaries(discharge_summaries):
+def call_gpt_with_multiple_discharge_summaries(
+        discharge_summaries,
+        include_explanation
+):
 
     max_retries = 10
     retry_delay = 5
@@ -153,58 +156,109 @@ def call_gpt_with_multiple_discharge_summaries(discharge_summaries):
         api_version=os.getenv("AZURE_API_VERSION"),
     )
 
-    discharge_summaries = prepare_discharge_summaries(discharge_summaries)
-
     system_message = """You are an expert medical professional tasked
     with creating clinically relevant question-answer pairs based on a
     discharge summary from the MIMIC-III database."""
 
-    user_prompt = f"""
-        You are given a set of discharge summaries from the MIMIC-III 
-        database. Your task is to generate a question and answer pair that is relevant 
-        to clinical practice.
+    if include_explanation:
+        user_prompt = f"""
+            You are given a set of discharge summaries from the MIMIC-III 
+            database. Your task is to generate a question and answer pair that is relevant 
+            to clinical practice.
 
-        Clinically relevant questions should test the ability to summarize, 
-        identify, and arrange text, and answer specific questions related to:
-        1. Treatment
-        2. Assessment
-        3. Diagnosis
-        4. Problems or complications
-        5. Abnormalities
-        6. Etiology
-        7. Medical history
+            Clinically relevant questions should test the ability to summarize, 
+            identify, and arrange text, and answer specific questions related to:
+            1. Treatment
+            2. Assessment
+            3. Diagnosis
+            4. Problems or complications
+            5. Abnormalities
+            6. Etiology
+            7. Medical history
 
-        The question should also be one of the following types:
-        1. Yes/No/Maybe
-        2. Unanswerable
-        3. Temporal
-        4. Factual
-        5. Summarisation
-        6. Identification`
+            The question should also be one of the following types:
+            1. Yes/No/Maybe
+            2. Unanswerable
+            3. Temporal
+            4. Factual
+            5. Summarisation
+            6. Identification
 
-        Do not create a question that is too easy to answer, only clinicians 
-        should be able to answer the question. Do not create a question that 
-        can be answered without referring to the discharge summary. Do not
-        create a question-answer pair with exactly matching details.
+            Your response should also contain short, one-sentence rationale behind 
+            the answer detailing the reason why the answer is correct.
 
-        Please follow this format:
+            Do not create a question that is too easy to answer, only clinicians 
+            should be able to answer the question. Do not create a question that 
+            can be answered without referring to the discharge summary. Do not
+            create a question-answer pair with exactly matching details.
 
-        Question: [Insert your clinical question here]
-        Answer: [Insert the corresponding answer here]
-        Type: [Your chosen question type from the list, spelled the same]
+            Please follow this format:
 
-        The discharge summaries are provided between [Discharge summary 
-        n start] and [Discharge summary n end] where n is the number 
-        corresponding to the discharge summary being passed. The 
-        discharge summaries are provided in chronological order.
+            Question: [Insert your clinical question here]
+            Answer: [Insert the corresponding answer here]
+            Type: [Your chosen question type from the list, spelled the same]
+            Reason: [Short explanation for the answer, based on the discharge 
+            summaries]
 
-        Here are the discharge summaries for you to work on.
+            The discharge summaries are provided between [Discharge summary 
+            n start] and [Discharge summary n end] where n is the number 
+            corresponding to the discharge summary being passed. The 
+            discharge summaries are provided in chronological order.
 
-        {discharge_summaries}
+            Here are the discharge summaries for you to work on:
 
-        Please provide a clinically relevant question and answer based on the 
-        above discharge summary.
-    """
+            {discharge_summaries}
+
+            Please provide a clinically relevant question and answer based on the 
+            above discharge summary.
+        """
+    else:
+        user_prompt = f"""
+            You are given a set of discharge summaries from the MIMIC-III 
+            database. Your task is to generate a question and answer pair that is relevant 
+            to clinical practice.
+
+            Clinically relevant questions should test the ability to summarize, 
+            identify, and arrange text, and answer specific questions related to:
+            1. Treatment
+            2. Assessment
+            3. Diagnosis
+            4. Problems or complications
+            5. Abnormalities
+            6. Etiology
+            7. Medical history
+
+            The question should also be one of the following types:
+            1. Yes/No/Maybe
+            2. Unanswerable
+            3. Temporal
+            4. Factual
+            5. Summarisation
+            6. Identification`
+
+            Do not create a question that is too easy to answer, only clinicians 
+            should be able to answer the question. Do not create a question that 
+            can be answered without referring to the discharge summary. Do not
+            create a question-answer pair with exactly matching details.
+
+            Please follow this format:
+
+            Question: [Insert your clinical question here]
+            Answer: [Insert the corresponding answer here]
+            Type: [Your chosen question type from the list, spelled the same]
+
+            The discharge summaries are provided between [Discharge summary 
+            n start] and [Discharge summary n end] where n is the number 
+            corresponding to the discharge summary being passed. The 
+            discharge summaries are provided in chronological order.
+
+            Here are the discharge summaries for you to work on.
+
+            {discharge_summaries}
+
+            Please provide a clinically relevant question and answer based on the 
+            above discharge summary.
+        """
 
     for i in range(0, max_retries):
         try:

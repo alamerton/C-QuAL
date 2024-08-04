@@ -29,14 +29,15 @@ def reduce_discharge_summary(discharge_summary):
     discharge_summary = re.sub(r'\s', ' ', discharge_summary).strip()
     # Remove special characters and punctuation
     discharge_summary = re.sub(r'[^\w\s]', '', discharge_summary)
+    return discharge_summary
 
 # Add a start and end tag to each discharge summary for the LLM to 
 # identify and concatenate them.
 def prepare_discharge_summaries(discharge_summaries):
     multiple_summaries = ""
-    for i in discharge_summaries:
-        start_string = f"[Discharge summary {i} start]\n"
-        end_string = f"\n[Discharge summary {i} end]\n"
+    for i in range(0, len(discharge_summaries)):
+        start_string = f"[Discharge summary {i + 1} start]\n"
+        end_string = f"\n[Discharge summary {i + 1} end]\n"
         discharge_summary = discharge_summaries[i]
         discharge_summary = reduce_discharge_summary(discharge_summary)
         multiple_summaries += start_string + discharge_summary + end_string
@@ -74,8 +75,9 @@ def call_mimic_iii(num_rows, max_summaries):
     cursor.execute(query)
 
     # For each discharge summary retrieved, either parse discharge 
-    # summaries straight into an array.
-    for _ in range(num_rows):
+    # summaries straight into an array.                 
+
+    for i in range(num_rows):
         # If generating multiple summaries, retrive patient id as well.
         if max_summaries > 1:
             row = cursor.fetchone()
@@ -83,28 +85,30 @@ def call_mimic_iii(num_rows, max_summaries):
                 break
             subject_id, discharge_summary = row
 
-            multiple_summaries = [discharge_summary]
-            next_row = cursor.fetchone()
-            cursor.rownumber -= 1
 
-            # When multiple discharge summaries correspond to one 
-            # patient in sequence (characteristic of MIMIC-III rows),
-            # collect up to [max_summaries] discharge summaries and 
-            # combine them into one string.
-            while next_row and next_row[0] == subject_id \
-            and len(multiple_summaries) < max_summaries:
-                _, next_discharge_summary = next_row
-                multiple_summaries.append(next_discharge_summary)
-                
-                cursor.fetchone()
+            multiple_summaries = [discharge_summary]
+            single_summary = discharge_summary
+
+            while len(multiple_summaries) < max_summaries:
+                # Check the subject_id of the next discharge summary
                 next_row = cursor.fetchone()
-                cursor.rownumber -= 1
-            combined_summaries = prepare_discharge_summaries(multiple_summaries)
-            discharge_summaries.append(combined_summaries)
+                if next_row is None or next_row[0] != subject_id:
+                    if next_row:
+                        cursor.execute(
+                            "SELECT * FROM (SELECT 1) LIMIT 0")
+                    break
+                multiple_summaries.append(next_row[1])
+                if max_summaries is not None and \
+                len(multiple_summaries) >= max_summaries:
+                    break
+            if len(multiple_summaries) > 1:
+                combined_summaries = prepare_discharge_summaries(
+                    multiple_summaries)
+                discharge_summaries.append(combined_summaries)
+            else:
+                discharge_summaries.append(single_summary)
         else:
             row = cursor.fetchone()
-            if row is None:
-                break
             discharge_summary = reduce_discharge_summary(row)
             discharge_summaries.append(discharge_summary)
 

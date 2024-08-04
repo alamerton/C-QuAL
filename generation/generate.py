@@ -6,7 +6,7 @@ import pandas as pd
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
-from utils.generation.call_gpt import call_gpt
+from utils.generation.call_gpt import call_gpt, call_gpt_with_multiple_discharge_summaries
 from utils.generation.call_mimic_iii import call_mimic_iii
 
 # SAVE_TO_HF = False #TODO
@@ -51,6 +51,7 @@ def main():
         NUMBER_OF_QA_PAIRS,
         MAX_SUMMARIES
     )
+    print("This is length! ", len(discharge_summaries))
 
     # For loop for generating qa pairs
     print("Done\n\nGenerating Q-A pairs...")
@@ -61,9 +62,15 @@ def main():
 
         # Create data item starting with discharge summary
         data_item = [discharge_summaries[row]]
+        print("This is length: ", len(discharge_summaries))
+        # print("This is it! ", data_item)
 
         # Call LLM with discharge summary and prompt
-        qa_string = call_gpt(data_item, INCLUDE_EXPLANATION)
+        # qa_string = call_gpt(data_items, INCLUDE_EXPLANATION)
+        qa_string = call_gpt_with_multiple_discharge_summaries(
+            data_item,
+            INCLUDE_EXPLANATION
+        )
 
         # Check correct columns are in response, regenerate until true
         while "Question" not in qa_string \
