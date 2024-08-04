@@ -63,13 +63,13 @@ def call_gpt(
             can be answered without referring to the discharge summary. Do not
             create a question-answer pair with exactly matching details.
 
-            Please follow this format:
+            Please follow this format exactly:
 
-            Question: [Insert your clinical question here]
-            Answer: [Insert the corresponding answer here]
-            Type: [Your chosen question type from the list, spelled the same]
+            Question: [Insert your clinical question here]\n
+            Answer: [Insert the corresponding answer here]\n
+            Type: [Your chosen question type from the list, spelled the same]\n
             Reason: [Short explanation for the answer, based on the discharge 
-            summaries]
+            summaries]\n
 
             If there are multiple discharge summaries, each will be provided 
             between [Discharge summary n start] and [Discharge summary n end] 

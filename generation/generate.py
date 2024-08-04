@@ -102,7 +102,6 @@ def main():
 
         # Output message to terminal
         print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
-        # time.sleep(5)
 
         checkpoint_directory_path = "data/generations/checkpoints/"
         if (row + 1) % 10 == 0:
