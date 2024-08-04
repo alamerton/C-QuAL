@@ -69,6 +69,7 @@ def main():
         # Call LLM with discharge summary and prompt
         # qa_string = call_gpt(data_items, INCLUDE_EXPLANATION)
         qa_string = call_gpt_with_multiple_discharge_summaries(
+            QA_GENERATION_MODEL,
             data_item,
             INCLUDE_EXPLANATION
         )
@@ -102,10 +103,10 @@ def main():
         checkpoint_directory_path = "data/generations/checkpoints/"
         if (row + 1) % 10 == 0:
             if CHECKPOINT > 0:
-                checkpoint_name = f"{date}-rows-{CHECKPOINT}-{row+1}"
+                checkpoint_name = f"rows-{CHECKPOINT}-{row+1}-{date}"
                 checkpoint_path = checkpoint_directory_path + checkpoint_name
             else:
-                checkpoint_name = f"{date}-{row+1}-rows"
+                checkpoint_name = f"{row+1}-rows-{date}"
                 checkpoint_path = checkpoint_directory_path + checkpoint_name
             data.to_csv(f"{checkpoint_path}.csv")
 
