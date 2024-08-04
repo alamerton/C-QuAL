@@ -7,21 +7,26 @@ import pandas as pd
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
 from utils.generation.call_gpt import call_gpt
-from utils.generation.call_mimic import call_mimic
+from utils.generation.call_mimic_iii import call_mimic_iii
 
 # SAVE_TO_HF = False #TODO
-NUMBER_OF_QA_PAIRS = 1000
-INCLUDE_EXPLANATION = False
+NUMBER_OF_QA_PAIRS: int = 1000
+INCLUDE_EXPLANATION: bool = False
 # Variable for starting the generation from a specific row in MIMIC-III
-CHECKPOINT = 0 
+CHECKPOINT: int = 0 
+MULTIPLE_SUMMARIES: bool = True
 
 def main():
     # create dataframe with question and expected answer columns
-
+    if MULTIPLE_SUMMARIES:
+        discharge_summary_string = "Discharge Summaries"
+    else:
+        discharge_summary_string = "Discharge Summary"
+    
     if INCLUDE_EXPLANATION:
         data = pd.DataFrame(
             columns=[
-                "Discharge Summary",
+                discharge_summary_string,
                 "Question",
                 "Expected Answer",
                 "Reason",
@@ -40,7 +45,7 @@ def main():
 
     print("Getting summaries for generation")
 
-    discharge_summaries = call_mimic(NUMBER_OF_QA_PAIRS)
+    discharge_summaries = call_mimic_iii(NUMBER_OF_QA_PAIRS)
 
     # For loop for generating qa pairs
     print("Done\n\nGenerating Q-A pairs...")

@@ -22,7 +22,7 @@ def save_data(results): # Load query results into a dataframe containing subject
     results_df.to_csv(f'C-QuAL/data/mimic-iii-subset.csv')
 
 
-def call_mimic(num_rows): # Return a discharge summary from the MIMIC-III database
+def call_mimic_iii(num_rows): # Return a discharge summary from the MIMIC-III database
     # Get date and time data for outputs
     current_date = datetime.now()
 
