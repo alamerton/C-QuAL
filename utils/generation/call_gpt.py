@@ -151,14 +151,14 @@ def reduce_discharge_summary(discharge_summary):
     discharge_summary = re.sub(r'[^\w\s]', '', discharge_summary)
 
 def prepare_discharge_summaries(discharge_summaries):
-    discharge_summary_string = ""
+    multiple_summaries = ""
     for i in discharge_summaries:
-        start_string = f"[Discharge summary {i} start]"
-        end_string = f"[Discharge summary {i} end]"
+        start_string = f"[Discharge summary {i} start]\n"
+        end_string = f"\n[Discharge summary {i} end]\n"
         discharge_summary = discharge_summaries[i]
         discharge_summary = reduce_discharge_summary(discharge_summary)
-        ds_string += start_string + discharge_summary + end_string
-    return discharge_summary_string
+        multiple_summaries += start_string + discharge_summary + end_string
+    return multiple_summaries
 
 
 def call_gpt_with_multiple_discharge_summaries(discharge_summaries):
