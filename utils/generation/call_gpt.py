@@ -11,8 +11,6 @@ import time
 
 load_dotenv()
 
-QA_GENERATION_MODEL = "gpt-35-turbo-16k"
-
 
 def call_gpt(discharge_summary, include_explanation):
 

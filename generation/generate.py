@@ -16,6 +16,7 @@ INCLUDE_EXPLANATION: bool = False
 # Variable for starting the generation from a specific row in MIMIC-III.
 # Default value is 0. Set to 0 if generating new dataset.
 CHECKPOINT: int = 0 
+QA_GENERATION_MODEL = "gpt-35-turbo-16k"
 MAX_SUMMARIES: int = 3
 
 def main():
