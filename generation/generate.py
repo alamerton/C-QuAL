@@ -6,7 +6,7 @@ import pandas as pd
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
-from utils.generation.call_gpt import call_gpt, call_gpt_with_multiple_discharge_summaries
+from utils.generation.call_gpt import call_gpt
 from utils.generation.call_mimic_iii import call_mimic_iii
 
 # SAVE_TO_HF = False #TODO
@@ -15,7 +15,7 @@ INCLUDE_EXPLANATION: bool = False
 
 # Variable for starting the generation from a specific row in MIMIC-III.
 # Default value is 0. Set to 0 if generating new dataset.
-CHECKPOINT: int = 0 
+CHECKPOINT: int = 120
 QA_GENERATION_MODEL = "gpt-35-turbo-16k"
 MAX_SUMMARIES: int = 3
 
@@ -68,7 +68,7 @@ def main():
 
         # Call LLM with discharge summary and prompt
         # qa_string = call_gpt(data_items, INCLUDE_EXPLANATION)
-        qa_string = call_gpt_with_multiple_discharge_summaries(
+        qa_string = call_gpt(
             QA_GENERATION_MODEL,
             data_item,
             INCLUDE_EXPLANATION
