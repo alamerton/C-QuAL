@@ -78,7 +78,11 @@ def main():
         while "Question" not in qa_string \
               or "Answer" not in qa_string \
               or "Type" not in qa_string:
-            qa_string = call_gpt(data_item, INCLUDE_EXPLANATION)
+            qa_string = call_gpt(
+                QA_GENERATION_MODEL,
+                data_item,
+                INCLUDE_EXPLANATION
+            )
 
         # Parse the json to get the question and answer as variables
         qa_parts = qa_string.split("\n")
