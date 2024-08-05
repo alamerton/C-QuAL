@@ -3,7 +3,7 @@ import pandas as pd
 import re
 
 DATASET_PATH = '../data/generations/c-qual-xl.csv'
-SAVE_PATH = '../data/processing/matching_pairs/dataset_processed_overwrite.csv's
+SAVE_PATH = '../data/processing/matching_pairs/dataset_processed_overwrite.csv'
 
 # Open a dataset and remove any row where the answer contains an 
 # exact match of a given length

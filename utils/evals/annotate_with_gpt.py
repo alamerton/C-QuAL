@@ -5,18 +5,18 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-ANNOTATION_MODEL = "gpt-35-turbo-16k"
+ANNOTATION_MODEL = "gpt-4o"
 
 def annotate_with_gpt(
         discharge_summary,
         question,
         expected_answer,
-        reason
         ):
 
     client = AzureOpenAI(
-        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-        api_key=os.getenv("AZURE_OPENAI_KEY"),
+        # azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        azure_endpoint=os.getenv("AZURE_GPT_4O_ENDPOINT"),
+        api_key=os.getenv("AZURE_GPT_4O_API_KEY"),
         api_version=os.getenv("AZURE_API_VERSION"),
     )
 
@@ -30,18 +30,22 @@ def annotate_with_gpt(
         given discharge summaries.\nBy using the correct answer 
         also provided, you must score the answer as 0 or 1, based 
         on the following scoring instructions.\nScoring 
-        Instructions:\n1. Assign 1 point if the answer is correct.
-        \n2. Assign 0 points if the answer is either incorrect, or 
+        Instructions:\n
+        1. Assign 0 points if the answer is either incorrect, or 
         if it falsely claims there is no answer when one exists 
         according to the discharge summaries.\n\n
+        2. Assign 0 points if the question gives away the answer to
+        the model. Be strict about this.
+        3. Assign 1 otherwise
+        4. You should only assign the output 1 if you think it is a very
+        good question-answer pair for benchmarking a clinical large
+        language model
+
         - Discharge Summaries:\n{discharge_summary}\n\n
         - Question: {question}\n\n
         - Correct Answer: {expected_answer}\n\n
-        - Model Output:\n\n{reason}\n\n
-        Output format:\nScore: {{score}}\nReasoning: {{explanation}}
-        \n(Note: In your response please replace {{score}} with the 
-        numerical score of 0 or 1, and provide a brief reasoning for
-            the assigned score based on the evaluation criteria.)
+        Output format:\nScore: {{score}}\n(Note: In your response 
+        please replace {{score}} with the numerical score of 0 or 1)
     """
 
     response = client.chat.completions.create(

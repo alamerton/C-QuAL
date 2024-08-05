@@ -1,8 +1,12 @@
-# %%
-
+import sys
+import os
 from datetime import datetime
 import tiktoken
-from generation.call_mimic_iii import call_mimic_iii
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, parent_dir)
+
+from utils.generation.call_mimic_iii import call_mimic_iii
 
 NUMBER_OF_QA_PAIRS = 1000
 MODEL_NAME = "gpt-4"
@@ -62,13 +66,12 @@ def calculate_max_discharge_summaries(model_name, limit=10):
 # max_tokens = calculate_max_tokens(strings, "gpt-35-turbo-16k")
 # print(f"Max tokens: {max_tokens}")
 
-limit = 10
-biggest_string_token_lengths = calculate_max_discharge_summaries(
-    "gpt-35-turbo-16k", limit
-)
+# limit = 10
+# biggest_string_token_lengths = calculate_max_discharge_summaries(
+#     "gpt-35-turbo-16k", limit
+# )
 
-print(
-    f"Biggest discharge summary strings with limit {limit} summaries: { \
-    biggest_string_token_lengths}"
-)
-# %%
+# print(
+#     f"Biggest discharge summary strings with limit {limit} summaries: { \
+#     biggest_string_token_lengths}"
+# )
