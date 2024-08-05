@@ -40,7 +40,7 @@ def benchmark_locally(model_name, discharge_summary, question):
 
 
     tokenised_prompt = tokeniser(prompt, return_tensors="pt")
-    generation = model.generate(tokenised_prompt["input_ids"], max_length=999)
+    generation = model.generate(tokenised_prompt["input_ids"], max_length=99999)
     response = tokeniser.decode(generation[0], skip_special_tokens=True)
 
     return response
