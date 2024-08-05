@@ -151,6 +151,11 @@ def get_g_eval(expected_answer: str, model_answer: str):
 
 def score_model(dataset, model_name):
 
+    if '/' in model_name:
+        model_name.replace('/', '_')
+
+    dataset[f"{model_name} Response"] = None
+
     em_scores = []
     f1_scores = []
     sas_scores = []
@@ -178,6 +183,7 @@ def score_model(dataset, model_name):
     # clinical_concept_extraction = np.mean(clinical_concept_extraction_scores)
     # medical_relation_extraction = np.mean(medical_relation_extraction_scores)
     # print("g_eval_scores: ", g_eval_scores)
+
 
     benchmarking_results = pd.DataFrame(
         {
@@ -209,6 +215,9 @@ def score_model(dataset, model_name):
 def main():
     model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
     save_dataset(model_answers, directory="model-answers")
+    model_answers = pd.read_csv(
+        "data/model-answers/3-QA-pairs-2024-08-02 14:03:57.715991.csv"
+    )
     benchmarking_results = score_model(model_answers, MODEL_NAME)
     save_dataset(benchmarking_results, directory="benchmarking-results")
     print(benchmarking_results)
