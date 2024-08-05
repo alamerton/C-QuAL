@@ -15,10 +15,12 @@ from deepeval.test_case import LLMTestCase
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
 from utils.evals.benchmark_with_azure import benchmark_with_azure
+from utils.evals.benchmark_locally import benchmark_locally
 from utils.misc import save_dataset
 
 DATASET_PATH = "data/generations/3-QA-pairs-2024-08-01 14:04:41.574896.csv"
-MODEL_NAME = "gpt-35-turbo-16k"
+MODEL_NAME = "starmpcc/Asclepius-13B"
+LOCAL = True
 
 embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
 rouge = Rouge()
@@ -42,21 +44,29 @@ g_eval_metric = GEval(
 
 
 def record_model_answers(dataset_path, model_name):
-    # TODO: extend to include local models
     print("Loading dataset")
     dataset = pd.read_csv(dataset_path)
 
     for index, row in tqdm(
-        dataset.iterrows(), total=len(dataset), desc=f"Benchmarking model"
+        dataset.iterrows(),
+        total=len(dataset),
+        desc=f"Benchmarking model"
     ):
         discharge_summary = row["Discharge Summary"]
         question = row["Question"]
 
-        response = benchmark_with_azure(
-            model_name,
-            discharge_summary,
-            question
-        )
+        if LOCAL:
+            response = benchmark_locally(
+                model_name,
+                discharge_summary,
+                question
+            )
+        else:
+            response = benchmark_with_azure(
+                model_name,
+                discharge_summary,
+                question
+            )
 
         dataset.at[index, f"{model_name} Response"] = response
     return dataset
@@ -129,19 +139,6 @@ def get_bleu(expected_answer: str, model_answer: str):
     return score
 
 
-# # TODO: implement clinical_concept_extraction
-# def get_clinical_concept_extraction(model_answer: str):
-#     doc = nlp(model_answer)
-#     entities = [(ent.text, ent.label_) for ent in doc.ents]
-#     print(entities)
-#     return 0
-
-
-# def get_medical_relation_extraction(expected_answer: str, model_answer: str):
-#     train = kindred.bionlpst.load('2016-SeeDev-binary-train')
-#     dev = kindred.bionlpst.load('2016-SeeDev-binary-dev')
-
-
 def get_g_eval(expected_answer: str, model_answer: str):
     # test_case = LLMTestCase(input=model_answer, actual_output=expected_answer)
     test_case = LLMTestCase(input="Test input", actual_output="Expected output")
@@ -210,11 +207,8 @@ def score_model(dataset, model_name):
 
 
 def main():
-    # model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
-    # save_dataset(model_answers, directory="model-answers")
-    model_answers = pd.read_csv(
-        "data/model-answers/3-QA-pairs-2024-08-02 14:03:57.715991.csv"
-    )
+    model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
+    save_dataset(model_answers, directory="model-answers")
     benchmarking_results = score_model(model_answers, MODEL_NAME)
     save_dataset(benchmarking_results, directory="benchmarking-results")
     print(benchmarking_results)
