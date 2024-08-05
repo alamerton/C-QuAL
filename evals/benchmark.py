@@ -28,7 +28,7 @@ g_eval_metric = GEval(
     name="g-eval",
     criteria="""
     Evaluate the quality of the generated text based on the ability of the LLM
-    to summarize, identify, and arrange text, and answer specific questions 
+    to summarize, identify, and arrange text, ancondad answer specific questions 
     related to:
         1. Patient’s medical history
         2. Diagnoses made

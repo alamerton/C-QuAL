@@ -2,7 +2,8 @@
 import pandas as pd
 import re
 
-DATASET_PATH = '../data/generations/c-qual-xl.csv'
+# DATASET_PATH = '../data/generations/c-qual-xl.csv'
+DATASET_PATH = 'data/annotations/checkpoints/20-rows-2024-08-05 17:44:22.csv'
 SAVE_PATH = '../data/processing/matching-pairs/dataset_processed_overwrite.csv'
 
 # Open a dataset and remove any row where the answer contains an 
@@ -29,4 +30,28 @@ def remove_spurious_pairs(dataset_path, save_path):
     df_filtered.to_csv(save_path)
     print("New shape: ", df_filtered.shape)
 
-remove_spurious_pairs(DATASET_PATH, SAVE_PATH)
+def remove_low_quality_pairs(dataset_path, save_path):
+    df = pd.read_csv(dataset_path)
+    no_zeros_df = df[~df['Annotation'].astype(str).str.contains('0')]
+    no_annotations_df = no_zeros_df.drop('Annotation', axis=1)
+    new_df = no_annotations_df.reset_index(drop=True)
+    print(new_df.head)
+    new_df.to_csv(save_path)
+
+def remove_extraneous_columns(dataframe):
+    columns_to_keep = ['Discharge Summaries', 'Question,Expected', 'Answer', 'Question Type']
+    return dataframe[columns_to_keep]
+
+def main():
+    # remove_spurious_pairs(DATASET_PATH, SAVE_PATH)
+    annotated_df = remove_low_quality_pairs(DATASET_PATH, SAVE_PATH)
+    relevant_columns_df = remove_extraneous_columns(annotated_df)
+    print(relevant_columns_df.head)
+    print(relevant_columns_df.shape)
+    
+
+
+
+if __name__ == '__main__':
+    main()
+
