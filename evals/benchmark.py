@@ -18,7 +18,7 @@ from utils.evals.benchmark_with_azure import benchmark_with_azure
 from utils.misc import save_dataset
 
 DATASET_PATH = "data/generations/3-QA-pairs-2024-08-01 14:04:41.574896.csv"
-MODEL_NAME = "gpt-35-turbo-16k"
+MODEL_NAME = "starmpcc/Asclepius-13Bk"
 
 embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
 rouge = Rouge()
@@ -57,7 +57,8 @@ def record_model_answers(dataset_path, model_name):
             discharge_summary,
             question
         )
-
+        if '/' in model_name:
+                model_name.replace('/', '_')
         dataset.at[index, f"{model_name} Response"] = response
     return dataset
 
@@ -154,6 +155,11 @@ def get_g_eval(expected_answer: str, model_answer: str):
 
 def score_model(dataset, model_name):
 
+    if '/' in model_name:
+        model_name.replace('/', '_')
+
+    dataset[f"{model_name} Response"] = None
+
     em_scores = []
     f1_scores = []
     sas_scores = []
@@ -181,6 +187,7 @@ def score_model(dataset, model_name):
     # clinical_concept_extraction = np.mean(clinical_concept_extraction_scores)
     # medical_relation_extraction = np.mean(medical_relation_extraction_scores)
     # print("g_eval_scores: ", g_eval_scores)
+
 
     benchmarking_results = pd.DataFrame(
         {
@@ -210,8 +217,8 @@ def score_model(dataset, model_name):
 
 
 def main():
-    # model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
-    # save_dataset(model_answers, directory="model-answers")
+    model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
+    save_dataset(model_answers, directory="model-answers")
     model_answers = pd.read_csv(
         "data/model-answers/3-QA-pairs-2024-08-02 14:03:57.715991.csv"
     )
