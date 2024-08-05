@@ -5,7 +5,6 @@ the analysis results to a CSV file.
 """
 
 import pandas as pd
-from tqdm import tqdm
 from datetime import datetime
 import sys
 import os

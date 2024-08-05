@@ -1,5 +1,9 @@
-#TODO: write
+# %%
+import pandas as pd
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
-def load_local_model(model_name):
-    #TODO: write
-    return True
+
+# %%
+tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-70B")
+model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-70B")
+# %%

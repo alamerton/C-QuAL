@@ -172,13 +172,6 @@ def score_model(dataset, model_name):
         sas_scores.append(get_sas(expected_answer, model_answer))
         rouge_scores.append(get_rouge(expected_answer, model_answer))
         bleu_scores.append(get_bleu(expected_answer, model_answer))
-        # clinical_concept_extraction_scores.append(
-        #     get_clinical_concept_extraction(model_answer)
-        # )
-        # medical_relation_extraction_scores.append(
-        #     get_medical_relation_extraction(expected_answer, model_answer)
-        # )
-        # g_eval_scores.append(get_g_eval(expected_answer, model_answer))
 
     exact_match = np.mean(em_scores)
     f1 = np.mean(f1_scores)

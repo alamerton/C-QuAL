@@ -10,12 +10,12 @@ from utils.generation.call_gpt import call_gpt
 from utils.generation.call_mimic_iii import call_mimic_iii
 
 # SAVE_TO_HF = False #TODO
-NUMBER_OF_QA_PAIRS: int = 1000
+NUMBER_OF_QA_PAIRS: int = 1500
 INCLUDE_EXPLANATION: bool = False
 
 # Variable for starting the generation from a specific row in MIMIC-III.
 # Default value is 0. Set to 0 if generating new dataset.
-CHECKPOINT: int = 150
+CHECKPOINT: int = 850
 QA_GENERATION_MODEL = "gpt-35-turbo-16k"
 MAX_SUMMARIES: int = 3
 
@@ -62,8 +62,6 @@ def main():
 
         # Create data item starting with discharge summary
         data_item = [discharge_summaries[row]]
-        print("This is length: ", len(discharge_summaries))
-        # print("This is it! ", data_item)
 
         # Call LLM with discharge summary and prompt
         # qa_string = call_gpt(data_items, INCLUDE_EXPLANATION)
