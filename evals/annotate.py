@@ -1,5 +1,6 @@
 import pandas as pd
-import os, sys
+import os
+import sys
 from datetime import datetime
 from tqdm import tqdm
 
@@ -10,7 +11,7 @@ from utils.misc import save_dataset
 
 DATASET_PATH = 'data/processing/matching-pairs/dataset_processed_overwrite.csv'
 SAVE_LOCALLY = True
-CHECKPOINT = 630
+CHECKPOINT = 0
 
 date = datetime.now()
 date = date.strftime("%Y-%m-%d %H:%M:%S")

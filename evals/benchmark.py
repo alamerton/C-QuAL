@@ -10,7 +10,7 @@ from nltk.util import ngrams
 from deepeval.metrics import GEval
 from deepeval.test_case import LLMTestCaseParams
 from deepeval.test_case import LLMTestCase
-
+from datetime import datetime
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
@@ -21,6 +21,11 @@ from utils.misc import save_dataset
 DATASET_PATH = "data/generations/3-QA-pairs-2024-08-01 14:04:41.574896.csv"
 MODEL_NAME = "starmpcc/Asclepius-13B"
 LOCAL = True
+CHECKPOINT = 0
+
+
+date = datetime.now()
+date = date.strftime("%Y-%m-%d %H:%M:%S")
 
 embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
 rouge = Rouge()
@@ -48,27 +53,32 @@ def record_model_answers(dataset_path, model_name):
     dataset = pd.read_csv(dataset_path)
 
     for index, row in tqdm(
-        dataset.iterrows(),
-        total=len(dataset),
-        desc=f"Benchmarking model"
+        dataset.iterrows(), total=len(dataset), desc=f"Benchmarking model"
     ):
         discharge_summary = row["Discharge Summary"]
         question = row["Question"]
 
         if LOCAL:
-            response = benchmark_locally(
-                model_name,
-                discharge_summary,
-                question
-            )
+            response = benchmark_locally(model_name, discharge_summary, question)
         else:
-            response = benchmark_with_azure(
-                model_name,
-                discharge_summary,
-                question
-            )
+            response = benchmark_with_azure(model_name, discharge_summary, question)
+
+        if "/" in model_name:
+            model_name.replace("/", "_")
 
         dataset.at[index, f"{model_name} Response"] = response
+
+        checkpoint_directory_path = "data/model-answers/checkpoints/"
+
+        if (index + 1) % 10 == 0:
+            if CHECKPOINT > 0:
+                checkpoint_name = f"rows-{CHECKPOINT}-{index+1}-{date}"
+                checkpoint_path = checkpoint_directory_path + checkpoint_name
+            else:
+                checkpoint_name = f"{model_name}-{index+1}-rows-{date}"
+                checkpoint_path = checkpoint_directory_path + checkpoint_name
+            dataset.to_csv(f"{checkpoint_path}.csv")
+
     return dataset
 
 
@@ -151,8 +161,8 @@ def get_g_eval(expected_answer: str, model_answer: str):
 
 def score_model(dataset, model_name):
 
-    if '/' in model_name:
-        model_name.replace('/', '_')
+    if "/" in model_name:
+        model_name.replace("/", "_")
 
     dataset[f"{model_name} Response"] = None
 
@@ -184,7 +194,6 @@ def score_model(dataset, model_name):
     # medical_relation_extraction = np.mean(medical_relation_extraction_scores)
     # print("g_eval_scores: ", g_eval_scores)
 
-
     benchmarking_results = pd.DataFrame(
         {
             "Metric": [
@@ -209,6 +218,7 @@ def score_model(dataset, model_name):
             ],
         }
     )
+
     return benchmarking_results
 
 

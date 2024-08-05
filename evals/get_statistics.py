@@ -13,7 +13,7 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
 from utils.evals.categorise_with_gpt import categorise_with_gpt
 
-DATASET_PATH = "data/generations/3-QA-pairs-2024-08-01 14:04:41.574896.csv"
+DATASET_PATH = "data/processing/cqual-small.csv"
 
 def get_question_categories(df: pd.DataFrame):
     """
@@ -138,8 +138,7 @@ def main():
     data = get_statistics(DATASET_PATH)
     name = DATASET_PATH.split("/")[-1]
     output_path = f"data/analysis/dataset-{name}-analysed-at-{datetime.now()}"
-    # data.to_csv(f"{output_path}.csv")
-    data.to_csv("data/analysis/overwrite.csv")
+    data.to_csv(f"{output_path}.csv")
 
 
 if __name__ == "__main__":
