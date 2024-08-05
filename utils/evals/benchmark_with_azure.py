@@ -12,6 +12,12 @@ def benchmark_with_azure(
     discharge_summary,
     question,
 ):
+    if 'gpt' in model_name:
+        if '4o' in model_name:
+            endpoint = os.getenv("AZURE_GPT_4O_ENDPOINT")
+        if '35' in model_name:
+            endpoint = os.getenv("")
+
 
     client = AzureOpenAI(
         azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
