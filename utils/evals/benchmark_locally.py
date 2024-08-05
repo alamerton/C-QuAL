@@ -4,7 +4,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 def benchmark_locally(model_name, discharge_summary, question):
     tokeniser = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForCausalLM.from_pretrained(model_name)
-
+    
     prompt = f"""
     You are an expert medical professional tasked 
     with answering a clinical question to the best of your ability. You 

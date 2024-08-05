@@ -40,12 +40,15 @@ def annotate_with_gpt(
         4. You should only assign the output 1 if you think it is a very
         good question-answer pair for benchmarking a clinical large
         language model
-
+        
+        Please do not include any other information than the score number\n
+        Output format:\nScore: [your score of either 0 or 1]
+        
         - Discharge Summaries:\n{discharge_summary}\n\n
         - Question: {question}\n\n
         - Correct Answer: {expected_answer}\n\n
-        Output format:\nScore: {{score}}\n(Note: In your response 
-        please replace {{score}} with the numerical score of 0 or 1)
+        
+        Score: 
     """
 
     response = client.chat.completions.create(
@@ -54,7 +57,7 @@ def annotate_with_gpt(
             {"role": "system", "content": system_message},
             {"role": "user", "content": user_prompt},
         ],
-        max_tokens=600,
+        max_tokens=10,
         temperature=0,
     )
 

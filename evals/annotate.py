@@ -10,7 +10,7 @@ from utils.misc import save_dataset
 
 DATASET_PATH = 'data/processing/matching_pairs/dataset_processed_overwrite.csv'
 SAVE_LOCALLY = True
-CHECKPOINT = 0
+CHECKPOINT = 630
 
 date = datetime.now()
 date = date.strftime("%Y-%m-%d %H:%M:%S")
@@ -21,7 +21,7 @@ def annotate_dataset(dataset_path, local: bool = False):
     dataset: pd.DataFrame = pd.read_csv(dataset_path)
 
     for index, row in tqdm(
-        dataset.iterrows(),
+        dataset.iloc[CHECKPOINT:].iterrows(),
         total = len(dataset),
         desc='Annotating dataset'
         ):
@@ -40,6 +40,8 @@ def annotate_dataset(dataset_path, local: bool = False):
 
         dataset.at[index, 'Annotation'] = annotation
 
+        print(f"{index+1}/{len(dataset)}")
+        
         checkpoint_directory_path = "data/annotations/checkpoints/"
         if (index + 1) % 10 == 0:
             if CHECKPOINT > 0:
