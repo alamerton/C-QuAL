@@ -3,8 +3,8 @@ import pandas as pd
 import re
 
 # DATASET_PATH = '../data/generations/c-qual-xl.csv'
-DATASET_PATH = 'data/annotations/checkpoints/20-rows-2024-08-05 17:44:22.csv'
-SAVE_PATH = '../data/processing/matching-pairs/dataset_processed_overwrite.csv'
+DATASET_PATH = 'data/processing/annotated_high_quality_pairs.csv'
+SAVE_PATH = 'data/processing/annotated_high_quality_pairs.csv'
 
 # Open a dataset and remove any row where the answer contains an 
 # exact match of a given length
@@ -33,23 +33,40 @@ def remove_spurious_pairs(dataset_path, save_path):
 def remove_low_quality_pairs(dataset_path, save_path):
     df = pd.read_csv(dataset_path)
     no_zeros_df = df[~df['Annotation'].astype(str).str.contains('0')]
-    no_annotations_df = no_zeros_df.drop('Annotation', axis=1)
-    new_df = no_annotations_df.reset_index(drop=True)
+    # no_annotations_df = no_zeros_df.drop('Annotation', axis=1)
+    # new_df = no_annotations_df.reset_index(drop=True)
+    new_df = no_zeros_df.reset_index(drop=True)
     print(new_df.head)
     new_df.to_csv(save_path)
 
-def remove_extraneous_columns(dataframe):
-    columns_to_keep = ['Discharge Summaries', 'Question,Expected', 'Answer', 'Question Type']
-    return dataframe[columns_to_keep]
+def remove_extraneous_columns(dataset_path, save_path):
+    df = pd.read_csv(dataset_path)
+    columns_to_keep = ['Discharge Summaries', 'Question', 'Expected Answer', 'Question Type']
+    relevant_columns_df = df[columns_to_keep]
+    relevant_columns_df.to_csv(save_path)
+
+def combine_csv_files(csv_1_path, csv_2_path):
+    df1 = pd.read_csv(csv_1_path)
+    df2 = pd.read_csv(csv_2_path)
+
+    df1_subset = df1.iloc[:630]
+    df2_subset = df2.iloc[630:]
+
+    combined_df = pd.concat([df1_subset, df2_subset])
+    combined_df.to_csv('data/annotations/combined_annotation_datasets.csv')
+
+def remove_missing_value_rows(dataset_path, save_path):
+    df = pd.read_csv(dataset_path)
+    df = df.drop('Discharge Summary', axis=1)
+    df = df.dropna()
+    df.to_csv(save_path)
 
 def main():
-    # remove_spurious_pairs(DATASET_PATH, SAVE_PATH)
-    annotated_df = remove_low_quality_pairs(DATASET_PATH, SAVE_PATH)
-    relevant_columns_df = remove_extraneous_columns(annotated_df)
-    print(relevant_columns_df.head)
-    print(relevant_columns_df.shape)
-    
-
+    # remove_extraneous_columns('data/processing/high_quality_annotated_no_missing_values.csv', 'data/processing/cqual-small.csv')
+    cqual = pd.read_csv('data/processing/cqual-small.csv')
+    print(cqual.head)
+    print("Dataset size:", len(cqual))
+    print
 
 
 if __name__ == '__main__':
