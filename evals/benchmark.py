@@ -11,6 +11,7 @@ from deepeval.metrics import GEval
 from deepeval.test_case import LLMTestCaseParams
 from deepeval.test_case import LLMTestCase
 from datetime import datetime
+from transformers import AutoTokenizer
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
@@ -18,8 +19,8 @@ from utils.evals.benchmark_with_azure import benchmark_with_azure
 from utils.evals.benchmark_locally import benchmark_locally
 from utils.misc import save_dataset
 
-DATASET_PATH = "data/generations/3-QA-pairs-2024-08-01 14:04:41.574896.csv"
-MODEL_NAME = "starmpcc/Asclepius-13B"
+DATASET_PATH = "data/processing/cqual-small.csv"
+MODEL_NAME = "gpt-4o"
 LOCAL = True
 CHECKPOINT = 0
 
@@ -58,6 +59,28 @@ def record_model_answers(dataset_path, model_name):
         discharge_summary = row["Discharge Summary"]
         question = row["Question"]
 
+        if model_name == "starmpcc/Asclepius-13B" or \
+        model_name == "starmpcc/Asclepius-13B":
+            tokeniser = AutoTokenizer.from_pretrained(model_name)
+            
+            prompt = f"""You are an intelligent clinical languge model.
+            Below is a snippet of patient's discharge summary and a following instruction from healthcare professional.
+            Write a response that appropriately completes the instruction.
+            The response should provide the accurate answer to the instruction, while being concise.
+
+            [Discharge Summary Begin]
+            {discharge_summary}
+            [Discharge Summary End]
+
+            [Instruction Begin]
+            {question}
+            [Instruction End] 
+            """
+            tokenised_prompt = tokeniser(prompt, return_tensors="pt")
+            
+            if len(tokenised_prompt > 1800):
+                continue
+
         if LOCAL:
             response = benchmark_locally(model_name, discharge_summary, question)
         else:
@@ -65,6 +88,7 @@ def record_model_answers(dataset_path, model_name):
 
         if "/" in model_name:
             model_name.replace("/", "_")
+
 
         dataset.at[index, f"{model_name} Response"] = response
 
