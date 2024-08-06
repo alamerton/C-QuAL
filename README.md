@@ -2,6 +2,8 @@
 
 This is the repo for my MSc individual project: C-QuAL: a **C**linical **Qu**estion **A**nswering **L**arge Language Model Benchmarking Dataset. This repo contains the code for generating the dataset.
 
+![Q-A-diagram (1)](https://github.com/user-attachments/assets/cdadf8d7-1cda-4539-921b-dbeac06bcfae)
+
 ## Broad Scope of the Project
 
 I am part of a team of 5 MSc students working on a project with the goal of developing a large language model (LLM) that can be deployed in clinical settings to assist with the decision reasoning of clinicians. Clinicians spend too much time manually reasoning about decisions when much of it can be automated thanks to the abundance of clinical data in electronic health records (EHR). An LLM can be fine-tuned to assist with that decision reasoning and decision making, reducing the amount of time clinicians would need to spend on it. At scale, this could significantly improve clinical processes.
