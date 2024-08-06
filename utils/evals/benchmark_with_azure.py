@@ -89,41 +89,6 @@ def benchmark_with_azure(
             print(f"An error occured, status code: {response.status_code}")
             return 0
 
-    elif model_name == "Llama-2-70b-uvwrs":
-        endpoint = os.getenv("AZURE_LLAMA_2_ENDPOINT")
-        api_key = os.getenv("AZURE_LLAMA_2_API_KEY")
-
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}",
-        }
-
-        data = {
-            "prompt": system_message + user_prompt,
-            "max_tokens": 4096,
-            "temperature": 0,
-            "top_p": 0.1,
-            "best_of": 1,
-            "presence_penalty": 0,
-            "use_beam_search": "false",
-            "ignore_eos": "false",
-            "skip_special_tokens": "false",
-            "model": "llama-2",
-        }
-        body = json.dumps(data).encode("utf-8")  # Ensure utf-8 encoding
-
-        req = urllib.request.Request(endpoint, body, headers)
-
-        try:
-            response = urllib.request.urlopen(req)
-            result = response.read()
-            print(result.decode("utf-8"))
-        except urllib.error.HTTPError as error:
-            print(f"The request failed with status code: {error.code}")
-            # Print the headers - they include the request ID and the timestamp, which are useful for debugging the failure
-            print(error.info())
-            print(error.read().decode("utf-8", "ignore"))
-
     elif "Mistral" in model_name:
         mistral_endpoint = os.getenv("AZURE_MISTRAL_LARGE_ENDPOINT")
         mistral_api_key = os.getenv("AZURE_MISTRAL_LARGE_API_KEY")
