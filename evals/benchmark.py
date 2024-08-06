@@ -168,8 +168,6 @@ def score_model(dataset, model_name):
     if "/" in model_name:
         model_name.replace("/", "_")
 
-    # dataset[f"{model_name} Response"] = None
-
     em_scores = []
     f1_scores = []
     sas_scores = []

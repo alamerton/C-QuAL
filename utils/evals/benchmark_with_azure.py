@@ -17,8 +17,6 @@ def benchmark_with_azure(
         if "4o" in model_name:
             endpoint = os.getenv("AZURE_GPT_4O_ENDPOINT")
             api_key = os.getenv("AZURE_GPT_4O_API_KEY")
-        # elif '35' in model_name:
-        #     endpoint = os.getenv("")
         else:
             endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
             api_key = os.getenv("AZURE_OPENAI_KEY")
@@ -107,12 +105,8 @@ def benchmark_with_azure(
         response_json = json.loads(result)
         content = response_json["choices"][0]["message"]["content"]
         return content
-        # return choice['message']['content']
-        # else:
-        #     print(f"An error occured, status code: {response.status_code}")
-        # return 0
 
     else:
         raise ValueError("Model name not recognised by script.")
 
-    # return result.choices[0].message.content
+    return result.choices[0].message.content
