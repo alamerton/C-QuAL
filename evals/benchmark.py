@@ -2,8 +2,6 @@ import pandas as pd
 from tqdm import tqdm
 import sys
 import os
-import tensorflow as tf
-import tensorflow_hub as hub
 import numpy as np
 from rouge import Rouge
 import numpy as np
@@ -12,10 +10,6 @@ from deepeval.metrics import GEval
 from deepeval.test_case import LLMTestCaseParams
 from deepeval.test_case import LLMTestCase
 from datetime import datetime
-from transformers import AutoTokenizer
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-from gensim.models import KeyedVectors
 import spacy
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -25,7 +19,7 @@ from utils.evals.benchmark_locally import benchmark_locally
 from utils.misc import save_dataset
 
 DATASET_PATH = "data/processing/cqual-small.csv"
-MODEL_NAME = "Mistral-large-qgpdg"
+MODEL_NAME = "Llama-2-70b-uvwrs"
 LOCAL = False
 CHECKPOINT = 0
 
@@ -233,8 +227,8 @@ def score_model(dataset, model_name):
 
 
 def main():
-    # model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
-    # save_dataset(model_answers, directory="model-answers")
+    model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
+    save_dataset(model_answers, directory="model-answers")
     model_answers = pd.read_csv(
         "data/model-answers/Mistral-large.csv"
     )

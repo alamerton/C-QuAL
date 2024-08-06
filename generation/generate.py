@@ -9,7 +9,6 @@ sys.path.insert(0, parent_dir)
 from utils.generation.call_gpt import call_gpt
 from utils.generation.call_mimic_iii import call_mimic_iii
 
-# SAVE_TO_HF = False #TODO
 NUMBER_OF_QA_PAIRS: int = 1500
 INCLUDE_EXPLANATION: bool = False
 
@@ -119,7 +118,6 @@ def main():
     data.to_csv(f"{output_path}.csv")
     print("Dataset saved")
 
-    # TODO: Or save it to Hugging Face
 
 
 if __name__ == "__main__":
