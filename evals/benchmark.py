@@ -20,7 +20,7 @@ from utils.evals.benchmark_locally import benchmark_locally
 from utils.misc import save_dataset
 
 DATASET_PATH = "data/processing/cqual-small.csv"
-MODEL_NAME = "gpt-35-turbo-16k"
+MODEL_NAME = "Llama-2-70b-uvwrs"
 LOCAL = False
 CHECKPOINT = 0
 
@@ -28,7 +28,7 @@ CHECKPOINT = 0
 date = datetime.now()
 date = date.strftime("%Y-%m-%d %H:%M:%S")
 
-embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
+# embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
 rouge = Rouge()
 g_eval_metric = GEval(
     name="g-eval",
@@ -58,28 +58,6 @@ def record_model_answers(dataset_path, model_name):
     ):
         discharge_summary = row["Discharge Summaries"]
         question = row["Question"]
-
-        if model_name == "starmpcc/Asclepius-13B" or \
-        model_name == "starmpcc/Asclepius-13B":
-            tokeniser = AutoTokenizer.from_pretrained(model_name)
-            
-            prompt = f"""You are an intelligent clinical languge model.
-            Below is a snippet of patient's discharge summary and a following instruction from healthcare professional.
-            Write a response that appropriately completes the instruction.
-            The response should provide the accurate answer to the instruction, while being concise.
-
-            [Discharge Summary Begin]
-            {discharge_summary}
-            [Discharge Summary End]
-
-            [Instruction Begin]
-            {question}
-            [Instruction End] 
-            """
-            tokenised_prompt = tokeniser(prompt, return_tensors="pt")
-            
-            if len(tokenised_prompt > 1800):
-                continue
 
         if LOCAL:
             response = benchmark_locally(model_name, discharge_summary, question)
@@ -132,10 +110,10 @@ def get_f1_score(expected_answer: str, model_answer: str):
     return f1
 
 
-def get_sas(expected_answer: str, model_answer: str):
-    embeddings = embed([expected_answer, model_answer])
-    similarity_matrix = np.inner(embeddings, embeddings)
-    return similarity_matrix[0, 1]
+# def get_sas(expected_answer: str, model_answer: str):
+#     embeddings = embed([expected_answer, model_answer])
+#     similarity_matrix = np.inner(embeddings, embeddings)
+#     return similarity_matrix[0, 1]
 
 
 def get_rouge(expected_answer: str, model_answer: str):
@@ -205,7 +183,7 @@ def score_model(dataset, model_name):
 
         em_scores.append(get_exact_match(expected_answer, model_answer))
         f1_scores.append(get_f1_score(expected_answer, model_answer))
-        sas_scores.append(get_sas(expected_answer, model_answer))
+        # sas_scores.append(get_sas(expected_answer, model_answer))
         rouge_scores.append(get_rouge(expected_answer, model_answer))
         bleu_scores.append(get_bleu(expected_answer, model_answer))
 

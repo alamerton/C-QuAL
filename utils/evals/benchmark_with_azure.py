@@ -3,6 +3,7 @@ import requests
 import json
 from openai import AzureOpenAI
 from dotenv import load_dotenv
+import urllib
 
 load_dotenv()
 
@@ -12,8 +13,8 @@ def benchmark_with_azure(
     discharge_summary,
     question,
 ):
-    if 'gpt' in model_name:
-        if '4o' in model_name:
+    if "gpt" in model_name:
+        if "4o" in model_name:
             endpoint = os.getenv("AZURE_GPT_4O_ENDPOINT")
             api_key = os.getenv("AZURE_GPT_4O_API_KEY")
         # elif '35' in model_name:
@@ -58,10 +59,10 @@ def benchmark_with_azure(
             temperature=0,
         )
 
-    elif "Llama" in model_name:
+    elif "Llama-3" in model_name:
 
-        llama_endpoint = os.getenv("AZURE_LLAMA_ENDPONT")
-        llama_api_key = os.getenv("AZURE_LLAMA_API_KEY")
+        llama_endpoint = os.getenv("AZURE_LLAMA_3_ENDPONT")
+        llama_api_key = os.getenv("AZURE_LLAMA_3_API_KEY")
 
         headers = {
             "Content-Type": "application/json",
@@ -82,13 +83,42 @@ def benchmark_with_azure(
 
         if response.status_code == 200:
             result = response.json()
-            choice = result['choices'][0]
-            return choice['message']['content']
+            choice = result["choices"][0]
+            return choice["message"]["content"]
         else:
             print(f"An error occured, status code: {response.status_code}")
             return 0
-    
-    elif 'Mistral' in model_name:
+
+    elif "Llama-2" in model_name:
+        endpoint = os.getenv("AZURE_LLAMA_2_ENDPOINT")
+        api_key = os.getenv("AZURE_LLAMA_2_API_KEY")
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": ("Bearer " + api_key),
+        }
+        
+        data = {
+            "messages": messages,
+            "temperature": 0,
+            "max_tokens": 4096,
+        }
+        body = str.encode(json.dumps(data))
+
+        req = urllib.request.Request(endpoint, body, headers)
+        try:
+            response = urllib.request.urlopen(req)
+            result = response.read()
+            response_json = json.loads(result)
+            content = response_json["choices"][0]["message"]["content"]
+            return content
+            
+        except urllib.error.HTTPError as error:
+            print("The request failed with status code: " + str(error.code))
+            print(error.info())
+            print(error.read().decode("utf8", 'ignore'))
+
+    elif "Mistral" in model_name:
         mistral_endpoint = os.getenv("AZURE_MISTRAL_LARGE_ENDPOINT")
         mistral_api_key = os.getenv("AZURE_MISTRAL_LARGE_API_KEY")
 
@@ -97,21 +127,19 @@ def benchmark_with_azure(
             "Authorization": f"Bearer {mistral_api_key}",
         }
 
-        data = {
-            "messages": messages,
-            "max_tokens": 4096,
-            "temperature": 0
-        }
+        data = {"messages": messages, "max_tokens": 4096, "temperature": 0}
+        body = str.encode(json.dumps(data))
 
-        response = requests.post(mistral_endpoint, headers=headers, json=data)
-        
-        if response.status_code == 200:
-            result = response.json()
-            choice = result['choices'][0]
-            return choice['message']['content']
-        else:
-            print(f"An error occured, status code: {response.status_code}")
-            return 0
+        req = urllib.request.Request(mistral_endpoint, body, headers)
+        response = urllib.request.urlopen(req)
+        result = response.read()
+        response_json = json.loads(result)
+        content = response_json["choices"][0]["message"]["content"]
+        return content
+        # return choice['message']['content']
+        # else:
+        #     print(f"An error occured, status code: {response.status_code}")
+        # return 0
 
     else:
         raise ValueError("Model name not recognised by script.")

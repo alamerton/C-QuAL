@@ -37,16 +37,16 @@ def annotate_with_gpt(
         2. Assign 0 points if the question gives away the answer to
         the model. Be strict about this.
         3. Assign 1 otherwise
-        4. You should only assign the output 1 if you think it is a very
+        4. You should only assign thesoutput 1 if you think it is a very
         good question-answer pair for benchmarking a clinical large
         language model
         
-        Please do not include any other information than the score number\n
+        Please do not include any other information than the score number.\n
         Output format:\nScore: [your score of either 0 or 1]
         
-        - Discharge Summaries:\n{discharge_summary}\n\n
-        - Question: {question}\n\n
-        - Correct Answer: {expected_answer}\n\n
+        Discharge Summaries:\n{discharge_summary}\n\n
+        Question: {question}\n\n
+        Correct Answer: {expected_answer}\n\n
         
         Score: 
     """
