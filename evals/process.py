@@ -57,16 +57,12 @@ def combine_csv_files(csv_1_path, csv_2_path):
 
 def remove_missing_value_rows(dataset_path, save_path):
     df = pd.read_csv(dataset_path)
-    df = df.drop('Discharge Summary', axis=1)
+    # df = df.drop('Discharge Summaries', axis=1)
     df = df.dropna()
     df.to_csv(save_path)
 
 def main():
-    # remove_extraneous_columns('data/processing/high_quality_annotated_no_missing_values.csv', 'data/processing/cqual-small.csv')
-    cqual = pd.read_csv('data/processing/cqual-small.csv')
-    print(cqual.head)
-    print("Dataset size:", len(cqual))
-    print
+    remove_missing_value_rows("data/model-answers/checkpoints/Mistral-large-qgpdg-330-rows-2024-08-06 03:28:33.csv", "data/model-answers/Mistral-large.csv")
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@ import pandas as pd
 from tqdm import tqdm
 import sys
 import os
+import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
 from rouge import Rouge
@@ -12,6 +13,10 @@ from deepeval.test_case import LLMTestCaseParams
 from deepeval.test_case import LLMTestCase
 from datetime import datetime
 from transformers import AutoTokenizer
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from gensim.models import KeyedVectors
+import spacy
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
@@ -20,7 +25,7 @@ from utils.evals.benchmark_locally import benchmark_locally
 from utils.misc import save_dataset
 
 DATASET_PATH = "data/processing/cqual-small.csv"
-MODEL_NAME = "Llama-2-70b-uvwrs"
+MODEL_NAME = "Mistral-large-qgpdg"
 LOCAL = False
 CHECKPOINT = 0
 
@@ -28,7 +33,7 @@ CHECKPOINT = 0
 date = datetime.now()
 date = date.strftime("%Y-%m-%d %H:%M:%S")
 
-# embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
+nlp = spacy.load("en_core_web_md")
 rouge = Rouge()
 g_eval_metric = GEval(
     name="g-eval",
@@ -110,10 +115,11 @@ def get_f1_score(expected_answer: str, model_answer: str):
     return f1
 
 
-# def get_sas(expected_answer: str, model_answer: str):
-#     embeddings = embed([expected_answer, model_answer])
-#     similarity_matrix = np.inner(embeddings, embeddings)
-#     return similarity_matrix[0, 1]
+def get_sas(expected_answer: str, model_answer: str):
+    doc1 = nlp(expected_answer)
+    doc2 = nlp(model_answer)
+    similarity = doc1.similarity(doc2)
+    return similarity
 
 
 def get_rouge(expected_answer: str, model_answer: str):
@@ -130,6 +136,8 @@ def get_n_grams(expected_answer: str, model_answer: str, n: int):
 def get_precision(expected_answer: str, model_answer: str, n: int):
     n_grams = get_n_grams(model_answer, expected_answer, n)
     total = len(list(ngrams(model_answer.split(), n)))
+    if total == 0:
+        return 0.0
     return n_grams / total
 
 
@@ -166,7 +174,7 @@ def score_model(dataset, model_name):
     if "/" in model_name:
         model_name.replace("/", "_")
 
-    dataset[f"{model_name} Response"] = None
+    # dataset[f"{model_name} Response"] = None
 
     em_scores = []
     f1_scores = []
@@ -183,7 +191,7 @@ def score_model(dataset, model_name):
 
         em_scores.append(get_exact_match(expected_answer, model_answer))
         f1_scores.append(get_f1_score(expected_answer, model_answer))
-        # sas_scores.append(get_sas(expected_answer, model_answer))
+        sas_scores.append(get_sas(expected_answer, model_answer))
         rouge_scores.append(get_rouge(expected_answer, model_answer))
         bleu_scores.append(get_bleu(expected_answer, model_answer))
 
@@ -225,10 +233,10 @@ def score_model(dataset, model_name):
 
 
 def main():
-    model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
-    save_dataset(model_answers, directory="model-answers")
+    # model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
+    # save_dataset(model_answers, directory="model-answers")
     model_answers = pd.read_csv(
-        "data/model-answers/3-QA-pairs-2024-08-02 14:03:57.715991.csv"
+        "data/model-answers/Mistral-large.csv"
     )
     benchmarking_results = score_model(model_answers, MODEL_NAME)
     save_dataset(benchmarking_results, directory="benchmarking-results")
