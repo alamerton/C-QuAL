@@ -56,7 +56,7 @@ def record_model_answers(dataset_path, model_name):
     for index, row in tqdm(
         dataset.iterrows(), total=len(dataset), desc=f"Benchmarking model"
     ):
-        discharge_summary = row["Discharge Summary"]
+        discharge_summary = row["Discharge Summaries"]
         question = row["Question"]
 
         if model_name == "starmpcc/Asclepius-13B" or \

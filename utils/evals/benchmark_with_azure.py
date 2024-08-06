@@ -15,13 +15,17 @@ def benchmark_with_azure(
     if 'gpt' in model_name:
         if '4o' in model_name:
             endpoint = os.getenv("AZURE_GPT_4O_ENDPOINT")
-        if '35' in model_name:
-            endpoint = os.getenv("")
+            api_key = os.getenv("AZURE_GPT_4O_API_KEY")
+        # elif '35' in model_name:
+        #     endpoint = os.getenv("")
+        else:
+            endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+            api_key = os.getenv("AZURE_OPENAI_KEY"),
 
 
     client = AzureOpenAI(
-        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-        api_key=os.getenv("AZURE_OPENAI_KEY"),
+        azure_endpoint=endpoint,
+        api_key=api_key,
         api_version=os.getenv("AZURE_API_VERSION"),
     )
 
@@ -35,10 +39,9 @@ def benchmark_with_azure(
     user_prompt = f"""
         Your task is to answer a clinical question based on the
         following discharge summary:\n{discharge_summary}\n\n
-        You should give an answer and a reason for your answer in the
-        following format:
+        You should give your answer in the
+        following format:s
         Answer: [your answer]
-        Reason: [your reason]
         Question: {question}\n\n
         Answer:
         """
