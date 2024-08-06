@@ -9,7 +9,7 @@ The question-answering capabilities of large language models (LLMs) is improving
 
 I am part of a team of 5 MSc students working on a project with the goal of developing a large language model (LLM) that can be deployed in clinical settings to assist with the decision reasoning of clinicians. Clinicians spend too much time manually reasoning about decisions when much of it can be automated thanks to the abundance of clinical data in electronic health records (EHR). An LLM can be fine-tuned to assist with that decision reasoning and decision making, reducing the amount of time clinicians would need to spend on it. At scale, this could significantly improve clinical processes.
 
-## A Better Dataset Can be Created
+## A More Relevant and Representative Dataset
 
 LLMs can be fine-tuned to be useful assistants in clinical decision reasoning, but to make progress developing effective models for this task, the models must be evaluated on their question answering (QA) capabilities. Usually, these abilities are evaluated using QA benchmarking datasets. Many QA datasets exist, but they are not representative enough of real-world clinical contexts, and suffer from other issues. This project aims to deliver a new clinical QA benchmarking dataset to address these limitations.
 
