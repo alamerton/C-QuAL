@@ -1,6 +1,6 @@
-# MSc Individual Project - Production of a New Clinical QA Benchmarking Dataset
+# C-QuAL – A Clinical Question Answering Benchmark for Long-Context Large Language Models
 
-This is the repo for my MSc individual project: C-QuAL: a **C**linical **Qu**estion **A**nswering **L**arge Language Model Benchmarking Dataset. This repo contains the code for generating the dataset.
+This is the repo for my MSc individual project: C-QuAL: a **C**linical **Qu**estion **A**nswering Benchmark for Long-Context **L**arge Language Model Benchmarking Dataset. This repo contains the code for generating the dataset.
 
 ![Q-A-diagram (2)](https://github.com/user-attachments/assets/86457399-391a-42ae-b51a-f691a217a575)
 
