@@ -4,6 +4,8 @@ This is the repo for my MSc individual project: C-QuAL: a **C**linical **Qu**es
 
 ![Q-A-diagram (2)](https://github.com/user-attachments/assets/86457399-391a-42ae-b51a-f691a217a575)
 
+## Abstract
+The question-answering capabilities of large language models (LLMs) is improving rapidly. These capabilities have opened opportunities for automation and assistance in health- care. LLMs show promise in clinical decision reasoning – the organisation, summary, identification, and retrieval of clinical text from electronic health records (EHR). LLMs for clinical decision reasoning must be benchmarked on their capabilities to be selected for clinical question answering (QA). This report documents the development of C-QuAL – a relevant and representative clinical question answering benchmark for long-context LLMs and evaluates its effectiveness on a number of natural language tasks.
 
 ## Broad Scope of the Project
 
@@ -13,11 +15,9 @@ I am part of a team of 5 MSc students working on a project with the goal of deve
 
 LLMs can be fine-tuned to be useful assistants in clinical decision reasoning, but to make progress developing effective models for this task, the models must be evaluated on their question answering (QA) capabilities. Usually, these abilities are evaluated using QA benchmarking datasets. Many QA datasets exist, but they are not representative enough of real-world clinical contexts, and suffer from other issues. This project aims to deliver a new clinical QA benchmarking dataset to address these limitations.
 
-  
-
 **The high-level steps for the production of the dataset using this code are as follows:**
 
-1. Implementing a dataset generation framework roughly equivalent to the framework presented in the [EHRNoteQA paper](https://github.com/ji-youn-kim/EHRNoteQA)
+1. Implementing a dataset generation framework building on the framework presented in the [EHRNoteQA paper](https://github.com/ji-youn-kim/EHRNoteQA)
 
 2. Modifying the framework to create a dataset using the MIMIC-III data
 
@@ -43,4 +43,4 @@ Generated datasets are saved as csv files to a `data` directory. The data direct
 └── processing
 ```
 
-The evaluations directory, `evals`', contains the scripts for annotating Q-A pairs and benchmarking models locally or on Microsoft Azure. The scripts in the evaluation framework follow the same structure as `generate.py`. Global variables are used to define specifications, and the scripts can be run in the terminal using `python [directory_name]/[file_name].py`.
+The evaluations directory, `evals`, contains the scripts for annotating Q-A pairs and benchmarking models locally or on Microsoft Azure. The scripts in the evaluation framework follow the same structure as `generate.py`. Global variables are used to define specifications, and the scripts can be run in the terminal using `python [directory_name]/[file_name].py`.
