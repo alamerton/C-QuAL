@@ -20,14 +20,13 @@ def benchmark_with_azure(
         #     endpoint = os.getenv("")
         else:
             endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
-            api_key = os.getenv("AZURE_OPENAI_KEY"),
+            api_key = os.getenv("AZURE_OPENAI_KEY")
 
-
-    client = AzureOpenAI(
-        azure_endpoint=endpoint,
-        api_key=api_key,
-        api_version=os.getenv("AZURE_API_VERSION"),
-    )
+        client = AzureOpenAI(
+            azure_endpoint=endpoint,
+            api_key=api_key,
+            api_version=os.getenv("AZURE_API_VERSION"),
+        )
 
     system_message = """
         You are an expert medical professional tasked 
@@ -83,8 +82,37 @@ def benchmark_with_azure(
 
         if response.status_code == 200:
             result = response.json()
+            choice = result['choices'][0]
+            return choice['message']['content']
         else:
             print(f"An error occured, status code: {response.status_code}")
+            return 0
+    
+    elif 'Mistral' in model_name:
+        mistral_endpoint = os.getenv("AZURE_MISTRAL_LARGE_ENDPOINT")
+        mistral_api_key = os.getenv("AZURE_MISTRAL_LARGE_API_KEY")
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {mistral_api_key}",
+        }
+
+        data = {
+            "messages": messages,
+            "max_tokens": 4096,
+            "temperature": 0
+        }
+
+        response = requests.post(mistral_endpoint, headers=headers, json=data)
+        
+        if response.status_code == 200:
+            result = response.json()
+            choice = result['choices'][0]
+            return choice['message']['content']
+        else:
+            print(f"An error occured, status code: {response.status_code}")
+            return 0
+
     else:
         raise ValueError("Model name not recognised by script.")
 

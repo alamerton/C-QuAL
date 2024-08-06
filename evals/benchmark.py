@@ -20,8 +20,8 @@ from utils.evals.benchmark_locally import benchmark_locally
 from utils.misc import save_dataset
 
 DATASET_PATH = "data/processing/cqual-small.csv"
-MODEL_NAME = "gpt-4o"
-LOCAL = True
+MODEL_NAME = "gpt-35-turbo-16k"
+LOCAL = False
 CHECKPOINT = 0
 
 
