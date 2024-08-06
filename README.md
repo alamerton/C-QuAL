@@ -24,7 +24,7 @@ LLMs can be fine-tuned to be useful assistants in clinical decision reasoning, b
 4. Annotating the QA dataset (the plan being to partly leverage scalable oversight with GPT-4, and partly outsource expert annotation to clinicians, comparing the quality of the resulting annotations)
 
 5. Benchmarking the clinical QA capabilities of LLMs, in terms of decision reasoning using electronic health records, using the dataset
-## Running the Dataset
+## Using the Framework
 This dataset generation framework contains a generation folder and an evals folder. The generation folder, `generation`, contains one file, `generate.py,` in which the model name and number of discharge summaries for generating Q-A pairs can be specified. The file requires the user to have a Microsoft Azure Cloud Services subscription in order to generate Q-A pairs using OpenAI-based LLMs due to their HIPAA agreement.
 
 Generated datasets are saved as csv files to a `data` directory. The data directory is not included in the code repository, but can be replicated for generation using the following structure:
