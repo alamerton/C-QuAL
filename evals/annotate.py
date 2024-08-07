@@ -55,8 +55,8 @@ def annotate_dataset(dataset_path, local: bool = False):
     return dataset
 
 def main():
-    annotated_dataset = annotate_dataset(DATASET_PATH, SAVE_LOCALLY)
-    save_dataset(annotated_dataset, SAVE_LOCALLY)
+    annotated_dataset = annotate_dataset(DATASET_PATH)
+    save_dataset(annotated_dataset)
     print("Complete")
 
 if __name__ == "__main__":
