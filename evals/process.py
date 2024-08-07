@@ -55,6 +55,7 @@ def remove_extraneous_columns(dataset_path, save_path):
         "Question Type",
     ]
     relevant_columns_df = df[columns_to_keep]
+    relevant_columns_df.reset_index()
     relevant_columns_df.to_csv(save_path)
 
 
@@ -77,9 +78,9 @@ def remove_missing_value_rows(dataset_path, save_path):
 
 
 def main():
-    remove_missing_value_rows(
-        "data/model-answers/checkpoints/Mistral-large-qgpdg-330-rows-2024-08-06 03:28:33.csv",
-        "data/model-answers/Mistral-large.csv",
+    remove_extraneous_columns(
+        "data/generations/c-qual-xl.csv",
+        "data/generations/c-qual-xl.csv",
     )
 
 
