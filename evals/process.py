@@ -55,7 +55,6 @@ def remove_extraneous_columns(dataset_path, save_path):
         "Question Type",
     ]
     relevant_columns_df = df[columns_to_keep]
-    relevant_columns_df.reset_index()
     relevant_columns_df.to_csv(save_path)
 
 
@@ -65,8 +64,8 @@ def combine_csv_files(csv_1_path, csv_2_path):
 
     df1_subset = df1.iloc[:630]
     df2_subset = df2.iloc[630:]
-
     combined_df = pd.concat([df1_subset, df2_subset])
+    combined_df = combined_df.reset_index()
     combined_df.to_csv("data/annotations/combined_annotation_datasets.csv")
 
 
@@ -78,7 +77,7 @@ def remove_missing_value_rows(dataset_path, save_path):
 
 
 def main():
-    remove_extraneous_columns(
+    remove_missing_value_rows(
         "data/generations/c-qual-xl.csv",
         "data/generations/c-qual-xl.csv",
     )
