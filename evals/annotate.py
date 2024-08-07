@@ -10,7 +10,6 @@ from utils.evals.annotate_with_gpt import annotate_with_gpt
 from utils.misc import save_dataset
 
 DATASET_PATH = 'data/processing/matching-pairs/dataset_processed_overwrite.csv'
-SAVE_LOCALLY = True
 CHECKPOINT = 0
 
 date = datetime.now()
