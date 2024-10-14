@@ -4,6 +4,7 @@
 # with specifications and requirements for the type of question
 
 import os
+import random
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 from azure.core.exceptions import HttpResponseError
@@ -12,14 +13,23 @@ import time
 load_dotenv()
 
 
-def call_gpt(
-        model_name,
-        discharge_summary_string,
-        include_explanation
-):
+def get_question_type():
+    question_types = [
+        "Yes/No/Maybe",
+        "Unanswerable",
+        "Temporal",
+        "Factual",
+        "Summarisation",
+        "Identification",
+    ]
+    return random.choice(question_types)
+
+
+def call_gpt(model_name, discharge_summary_string, include_explanation):
 
     max_retries = 10
     retry_delay = 5
+    question_type = get_question_type()
 
     client = AzureOpenAI(
         azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
@@ -47,13 +57,7 @@ def call_gpt(
             - Etiology
             - Medical history
 
-            The question should also be one of the following types:
-            - Yes/No/Maybe
-            - Unanswerable
-            - Temporal
-            - Factual
-            - Summarisation
-            - Identification
+            The question should be of the following type: ${question_type}
 
             Your response should also contain short, one-sentence rationale behind 
             the answer detailing the reason why the answer is correct.
@@ -99,13 +103,7 @@ def call_gpt(
             - Etiology
             - Medical history
 
-            The question should also be one of the following types:
-            - Yes/No/Maybe
-            - Unanswerable
-            - Temporal
-            - Factual
-            - Summarisation
-            - Identification
+            The question should be of the following type: ${question_type}
 
             Do not create a question that is too easy to answer, only clinicians 
             should be able to answer the question. Do not create a question that 
