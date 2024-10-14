@@ -82,16 +82,17 @@ def main():
 
         # Parse the json to get the question and answer as variables
         qa_parts = qa_string.split("\n")
-        print(qa_parts)
+        print(qa_parts)  # Log the data to terminal
         question = qa_parts[0][10:]  # Remove "Question: "
         answer = qa_parts[1][8:]  # Remove "Answer: "
         question_type = qa_parts[2][6:]  # Remove "Type: "
 
         if INCLUDE_EXPLANATION:
             explanation = qa_parts[3][8:]  # Remove "Reason: "
-            # Add question and answer as tuple to data item
+            # Add data to data item
             data_item.extend((question, answer, explanation, question_type))
 
+        # Add data to data item
         data_item.extend((question, answer, question_type))
         # Add Q-A pair to dataframe
         data.loc[row] = data_item
