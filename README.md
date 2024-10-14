@@ -2,43 +2,87 @@
 
 ![Q-A-diagram (3)](https://github.com/user-attachments/assets/6f059669-6a81-47d6-829b-942d53e85008)
 
-## Abstract
-The question-answering capabilities of large language models (LLMs) is improving rapidly. These capabilities have opened opportunities for automation and assistance in health- care. LLMs show promise in clinical decision reasoning – the organisation, summary, identification, and retrieval of clinical text from electronic health records (EHR). LLMs for clinical decision reasoning must be benchmarked on their capabilities to be selected for clinical question answering (QA). This report documents the development of C-QuAL – a relevant and representative clinical question answering benchmark for long-context LLMs and evaluates its effectiveness on a number of natural language tasks.
+## Project Overview
 
-## Broad Scope of the Project
+The **C-QuAL** project focuses on leveraging large language models (LLMs) for assisting in clinical decision-making by automating question-answering (QA) tasks from electronic health records (EHRs). This project, developed as part of a team of MSc students, aims to create a more relevant and representative dataset for benchmarking the QA capabilities of LLMs, with the goal of deploying such models in clinical environments to improve decision reasoning and reduce clinician workload.
 
-I am part of a team of 5 MSc students working on a project with the goal of developing a large language model (LLM) that can be deployed in clinical settings to assist with the decision reasoning of clinicians. Clinicians spend too much time manually reasoning about decisions when much of it can be automated thanks to the abundance of clinical data in electronic health records (EHR). An LLM can be fine-tuned to assist with that decision reasoning and decision making, reducing the amount of time clinicians would need to spend on it. At scale, this could significantly improve clinical processes.
+The project results in a novel clinical QA benchmarking dataset, C-QuAL, designed to evaluate the performance of LLMs, especially in long-context scenarios, by generating and annotating QA pairs from EHRs.
 
-## A More Relevant and Representative Dataset
+## Goals
 
-LLMs can be fine-tuned to be useful assistants in clinical decision reasoning, but to make progress developing effective models for this task, the models must be evaluated on their question answering (QA) capabilities. Usually, these abilities are evaluated using QA benchmarking datasets. Many QA datasets exist, but they are not representative enough of real-world clinical contexts, and suffer from other issues. This project aims to deliver a new clinical QA benchmarking dataset to address these limitations.
+- **Develop a Clinical QA Benchmark**: To create C-QuAL, a dataset that addresses the limitations of existing clinical QA benchmarks, making it more representative of real-world clinical scenarios.
+- **Accelerate Clinical Decision Reasoning**: By assisting clinicians in navigating, retrieving, and summarizing data from EHRs, reducing time spent on manual tasks.
+- **Benchmark LLMs**: Evaluate and benchmark the performance of different LLMs for QA tasks using the C-QuAL dataset.
 
-**The high-level steps for the production of the dataset using this code are as follows:**
+## Dataset Overview
 
-1. Implementing a dataset generation framework building on the framework presented in the [EHRNoteQA paper](https://github.com/ji-youn-kim/EHRNoteQA)
+**C-QuAL** was developed using discharge summaries from the MIMIC-III dataset, which offers a more recent and representative clinical corpus compared to earlier datasets like n2c2. The framework for generating this dataset builds upon previous works like EHRNoteQA but improves upon them by leveraging long-context LLMs for processing multiple and longer discharge summaries.
 
-2. Modifying the framework to create a dataset using the MIMIC-III data
+### Dataset Features
 
-3. Developing the dataset based on the comparative analysis of the other major clinical QA benchmarking datasets, addressing their flaws
+- **Corpus**: The dataset is generated using the MIMIC-III database, focusing on patient discharge summaries to create QA pairs that cover various clinical aspects, such as treatments, diagnoses, and patient history.
+- **Question Types**: Includes yes/no/maybe, temporal, factual, summarization, identification, and unanswerable questions, ensuring comprehensive evaluation of LLM capabilities.
+- **Annotation**: A combination of GPT-4 and expert annotations ensures high-quality and clinically relevant QA pairs.
+- **Output**: Datasets are saved as CSV files for ease of use and further analysis.
 
-4. Annotating the QA dataset (the plan being to partly leverage scalable oversight with GPT-4, and partly outsource expert annotation to clinicians, comparing the quality of the resulting annotations)
+## Folder Structure
 
-5. Benchmarking the clinical QA capabilities of LLMs, in terms of decision reasoning using electronic health records, using the dataset
-## Using the Framework
-This dataset generation framework contains a generation folder and an evals folder. The generation folder, `generation`, contains one file, `generate.py,` in which the model name and number of discharge summaries for generating Q-A pairs can be specified. The file requires the user to have a Microsoft Azure Cloud Services subscription in order to generate Q-A pairs using OpenAI-based LLMs due to their HIPAA agreement.
-
-Generated datasets are saved as csv files to a `data` directory. The data directory is not included in the code repository, but can be replicated for generation using the following structure:
+The project includes two primary components: **generation** and **evaluation**.
 
 ```
 .
 ├── analysis
 ├── annotations
-│   └── checkpoints
+│   └── checkpoints
 ├── benchmarking-results
 ├── generations
-│   └── checkpoints
+│   └── checkpoints
 ├── model-answers
 └── processing
 ```
 
-The evaluations directory, `evals`, contains the scripts for annotating Q-A pairs and benchmarking models locally or on Microsoft Azure. The scripts in the evaluation framework follow the same structure as `generate.py`. Global variables are used to define specifications, and the scripts can be run in the terminal using `python [directory_name]/[file_name].py`.
+- **`generation/`**: Contains the `generate.py` script, which allows users to specify model configurations and the number of discharge summaries used to generate QA pairs.
+- **`evals/`**: Includes scripts for evaluating the generated QA pairs and benchmarking LLM performance locally or on Microsoft Azure.
+
+## Setup Instructions
+
+1. **Prerequisites**:
+   - Python 3.7+
+   - A Microsoft Azure Cloud subscription with access to OpenAI-based LLM services (due to HIPAA agreement for processing MIMIC-III data).
+
+2. **Install Dependencies**:
+   Run the following command to install necessary packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Generate Dataset**:
+   Use the `generate.py` script to generate QA pairs by specifying model configurations:
+   ```bash
+   python generation/generate.py
+   ```
+
+4. **Evaluation**:
+   Run the evaluation scripts to benchmark model performance:
+   ```bash
+   python evals/[file_name].py
+   ```
+
+## Usage of C-QuAL
+
+The **C-QuAL** dataset is designed for evaluating LLMs on clinical QA tasks. It focuses on ensuring that the models are tested on realistic, complex clinical questions. The dataset can be used to:
+
+- Benchmark the performance of long-context LLMs on clinical QA tasks.
+- Assist in the selection of the most suitable LLM for clinical deployment by evaluating their ability to reason, summarize, and retrieve information from EHRs.
+
+### Output
+
+The generated datasets are stored as CSV files in the `data/` directory, structured as follows:
+- **Discharge Summary**: The clinical text provided to the model.
+- **Question**: The question posed based on the summary.
+- **Correct Answer**: The annotated answer.
+- **Model Answer**: The answer generated by the model.
+
+## Contributions
+
+The project was developed under the guidance of **Professor Yulan He** and with insights from clinicians to ensure clinical relevance. The dataset and generation framework are open-source and hosted on GitHub under the MIT license, encouraging further research and improvements in the field of clinical QA using LLMs.
