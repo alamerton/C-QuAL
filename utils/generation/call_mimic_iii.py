@@ -82,7 +82,7 @@ def call_mimic_iii(num_rows, max_summaries):
                 # If it's just one discharge summary, add it to the
                 # list.
                 else:
-                    single_summary = reduce_discharge_summary(current_summaries[0])
+                    single_summary = current_summaries[0]
                     discharge_summaries.append(single_summary)
             # Continue to next row.
             current_subject_id = subject_id
@@ -102,7 +102,7 @@ def call_mimic_iii(num_rows, max_summaries):
                     discharge_summaries.append(combined_summaries)
                 # If there is just one summary, reduce and add it
                 else:
-                    single_summary = reduce_discharge_summary(current_summaries[0])
+                    single_summary = current_summaries[0]
                     discharge_summaries.append(single_summary)
 
     # Close the database connection
