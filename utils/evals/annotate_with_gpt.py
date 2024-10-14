@@ -1,4 +1,3 @@
-
 import os
 from openai import AzureOpenAI
 from dotenv import load_dotenv
@@ -7,11 +6,12 @@ load_dotenv()
 
 ANNOTATION_MODEL = "gpt-4o"
 
+
 def annotate_with_gpt(
-        discharge_summary,
-        question,
-        expected_answer,
-        ):
+    discharge_summary,
+    question,
+    expected_answer,
+):
 
     client = AzureOpenAI(
         azure_endpoint=os.getenv("AZURE_GPT_4O_ENDPOINT"),
@@ -36,7 +36,7 @@ def annotate_with_gpt(
         2. Assign 0 points if the question gives away the answer to
         the model. Be strict about this.
         3. Assign 1 otherwise
-        4. You should only assign thesoutput 1 if you think it is a very
+        4. You should only assign the output 1 if you think it is a very
         good question-answer pair for benchmarking a clinical large
         language model
         
