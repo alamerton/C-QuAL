@@ -14,7 +14,8 @@ database_password = os.environ.get("DATABASE_PASSWORD")
 database_name = os.environ.get("DATABASE_NAME")
 database_port = os.environ.get("DATABASE_PORT")
 
-# Flag
+# Variable to flag where to save collected discharge summaries, default
+# is function.
 SUMMARIES_DESTINATION = "function"
 
 
@@ -24,14 +25,7 @@ def save_data(results):
     results_df.to_csv(f"C-QuAL/data/mimic-iii-subset.csv")
 
 
-def reduce_discharge_summary(discharge_summary):
-    # Remove whitespace
-    discharge_summary = re.sub(r'\s', ' ', discharge_summary).strip()
-    # Remove special characters and punctuation
-    discharge_summary = re.sub(r'[^\w\s]', '', discharge_summary)
-    return discharge_summary
-
-# Add a start and end tag to each discharge summary for the LLM to 
+# Add a start and end tag to each discharge summary for the LLM to
 # identify and concatenate them.
 def prepare_discharge_summaries(discharge_summaries):
     multiple_summaries = ""
@@ -39,7 +33,6 @@ def prepare_discharge_summaries(discharge_summaries):
         start_string = f"[Discharge summary {i + 1} start]\n"
         end_string = f"\n[Discharge summary {i + 1} end]\n"
         discharge_summary = discharge_summaries[i]
-        discharge_summary = reduce_discharge_summary(discharge_summary)
         multiple_summaries += start_string + discharge_summary + end_string
     return multiple_summaries
 
@@ -67,13 +60,13 @@ def call_mimic_iii(num_rows, max_summaries):
         ORDER BY row_id ASC 
         LIMIT %s;
     """
-    
+
     cursor.execute(query, (num_rows,))
     rows = cursor.fetchall()
 
     current_subject_id = None
     current_summaries = []
-    
+
     # For each row in array of discharge summaries
     for row in rows:
         subject_id, discharge_summary = row
@@ -81,17 +74,15 @@ def call_mimic_iii(num_rows, max_summaries):
         # Check if the next subject id is the same. If not:
         if subject_id != current_subject_id:
             if current_summaries:
-                # If multiple summaries have been collected for one 
+                # If multiple summaries have been collected for one
                 # patient, save them as a multiple-summary string.
                 if len(current_summaries) > 1:
-                    combined_summaries = prepare_discharge_summaries(
-                        current_summaries)
+                    combined_summaries = prepare_discharge_summaries(current_summaries)
                     discharge_summaries.append(combined_summaries)
-                # If it's just one discharge summary, add it to the 
+                # If it's just one discharge summary, add it to the
                 # list.
                 else:
-                    single_summary = reduce_discharge_summary(
-                        current_summaries[0])
+                    single_summary = reduce_discharge_summary(current_summaries[0])
                     discharge_summaries.append(single_summary)
             # Continue to next row.
             current_subject_id = subject_id
@@ -102,18 +93,16 @@ def call_mimic_iii(num_rows, max_summaries):
             # reached, add another summary to the list for combination.
             if len(current_summaries) < max_summaries:
                 current_summaries.append(discharge_summary)
-            # Once the maximum number of summaries is reached: 
+            # Once the maximum number of summaries is reached:
             else:
-                # If multiple summaries have been collected for one 
+                # If multiple summaries have been collected for one
                 # patient, combine them and add them to the list
                 if len(current_summaries) > 1:
-                    combined_summaries = prepare_discharge_summaries(
-                        current_summaries)
+                    combined_summaries = prepare_discharge_summaries(current_summaries)
                     discharge_summaries.append(combined_summaries)
                 # If there is just one summary, reduce and add it
                 else:
-                    single_summary = reduce_discharge_summary(
-                        current_summaries[0])
+                    single_summary = reduce_discharge_summary(current_summaries[0])
                     discharge_summaries.append(single_summary)
 
     # Close the database connection
