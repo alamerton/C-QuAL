@@ -47,7 +47,7 @@ def call_gpt(model_name, discharge_summary_string, include_explanation):
             database. Your task is to generate a question and answer pair that is relevant 
             to clinical practice.
 
-            Clinically relevant questions should test the ability to summarize, 
+            Clinically relevant questions should test the ability to summarise, 
             identify, and arrange text, and answer specific questions related to:
             - Treatment
             - Assessment
@@ -121,7 +121,7 @@ def call_gpt(model_name, discharge_summary_string, include_explanation):
             where n is the number corresponding to the discharge summary being 
             given. The discharge summaries are provided in chronological order.
 
-            Here are the discharge summaries for you to work on.
+            Here is the discharge summary text for you to work on.
 
             {discharge_summary_string}
 
