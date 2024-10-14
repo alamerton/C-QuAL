@@ -22,7 +22,7 @@ The project results in a novel clinical QA benchmarking dataset, C-QuAL, designe
 
 - **Corpus**: The dataset is generated using the MIMIC-III database, focusing on patient discharge summaries to create QA pairs that cover various clinical aspects, such as treatments, diagnoses, and patient history.
 - **Question Types**: Includes yes/no/maybe, temporal, factual, summarization, identification, and unanswerable questions, ensuring comprehensive evaluation of LLM capabilities.
-- **Annotation**: Presently GPT-3.5-Turbo. In future, expert annotation will be used for improved dataset quality.
+- **Annotation**: GPT-4o. In future, human expert annotation will be used for improved dataset quality.
 
 ## Folder Structure
 
@@ -46,17 +46,20 @@ The project includes two primary components: **generation** and **evaluation**.
 ## Setup Instructions
 
 1. **Prerequisites**:
+
    - Python 3.7+
    - A Microsoft Azure Cloud subscription with access to OpenAI-based LLM services (due to HIPAA agreement for processing MIMIC-III data).
 
 2. **Install Dependencies**:
    Run the following command to install necessary packages:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 3. **Generate Dataset**:
    Use the `generate.py` script to generate QA pairs by specifying model configurations:
+
    ```bash
    python generation/generate.py
    ```
@@ -77,6 +80,7 @@ The **C-QuAL** dataset is designed for evaluating LLMs on clinical QA tasks. It 
 ### Output
 
 The generated datasets are stored as CSV files in the `data/` directory, structured as follows:
+
 - **Discharge Summary**: The clinical text provided to the model.
 - **Question**: The question posed based on the summary.
 - **Correct Answer**: The annotated answer.
