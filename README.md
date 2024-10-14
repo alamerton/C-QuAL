@@ -1,6 +1,6 @@
 # C-QuAL – A Clinical Question Answering Benchmark for Long-Context Large Language Models
 
-![Q-A-diagram (2)](https://github.com/user-attachments/assets/86457399-391a-42ae-b51a-f691a217a575)
+![Q-A-diagram (3)](https://github.com/user-attachments/assets/6f059669-6a81-47d6-829b-942d53e85008)
 
 ## Abstract
 The question-answering capabilities of large language models (LLMs) is improving rapidly. These capabilities have opened opportunities for automation and assistance in health- care. LLMs show promise in clinical decision reasoning – the organisation, summary, identification, and retrieval of clinical text from electronic health records (EHR). LLMs for clinical decision reasoning must be benchmarked on their capabilities to be selected for clinical question answering (QA). This report documents the development of C-QuAL – a relevant and representative clinical question answering benchmark for long-context LLMs and evaluates its effectiveness on a number of natural language tasks.
