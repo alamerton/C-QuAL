@@ -9,14 +9,23 @@ sys.path.insert(0, parent_dir)
 from utils.generation.call_gpt import call_gpt
 from utils.generation.call_mimic_iii import call_mimic_iii
 
+# Dataset size
 NUMBER_OF_QA_PAIRS: int = 1500
+
+# Explanation column flag
 INCLUDE_EXPLANATION: bool = False
 
 # Variable for starting the generation from a specific row in MIMIC-III.
 # Default value is 0. Set to 0 if generating new dataset.
 CHECKPOINT: int = 850
+
+# Model for generating QA pairs
 QA_GENERATION_MODEL = "gpt-35-turbo-16k"
+
+# Variable for limiting the number of consecutive summaries added to the
+# prompt (when multiple consecutive summaries belong to same patient).
 MAX_SUMMARIES: int = 3
+
 
 def main():
     # create dataframe with question and expected answer columns
@@ -24,7 +33,7 @@ def main():
         discharge_summary_string = "Discharge Summaries"
     else:
         discharge_summary_string = "Discharge Summary"
-    
+
     if INCLUDE_EXPLANATION:
         data = pd.DataFrame(
             columns=[
@@ -47,11 +56,8 @@ def main():
 
     print("Getting summaries for generation")
 
-    discharge_summaries = call_mimic_iii(
-        NUMBER_OF_QA_PAIRS,
-        MAX_SUMMARIES
-    )
-    
+    discharge_summaries = call_mimic_iii(NUMBER_OF_QA_PAIRS, MAX_SUMMARIES)
+
     # For loop for generating qa pairs
     print("Done\n\nGenerating Q-A pairs...")
 
@@ -64,21 +70,15 @@ def main():
 
         # Call LLM with discharge summary and prompt
         # qa_string = call_gpt(data_items, INCLUDE_EXPLANATION)
-        qa_string = call_gpt(
-            QA_GENERATION_MODEL,
-            data_item,
-            INCLUDE_EXPLANATION
-        )
+        qa_string = call_gpt(QA_GENERATION_MODEL, data_item, INCLUDE_EXPLANATION)
 
         # Check correct columns are in response, regenerate until true
-        while "Question" not in qa_string \
-              or "Answer" not in qa_string \
-              or "Type" not in qa_string:
-            qa_string = call_gpt(
-                QA_GENERATION_MODEL,
-                data_item,
-                INCLUDE_EXPLANATION
-            )
+        while (
+            "Question" not in qa_string
+            or "Answer" not in qa_string
+            or "Type" not in qa_string
+        ):
+            qa_string = call_gpt(QA_GENERATION_MODEL, data_item, INCLUDE_EXPLANATION)
 
         # Parse the json to get the question and answer as variables
         qa_parts = qa_string.split("\n")
@@ -117,7 +117,6 @@ def main():
     {NUMBER_OF_QA_PAIRS}-QA-pairs-{date}"""
     data.to_csv(f"{output_path}.csv")
     print("Dataset saved")
-
 
 
 if __name__ == "__main__":
