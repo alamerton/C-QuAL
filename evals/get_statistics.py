@@ -8,12 +8,14 @@ import pandas as pd
 from datetime import datetime
 import sys
 import os
+from lexicalrichness import lexicalrichness
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
 from utils.evals.categorise_with_gpt import categorise_with_gpt
 
 DATASET_PATH = "data/processing/cqual-small.csv"
+
 
 def get_question_categories(df: pd.DataFrame):
     """
@@ -79,11 +81,25 @@ def get_question_categories(df: pd.DataFrame):
         medical_history,
     )
 
+
 def get_question_complexity(df: pd.DataFrame):
     """
     Use bleu ideally with a library and return mean
     """
     return 0
+
+
+def get_lexical_richness(df: pd.DataFrame):
+    """
+    Return lexical richness for generated questions and answers
+    """
+    lr_values = []
+    for _, row in df.iterrows():
+        question = row["Question"]
+        answer = row["Expected Answer"]
+        string = question + answer
+        lr_values.append(lexicalrichness(string))
+    return sum(lr_values) / len(lr_values)
 
 
 # Return a dataframe containing analysis results for a given dataset
@@ -100,12 +116,14 @@ def get_statistics(dataset_path):
     factual_qs = dataset["Question Type"].str.count("Factual").sum()
     summarisation_qs = dataset["Question Type"].str.count("Summarisation").sum()
     identification_qs = dataset["Question Type"].str.count("Identification").sum()
+    lexical_richness = get_lexical_richness(dataset)
 
     statistics = pd.DataFrame(
         {
             "Metric": [
                 "Number of QA Pairs",
                 "Question Types",
+                "Lexical Richness",
                 "BLEU Complexity",
                 "Topic Distribution",
                 "Coverage of Clinical Concepts",
@@ -119,6 +137,7 @@ def get_statistics(dataset_path):
             "Value": [
                 dataset_length,
                 0,
+                lexical_richness,
                 0,
                 0,
                 0,
