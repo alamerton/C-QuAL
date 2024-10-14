@@ -22,8 +22,7 @@ The project results in a novel clinical QA benchmarking dataset, C-QuAL, designe
 
 - **Corpus**: The dataset is generated using the MIMIC-III database, focusing on patient discharge summaries to create QA pairs that cover various clinical aspects, such as treatments, diagnoses, and patient history.
 - **Question Types**: Includes yes/no/maybe, temporal, factual, summarization, identification, and unanswerable questions, ensuring comprehensive evaluation of LLM capabilities.
-- **Annotation**: A combination of GPT-4 and expert annotations ensures high-quality and clinically relevant QA pairs.
-- **Output**: Datasets are saved as CSV files for ease of use and further analysis.
+- **Annotation**: Presently GPT-3.5-Turbo. In future, expert annotation will be used for improved dataset quality.
 
 ## Folder Structure
 
@@ -73,7 +72,7 @@ The project includes two primary components: **generation** and **evaluation**.
 The **C-QuAL** dataset is designed for evaluating LLMs on clinical QA tasks. It focuses on ensuring that the models are tested on realistic, complex clinical questions. The dataset can be used to:
 
 - Benchmark the performance of long-context LLMs on clinical QA tasks.
-- Assist in the selection of the most suitable LLM for clinical deployment by evaluating their ability to reason, summarize, and retrieve information from EHRs.
+- Assist in the selection of the most suitable LLM for clinical deployment by evaluating their ability to reason, summarise, and retrieve information from EHRs.
 
 ### Output
 
