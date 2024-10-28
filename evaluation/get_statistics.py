@@ -12,7 +12,6 @@ from lexicalrichness import lexicalrichness
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
-from utils.evals.categorise_with_gpt import categorise_with_gpt
 
 DATASET_PATH = "data/processing/cqual-small.csv"
 
@@ -35,7 +34,8 @@ def get_question_categories(df: pd.DataFrame):
     ) = 0
 
     for question in df["Question"]:
-        category_response = categorise_with_gpt(question)
+        # TODO: replace logic with string map from 'question type' column
+        # category_response = categorise_with_gpt(question)
         if "," in question:
             categories = category_response.split(",")
             for i in range(0, len(categories)):
