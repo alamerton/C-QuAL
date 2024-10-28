@@ -1,6 +1,7 @@
 import pandas as pd
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
+
 def benchmark_locally(model_name, discharge_summary, question):
     tokeniser = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForCausalLM.from_pretrained(model_name)
