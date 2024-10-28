@@ -66,7 +66,6 @@ def record_model_answers(dataset_path, model_name):
         if "/" in model_name:
             model_name.replace("/", "_")
 
-
         dataset.at[index, f"{model_name} Response"] = response
 
         checkpoint_directory_path = "data/model-answers/checkpoints/"
@@ -227,9 +226,7 @@ def score_model(dataset, model_name):
 def main():
     model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
     save_dataset(model_answers, directory="model-answers")
-    model_answers = pd.read_csv(
-        "data/model-answers/Mistral-large.csv"
-    )
+    model_answers = pd.read_csv("data/model-answers/Mistral-large.csv")
     benchmarking_results = score_model(model_answers, MODEL_NAME)
     save_dataset(benchmarking_results, directory="benchmarking-results")
     print(benchmarking_results)

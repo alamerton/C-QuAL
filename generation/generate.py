@@ -17,14 +17,14 @@ INCLUDE_EXPLANATION: bool = False
 
 # Variable for starting the generation from a specific row in MIMIC-III.
 # Default value is 0. Set to 0 if generating new dataset.
-CHECKPOINT: int = 850
+CHECKPOINT: int = 0
 
 # Model for generating QA pairs
 QA_GENERATION_MODEL = "gpt-35-turbo-16k"
 
 # Variable for limiting the number of consecutive summaries added to the
 # prompt (when multiple consecutive summaries belong to same patient).
-MAX_SUMMARIES: int = 3
+MAX_SUMMARIES: int = 5
 
 
 def main():
