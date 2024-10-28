@@ -64,6 +64,7 @@ def main():
     print("Done\n\nGenerating Q-A pairs...")
 
     for row in tqdm(range(CHECKPOINT, NUMBER_OF_QA_PAIRS)):
+        # Get date for naming the dataset and checkpoints
         date = datetime.now()
         date = date.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -83,7 +84,6 @@ def main():
             qa_string = call_gpt(QA_GENERATION_MODEL, data_item, INCLUDE_EXPLANATION)
 
         # Parse the json to get the question and answer as variables
-        print(qa_string)
         qa_parts = qa_string.split("\n")
         qa_parts = [item for item in qa_parts if item != ""]  # Remove
         # items created by extra '\n's
@@ -99,6 +99,7 @@ def main():
 
         # Add data to data item
         data_item.extend((question, answer, question_type))
+
         # Add Q-A pair to dataframe
         data.loc[row] = data_item
 
