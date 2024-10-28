@@ -8,6 +8,7 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
 from utils.generation.call_gpt import call_gpt
 from utils.generation.call_mimic_iii import call_mimic_iii
+from utils.misc import remove_empty_quotes
 
 # Dataset size
 NUMBER_OF_QA_PAIRS: int = 1500
@@ -83,8 +84,10 @@ def main():
             qa_string = call_gpt(QA_GENERATION_MODEL, data_item, INCLUDE_EXPLANATION)
 
         # Parse the json to get the question and answer as variables
-        qa_string.replace("''", "")  # Remove empty strings returned by the LLM
+        print(qa_string)
         qa_parts = qa_string.split("\n")
+        qa_parts = [item for item in qa_parts if item != ""]  # Remove
+        # empty quotes created by the LLM returning > 1 new line
         print(qa_parts)  # Log the data to terminal
         question = qa_parts[0][10:]  # Remove "Question: "
         answer = qa_parts[1][8:]  # Remove "Answer: "
