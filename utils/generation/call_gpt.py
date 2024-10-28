@@ -20,7 +20,6 @@ def get_question_type():
         "Temporal",
         "Factual",
         "Summarisation",
-        "Identification",
     ]
     return random.choice(question_types)
 
