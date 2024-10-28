@@ -24,6 +24,8 @@ QA_GENERATION_MODEL = "gpt-35-turbo-16k"
 
 # Variable for limiting the number of consecutive summaries added to the
 # prompt (when multiple consecutive summaries belong to same patient).
+# TODO: what is the optimal setting for this number? In the clinical setting,
+# how many summaries do clinicians actually look through?
 MAX_SUMMARIES: int = 5
 
 
@@ -81,6 +83,7 @@ def main():
             qa_string = call_gpt(QA_GENERATION_MODEL, data_item, INCLUDE_EXPLANATION)
 
         # Parse the json to get the question and answer as variables
+        qa_string.replace("''", "")  # Remove empty strings returned by the LLM
         qa_parts = qa_string.split("\n")
         print(qa_parts)  # Log the data to terminal
         question = qa_parts[0][10:]  # Remove "Question: "
