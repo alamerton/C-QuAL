@@ -14,8 +14,8 @@ import spacy
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
-from utils.evals.benchmark_with_azure import benchmark_with_azure
-from utils.evals.benchmark_locally import benchmark_locally
+from utils.evaluation.benchmark_with_azure import benchmark_with_azure
+from utils.evaluation.benchmark_locally import benchmark_locally
 from utils.misc import save_dataset
 
 DATASET_PATH = "data/processing/cqual-small.csv"
