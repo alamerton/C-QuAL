@@ -8,6 +8,7 @@ import random
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 from azure.core.exceptions import HttpResponseError
+from prompts import get_planning_prompt, get_reasoning_prompt
 import time
 
 load_dotenv()
@@ -24,7 +25,7 @@ def get_question_type():
     return random.choice(question_types)
 
 
-def call_gpt(model_name, discharge_summary_string):
+def call_gpt(model_name, discharge_summary_string, capability_type):
 
     max_retries = 10
     retry_delay = 5
@@ -36,50 +37,21 @@ def call_gpt(model_name, discharge_summary_string):
         api_version=os.getenv("AZURE_API_VERSION"),
     )
 
-    system_message = """You are an expert medical professional tasked
-    with creating clinically relevant question-answer pairs based on a
-    discharge summary from the MIMIC-III database."""
+    # system_message = """You are an expert medical professional tasked
+    # with creating clinically relevant question-answer pairs based on a
+    # discharge summary from the MIMIC-III database."""
 
-    user_prompt = f"""
-        You are given a set of discharge summaries from the MIMIC-III 
-        database. Your task is to generate a question and answer pair that is relevant 
-        to clinical practice.
-
-        Clinically relevant questions should test the ability to summarize, 
-        identify, and arrange text, and answer specific questions related to:
-        - Treatment
-        - Assessment
-        - Diagnosis
-        - Problems or complications
-        - Abnormalities
-        - Etiology
-        - Medical history
-
-        The question should be of the following type: {question_type}
-
-        Do not create a question that is too easy to answer, only clinicians 
-        should be able to answer the question. Do not create a question that 
-        can be answered without referring to the discharge summary. Do not
-        create a question-answer pair with exactly matching details.
-
-        Please follow this format:
-
-        Question: [Insert your clinical question here]
-        Answer: [Insert the corresponding answer here]
-        Type: [Your chosen question type from the list, spelled the same]
-
-        If there are multiple discharge summaries, each will be provided 
-        between [Discharge summary n start] and [Discharge summary n end] 
-        where n is the number corresponding to the discharge summary being 
-        given. The discharge summaries are provided in chronological order.
-
-        Here is the discharge summary text for you to work on.
-
-        {discharge_summary_string}
-
-        Please provide a clinically relevant question and answer based on the 
-        above discharge summary.
-    """
+    # Maybe here I can put a capability type condition
+    if capability_type == "planning":
+        system_message, user_prompt = get_planning_prompt(
+            question_type, discharge_summary_string
+        )
+    elif capability_type == "reasoning":
+        system_message, user_prompt = get_reasoning_prompt(
+            question_type, discharge_summary_string
+        )
+    else:
+        raise ValueError("Invalid capability type passed to")
 
     for i in range(0, max_retries):
         try:
