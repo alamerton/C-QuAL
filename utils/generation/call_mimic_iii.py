@@ -15,7 +15,7 @@ database_port = os.environ.get("DATABASE_PORT")
 
 # Variable to flag where to save collected discharge summaries, default
 # is function.
-SUMMARIES_DESTINATION = "function"
+SUMMARIES_DESTINATION = "file"
 
 
 # Load query results into a dataframe containing subject_ids and notes
@@ -39,7 +39,7 @@ def prepare_discharge_summaries(discharge_summaries):
 # Return a discharge summary from the MIMIC-III database
 def call_mimic_iii(num_rows, max_summaries):
     # Get date and time data for outputs
-    current_date = datetime.now()
+    current_date = datetime.now().date()
 
     # Set up DB connection
     connection = psycopg2.connect(
@@ -109,9 +109,7 @@ def call_mimic_iii(num_rows, max_summaries):
     connection.close()
 
     if SUMMARIES_DESTINATION == "file":  # Save discharge summaries to file
-        with open(
-            f"C-QuAL/data/{num_rows}-discharge-summaries-{current_date}.json", "w"
-        ) as f:
+        with open(f"data/{num_rows}-discharge-summaries-{current_date}.json", "w") as f:
             json.dump(discharge_summaries, f)
 
     elif (
@@ -121,3 +119,6 @@ def call_mimic_iii(num_rows, max_summaries):
 
     else:
         raise ValueError("Destination value must be either 'file' or 'function'")
+
+
+call_mimic_iii(100, 3)

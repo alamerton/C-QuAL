@@ -59,7 +59,7 @@ def calculate_max_discharge_summaries(model_name, limit=10):
     return biggest_ds_strings
 
 
-def select_type(reasoning_proportion: int, planning_proportion: int) -> str:
+def select_capability_type(reasoning_proportion: int, planning_proportion: int) -> str:
     # Calculate the total weight to allow arbitrary proportions
     total_weight = reasoning_proportion + planning_proportion
 

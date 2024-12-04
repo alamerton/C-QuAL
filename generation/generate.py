@@ -8,7 +8,7 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
 from utils.generation.call_gpt import call_gpt
 from utils.generation.call_mimic_iii import call_mimic_iii
-from utils.misc import select_type
+from utils.misc import select_capability_type
 
 # Dataset size
 NUMBER_OF_QA_PAIRS: int = 1500
@@ -64,10 +64,12 @@ def main():
         # Create data item starting with discharge summary
         data_item = [discharge_summaries[row]]
 
-        capability_type = select_type(REASONING_Q_PROPORTION, PLANNING_Q_PROPORTION)
+        capability_type = select_capability_type(
+            REASONING_Q_PROPORTION, PLANNING_Q_PROPORTION
+        )
 
         # Call LLM with discharge summary and prompt
-        qa_string = call_gpt(QA_GENERATION_MODEL, data_item)
+        qa_string = call_gpt(QA_GENERATION_MODEL, data_item, capability_type)
 
         # Check correct columns are in response, regenerate until true
         while (
