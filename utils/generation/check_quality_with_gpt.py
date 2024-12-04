@@ -33,7 +33,7 @@ def check_quality_with_gpt(model_name, capability_type):
                     {"role": "system", "content": system_message},
                     {"role": "user", "content": user_prompt},
                 ],
-                max_tokens=999,
+                max_tokens=,
                 temperature=1,
             )
             return response.choices[0].message.content
