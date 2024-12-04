@@ -8,7 +8,7 @@ import random
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 from azure.core.exceptions import HttpResponseError
-from prompts import get_planning_prompt, get_reasoning_prompt
+from prompts import get_planning_generation_prompt, get_reasoning_generation_prompt
 import time
 
 load_dotenv()
@@ -37,17 +37,13 @@ def call_gpt(model_name, discharge_summary_string, capability_type):
         api_version=os.getenv("AZURE_API_VERSION"),
     )
 
-    # system_message = """You are an expert medical professional tasked
-    # with creating clinically relevant question-answer pairs based on a
-    # discharge summary from the MIMIC-III database."""
-
     # Maybe here I can put a capability type condition
     if capability_type == "planning":
-        system_message, user_prompt = get_planning_prompt(
+        system_message, user_prompt = get_planning_generation_prompt(
             question_type, discharge_summary_string
         )
     elif capability_type == "reasoning":
-        system_message, user_prompt = get_reasoning_prompt(
+        system_message, user_prompt = get_reasoning_generation_prompt(
             question_type, discharge_summary_string
         )
     else:

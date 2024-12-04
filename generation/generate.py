@@ -79,6 +79,8 @@ def main():
         ):
             qa_string = call_gpt(QA_GENERATION_MODEL, data_item)
 
+        # TODO: add quality checking here, a lot like the above while loop
+
         # Parse the json to get the question and answer as variables
         qa_parts = qa_string.split("\n")
         qa_parts = [item for item in qa_parts if item != ""]  # Remove
