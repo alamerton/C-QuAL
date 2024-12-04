@@ -24,7 +24,7 @@ def get_question_type():
     return random.choice(question_types)
 
 
-def call_gpt(model_name, discharge_summary_string, include_explanation):
+def call_gpt(model_name, discharge_summary_string):
 
     max_retries = 10
     retry_delay = 5
@@ -40,93 +40,46 @@ def call_gpt(model_name, discharge_summary_string, include_explanation):
     with creating clinically relevant question-answer pairs based on a
     discharge summary from the MIMIC-III database."""
 
-    if include_explanation:
-        user_prompt = f"""
-            You are given a set of discharge summaries from the MIMIC-III 
-            database. Your task is to generate a question and answer pair that is relevant 
-            to clinical practice.
+    user_prompt = f"""
+        You are given a set of discharge summaries from the MIMIC-III 
+        database. Your task is to generate a question and answer pair that is relevant 
+        to clinical practice.
 
-            Clinically relevant questions should test the ability to summarise, 
-            identify, and arrange text, and answer specific questions related to:
-            - Treatment
-            - Assessment
-            - Diagnosis
-            - Problems or complications
-            - Abnormalities
-            - Etiology
-            - Medical history
+        Clinically relevant questions should test the ability to summarize, 
+        identify, and arrange text, and answer specific questions related to:
+        - Treatment
+        - Assessment
+        - Diagnosis
+        - Problems or complications
+        - Abnormalities
+        - Etiology
+        - Medical history
 
-            The question should be of the following type: ${question_type}
+        The question should be of the following type: {question_type}
 
-            Your response should also contain short, one-sentence rationale behind 
-            the answer detailing the reason why the answer is correct.
+        Do not create a question that is too easy to answer, only clinicians 
+        should be able to answer the question. Do not create a question that 
+        can be answered without referring to the discharge summary. Do not
+        create a question-answer pair with exactly matching details.
 
-            Do not create a question that is too easy to answer, only clinicians 
-            should be able to answer the question. Do not create a question that 
-            can be answered without referring to the discharge summary. Do not
-            create a question-answer pair with exactly matching details.
+        Please follow this format:
 
-            Please follow this format exactly:
+        Question: [Insert your clinical question here]
+        Answer: [Insert the corresponding answer here]
+        Type: [Your chosen question type from the list, spelled the same]
 
-            Question: [Insert your clinical question here]\n
-            Answer: [Insert the corresponding answer here]\n
-            Type: [Your chosen question type from the list, spelled the same]\n
-            Reason: [Short explanation for the answer, based on the discharge 
-            summaries]\n
+        If there are multiple discharge summaries, each will be provided 
+        between [Discharge summary n start] and [Discharge summary n end] 
+        where n is the number corresponding to the discharge summary being 
+        given. The discharge summaries are provided in chronological order.
 
-            If there are multiple discharge summaries, each will be provided 
-            between [Discharge summary n start] and [Discharge summary n end] 
-            where n is the number corresponding to the discharge summary being 
-            given. The discharge summaries are provided in chronological order.
+        Here is the discharge summary text for you to work on.
 
-            Here are the discharge summaries for you to work on:
+        {discharge_summary_string}
 
-            {discharge_summary_string}
-
-            Please provide a clinically relevant question and answer based on the 
-            above discharge summary.
-        """
-    else:
-        user_prompt = f"""
-            You are given a set of discharge summaries from the MIMIC-III 
-            database. Your task is to generate a question and answer pair that is relevant 
-            to clinical practice.
-
-            Clinically relevant questions should test the ability to summarize, 
-            identify, and arrange text, and answer specific questions related to:
-            - Treatment
-            - Assessment
-            - Diagnosis
-            - Problems or complications
-            - Abnormalities
-            - Etiology
-            - Medical history
-
-            The question should be of the following type: {question_type}
-
-            Do not create a question that is too easy to answer, only clinicians 
-            should be able to answer the question. Do not create a question that 
-            can be answered without referring to the discharge summary. Do not
-            create a question-answer pair with exactly matching details.
-
-            Please follow this format:
-
-            Question: [Insert your clinical question here]
-            Answer: [Insert the corresponding answer here]
-            Type: [Your chosen question type from the list, spelled the same]
-
-            If there are multiple discharge summaries, each will be provided 
-            between [Discharge summary n start] and [Discharge summary n end] 
-            where n is the number corresponding to the discharge summary being 
-            given. The discharge summaries are provided in chronological order.
-
-            Here is the discharge summary text for you to work on.
-
-            {discharge_summary_string}
-
-            Please provide a clinically relevant question and answer based on the 
-            above discharge summary.
-        """
+        Please provide a clinically relevant question and answer based on the 
+        above discharge summary.
+    """
 
     for i in range(0, max_retries):
         try:
