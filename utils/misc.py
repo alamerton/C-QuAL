@@ -2,6 +2,7 @@ import sys
 import os
 from datetime import datetime
 import tiktoken
+import random
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
@@ -56,3 +57,14 @@ def calculate_max_discharge_summaries(model_name, limit=10):
         strings = call_mimic_iii(NUMBER_OF_QA_PAIRS, i)
         biggest_ds_strings.append(calculate_max_tokens(strings, model_name))
     return biggest_ds_strings
+
+
+def select_type(reasoning_proportion: int, planning_proportion: int) -> str:
+    # Calculate the total weight to allow arbitrary proportions
+    total_weight = reasoning_proportion + planning_proportion
+
+    # Generate a random number between 0 and the total weight
+    random_value = random.randint(0, total_weight)
+
+    # Determine the selection based on the random value
+    return "reasoning" if random_value <= reasoning_proportion else "planning"
