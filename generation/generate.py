@@ -9,6 +9,7 @@ sys.path.insert(0, parent_dir)
 from utils.generation.call_gpt import call_gpt
 from utils.generation.call_mimic_iii import call_mimic_iii
 from utils.misc import select_capability_type
+from utils.generation.check_quality_with_gpt import check_quality_with_gpt
 
 # Dataset size
 NUMBER_OF_QA_PAIRS: int = 1500
@@ -25,6 +26,9 @@ CHECKPOINT: int = 0
 
 # Model for generating QA pairs
 QA_GENERATION_MODEL = "gpt-4o"
+
+# Model for quality-checking QA pairs
+QUALITY_CHECKING_MODEL = "gpt-4o"
 
 # Variable for limiting the number of consecutive summaries added to the
 # prompt (when multiple consecutive summaries belong to same patient).
@@ -68,18 +72,23 @@ def main():
             REASONING_Q_PROPORTION, PLANNING_Q_PROPORTION
         )
 
-        # Call LLM with discharge summary and prompt
-        qa_string = call_gpt(QA_GENERATION_MODEL, data_item, capability_type)
+        quality_checking_result = ""
+        while "1" not in quality_checking_result:
 
-        # Check correct columns are in response, regenerate until true
-        while (
-            "Question" not in qa_string
-            or "Answer" not in qa_string
-            or "Type" not in qa_string
-        ):
-            qa_string = call_gpt(QA_GENERATION_MODEL, data_item)
+            # Call LLM with discharge summary and prompt
+            qa_string = call_gpt(QA_GENERATION_MODEL, data_item, capability_type)
 
-        # TODO: add quality checking here, a lot like the above while loop
+            # Check correct columns are in response, regenerate until true
+            while (
+                "Question" not in qa_string
+                or "Answer" not in qa_string
+                or "Type" not in qa_string
+            ):
+                qa_string = call_gpt(QA_GENERATION_MODEL, data_item)
+
+            quality_checking_result = check_quality_with_gpt(
+                qa_string, QUALITY_CHECKING_MODEL, capability_type
+            )
 
         # Parse the json to get the question and answer as variables
         qa_parts = qa_string.split("\n")

@@ -74,7 +74,7 @@ def get_reasoning_generation_prompt(question_type, discharge_summary_string):
     )
 
 
-def get_planning_qual_check_prompt():
+def get_planning_qual_check_prompt(qa_string):
     return (
         f"""You are a senior medical expert responsible for critically evaluating a clinical reasoning benchmark question-answer pair generated from a discharge summary.""",
         f""" Evaluation Criteria:
@@ -103,11 +103,13 @@ def get_planning_qual_check_prompt():
 
             Output Format:
             Score: [0 or 1]
+
+            Question-answer pair: {qa_string}
         """,
     )
 
 
-def get_reasoning_qual_check_prompt():
+def get_reasoning_qual_check_prompt(qa_string):
     return (
         f"""You are a senior medical expert responsible for critically evaluating a clinical reasoning benchmark question-answer pair generated from a discharge summary.""",
         f"""Evaluation Criteria:
@@ -134,5 +136,8 @@ def get_reasoning_qual_check_prompt():
             - Score 0: Fails to meet one or more critical criteria
 
             Output Format:
-            Score: [0 or 1]""",
+            Score: [0 or 1]
+        
+            Question-answer pair: {qa_string}
+        """,
     )
