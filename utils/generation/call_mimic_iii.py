@@ -15,7 +15,7 @@ database_port = os.environ.get("DATABASE_PORT")
 
 # Variable to flag where to save collected discharge summaries, default
 # is function.
-SUMMARIES_DESTINATION = "file"
+SUMMARIES_DESTINATION = "function"
 
 
 # Load query results into a dataframe containing subject_ids and notes

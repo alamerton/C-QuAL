@@ -9,7 +9,10 @@ import time
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 from azure.core.exceptions import HttpResponseError
-from prompts import get_planning_generation_prompt, get_reasoning_generation_prompt
+from utils.generation.prompts import (
+    get_planning_generation_prompt,
+    get_reasoning_generation_prompt,
+)
 
 load_dotenv()
 
