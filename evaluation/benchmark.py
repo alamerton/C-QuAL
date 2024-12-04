@@ -134,15 +134,15 @@ def get_precision(expected_answer: str, model_answer: str, n: int):
     return n_grams / total
 
 
-def get_bleu(expected_answer: str, model_answer: str):
+def get_bleu(reference: str, candidate: str):
     precisions = []
-    if not isinstance(expected_answer, list):
-        expected_answer = [expected_answer]
+    if not isinstance(reference, list):
+        reference = [reference]
 
     for n in range(1, 4):
-        precision = sum(
-            get_precision(model_answer, ans, n) for ans in expected_answer
-        ) / len(expected_answer)
+        precision = sum(get_precision(candidate, ans, n) for ans in reference) / len(
+            reference
+        )
         precisions.append(precision)
 
     if precisions:
