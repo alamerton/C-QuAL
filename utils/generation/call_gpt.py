@@ -102,7 +102,7 @@ def call_gpt(model_name, discharge_summary_string, include_explanation):
             - Etiology
             - Medical history
 
-            The question should be of the following type: ${question_type}
+            The question should be of the following type: {question_type}
 
             Do not create a question that is too easy to answer, only clinicians 
             should be able to answer the question. Do not create a question that 

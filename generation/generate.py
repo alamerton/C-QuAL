@@ -20,7 +20,7 @@ INCLUDE_EXPLANATION: bool = False
 CHECKPOINT: int = 0
 
 # Model for generating QA pairs
-QA_GENERATION_MODEL = "gpt-35-turbo-16k"
+QA_GENERATION_MODEL = "gpt-4o"
 
 # Variable for limiting the number of consecutive summaries added to the
 # prompt (when multiple consecutive summaries belong to same patient).

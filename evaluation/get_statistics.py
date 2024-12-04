@@ -13,6 +13,8 @@ from lexicalrichness import lexicalrichness
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
 
+from evaluation.benchmark import get_bleu
+
 DATASET_PATH = "data/processing/cqual-small.csv"
 
 
@@ -84,7 +86,7 @@ def get_question_categories(df: pd.DataFrame):
 
 def get_question_complexity(df: pd.DataFrame):
     """
-    Use bleu ideally with a library and return mean
+    Calculate complexity of questions
     """
     return 0
 
@@ -116,6 +118,7 @@ def get_statistics(dataset_path):
     factual_qs = dataset["Question Type"].str.count("Factual").sum()
     summarisation_qs = dataset["Question Type"].str.count("Summarisation").sum()
     identification_qs = dataset["Question Type"].str.count("Identification").sum()
+
     lexical_richness = get_lexical_richness(dataset)
 
     statistics = pd.DataFrame(
