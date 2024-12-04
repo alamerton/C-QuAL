@@ -1,5 +1,5 @@
 # TODO: decide whether to still use randomly chosen question type in prompt
-def get_planning_prompt(question_type, discharge_summary_string):
+def get_planning_generation_prompt(question_type, discharge_summary_string):
     return (
         f"""You are an expert medical annotator tasked with creating a clinical planning assessment using a discharge summary from the MIMIC-III database. Your goal is to extract and structure information that tests an LLM's ability to simulate clinical reasoning and planning.""",
         f"""Your task is to generate two critical components that capture the clinical decision-making trajectory:
@@ -36,7 +36,7 @@ def get_planning_prompt(question_type, discharge_summary_string):
     )
 
 
-def get_reasoning_prompt(question_type, discharge_summary_string):
+def get_reasoning_generation_prompt(question_type, discharge_summary_string):
     return (
         f"""You are a medical expert tasked with creating a sophisticated clinical reasoning benchmark using a discharge summary from the MIMIC-III database. Your objective is to design an assessment that captures the nuanced clinical decision-making process.""",
         f"""Your task is to generate three critical components:
@@ -71,4 +71,68 @@ def get_reasoning_prompt(question_type, discharge_summary_string):
 
             Discharge Summary: {discharge_summary_string}
         """,
+    )
+
+
+def get_planning_qual_check_prompt():
+    return (
+        f"""You are a senior medical expert responsible for critically evaluating a clinical reasoning benchmark question-answer pair generated from a discharge summary.""",
+        f""" Evaluation Criteria:
+            1. Clinical Reasoning Depth (40%)
+            - Does the question require sophisticated clinical inference?
+            - Does it test genuine medical decision-making beyond surface-level information?
+            - Can the question not be answered through simple fact retrieval?
+
+            2. Evidence Alignment (30%)
+            - Is the provided evidence directly relevant to answering the question?
+            - Does the evidence support a meaningful clinical reasoning process?
+            - Are the evidence chunks appropriately selected and crucial to the reasoning?
+
+            3. Question Quality (20%)
+            - Is the question formulated in a clinically authentic manner?
+            - Does it avoid directly revealing the answer?
+            - Is the question sufficiently challenging and nuanced?
+
+            4. Answer Accuracy (10%)
+            - Does the answer precisely reflect the clinical reasoning in the discharge summary?
+            - Is the answer concise and evidence-based?
+
+            Scoring Guidance:
+            - Score 1: Meets all criteria exceptionally well
+            - Score 0: Fails to meet one or more critical criteria
+
+            Output Format:
+            Score: [0 or 1]
+        """,
+    )
+
+
+def get_reasoning_qual_check_prompt():
+    return (
+        f"""You are a senior medical expert responsible for critically evaluating a clinical reasoning benchmark question-answer pair generated from a discharge summary.""",
+        f"""Evaluation Criteria:
+            1. Initial Scenario Comprehensiveness (35%)
+            - Does the initial section provide sufficient context for clinical reasoning?
+            - Are all critical patient details included?
+            - Can a skilled clinician develop meaningful hypotheses from this information?
+
+            2. Subsequent Course Revelation (35%)
+            - Does the subsequent information demonstrate the actual clinical decision-making process?
+            - Are the diagnostic and treatment steps clearly and logically presented?
+            - Does the scenario reveal the complexity of medical problem-solving?
+
+            3. Reasoning Trajectory (20%)
+            - Is there a clear evolution of clinical thinking?
+            - Do the initial and subsequent sections create a meaningful narrative of medical decision-making?
+
+            4. Educational Value (10%)
+            - Would this scenario be useful for testing an LLM's clinical reasoning abilities?
+            - Does it capture nuanced medical decision-making?
+
+            Scoring Guidance:
+            - Score 1: Exceptionally strong scenario that comprehensively demonstrates clinical reasoning
+            - Score 0: Fails to meet one or more critical criteria
+
+            Output Format:
+            Score: [0 or 1]""",
     )
