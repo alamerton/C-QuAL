@@ -31,6 +31,11 @@ def get_planning_generation_prompt(question_type, discharge_summary_string):
             - Demonstrate the complexity of medical problem-solving
             - Ensure both sections provide meaningful insights into clinical reasoning
 
+            Please follow this format exactly:
+
+            Question: [Insert Initial Clinical Scenario here]\n
+            Answer: [Insert Subsequent Clinical Course here]\n
+
             Discharge Summary: {discharge_summary_string}
         """,
     )
@@ -63,11 +68,18 @@ def get_reasoning_generation_prompt(question_type, discharge_summary_string):
             - Include only the most critical information needed to solve the reasoning challenge
             - Ensure the evidence is sufficient but not overly explicit
 
-            Additional Guidance:
+            Guidance:
 
             - The question should be sufficiently complex to differentiate between surface-level information processing and genuine clinical reasoning
             - Avoid questions that can be answered through simple pattern matching
             - Prioritize questions that require hypothesis generation, risk assessment, or complex diagnostic inference
+
+            Please follow this format exactly:
+
+            Question: [Insert Clinical Reasoning Question here]\n
+            Answer: [Insert the Expected Answer here]\n
+            Evidence: [Insert the Relevant Evidence Chunks here]\n
+
 
             Discharge Summary: {discharge_summary_string}
         """,
@@ -101,8 +113,10 @@ def get_planning_qual_check_prompt(qa_string):
             - Score 1: Meets all criteria exceptionally well
             - Score 0: Fails to meet one or more critical criteria
 
+            Please only respond with either the number 0 or 1, representing the score.
+
             Output Format:
-            Score: [0 or 1]
+            [0 or 1]
 
             Question-answer pair: {qa_string}
         """,
@@ -135,8 +149,10 @@ def get_reasoning_qual_check_prompt(qa_string):
             - Score 1: Exceptionally strong scenario that comprehensively demonstrates clinical reasoning
             - Score 0: Fails to meet one or more critical criteria
 
+            Please only respond with either the number 0 or 1, representing the score.
+
             Output Format:
-            Score: [0 or 1]
+            [0 or 1]
         
             Question-answer pair: {qa_string}
         """,

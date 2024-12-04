@@ -1,6 +1,9 @@
 import os
 import time
-from prompts import get_planning_qual_check_prompt, get_reasoning_qual_check_prompt
+from utils.generation.prompts import (
+    get_planning_qual_check_prompt,
+    get_reasoning_qual_check_prompt,
+)
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 from azure.core.exceptions import HttpResponseError
@@ -8,7 +11,7 @@ from azure.core.exceptions import HttpResponseError
 load_dotenv()
 
 
-def check_quality_with_gpt(model_name, capability_type):
+def check_quality_with_gpt(qa_string, model_name, capability_type):
     max_retries = 10
     retry_delay = 5
 
@@ -19,9 +22,9 @@ def check_quality_with_gpt(model_name, capability_type):
     )
 
     if capability_type == "reasoning":
-        system_message, user_prompt = get_planning_qual_check_prompt()
+        system_message, user_prompt = get_planning_qual_check_prompt(qa_string)
     elif capability_type == "planning":
-        system_message, user_prompt = get_reasoning_qual_check_prompt()
+        system_message, user_prompt = get_reasoning_qual_check_prompt(qa_string)
     else:
         raise ValueError("Invalid capability type passed to check_quality_with_gpt")
 
@@ -33,7 +36,7 @@ def check_quality_with_gpt(model_name, capability_type):
                     {"role": "system", "content": system_message},
                     {"role": "user", "content": user_prompt},
                 ],
-                max_tokens=,
+                max_tokens=10,
                 temperature=1,
             )
             return response.choices[0].message.content
