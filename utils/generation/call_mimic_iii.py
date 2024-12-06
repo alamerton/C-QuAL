@@ -108,6 +108,14 @@ def call_mimic_iii(num_rows, max_summaries):
     cursor.close()
     connection.close()
 
+    if current_summaries:
+        if len(current_summaries) > 1:
+            combined_summaries = prepare_discharge_summaries(current_summaries)
+            discharge_summaries.append(combined_summaries)
+        else:
+            single_summary = current_summaries[0]
+            discharge_summaries.append(single_summary)
+
     if SUMMARIES_DESTINATION == "file":  # Save discharge summaries to file
         with open(f"data/{num_rows}-discharge-summaries-{current_date}.json", "w") as f:
             json.dump(discharge_summaries, f)
@@ -119,6 +127,3 @@ def call_mimic_iii(num_rows, max_summaries):
 
     else:
         raise ValueError("Destination value must be either 'file' or 'function'")
-
-
-call_mimic_iii(100, 3)

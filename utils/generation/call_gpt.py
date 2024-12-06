@@ -40,7 +40,6 @@ def call_gpt(model_name, discharge_summary_string, capability_type):
         api_version=os.getenv("AZURE_API_VERSION"),
     )
 
-    # Maybe here I can put a capability type condition
     if capability_type == "planning":
         system_message, user_prompt = get_planning_generation_prompt(
             question_type, discharge_summary_string
@@ -64,6 +63,7 @@ def call_gpt(model_name, discharge_summary_string, capability_type):
                 temperature=1,
             )
             return response.choices[0].message.content
+
         except HttpResponseError as e:
             if "429" in str(e):
                 print(f"Rate limit exceeded. Attempt {i + 1} of {max_retries}.")

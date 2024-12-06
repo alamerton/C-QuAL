@@ -12,7 +12,7 @@ from utils.misc import select_capability_type
 from utils.generation.check_quality_with_gpt import check_quality_with_gpt
 
 # Dataset size
-NUMBER_OF_QA_PAIRS: int = 10
+NUMBER_OF_QA_PAIRS: int = 15
 
 # Control the ratio of reasoning and planning questions in the dataset
 # by setting the proportion of reasoning questions. They can be any
@@ -91,7 +91,7 @@ def main():
                     or "Evidence" not in qa_string
                 ):
                     qa_string = call_gpt(
-                        QA_GENERATION_MODEL, data_item, capability_type
+                        QA_GENERATION_MODEL, discharge_summary, capability_type
                     )
 
             quality_checking_result = check_quality_with_gpt(
@@ -128,7 +128,7 @@ def main():
         print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
 
         checkpoint_directory_path = "data/generations/checkpoints/"
-        if (row + 1) % 10 == 0:
+        if (row + 1) % 3 == 0:
             if CHECKPOINT > 0:
                 checkpoint_name = f"rows-{CHECKPOINT}-{row+1}-{date}"
                 checkpoint_path = checkpoint_directory_path + checkpoint_name
