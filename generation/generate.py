@@ -59,11 +59,10 @@ def main():
 
     # For the number of desired rows for the dataset:
     for row in tqdm(range(CHECKPOINT, NUMBER_OF_QA_PAIRS)):
-        # Get date for naming the dataset and checkpoints
+        # Get date for naming the dataset and checkpoints.
         date = datetime.now()
         date = date.strftime("%Y-%m-%d %H:%M:%S")
 
-        # Create data item starting with discharge summary
         data_item = []
         discharge_summary = discharge_summaries[row]
 
@@ -82,7 +81,8 @@ def main():
 
             print("QA String: ", qa_string)
 
-            # Check correct columns are in response, regenerate until true
+            # Check the expected parts are in response, regenerate if
+            # not.
             if capability_type == "planning":
                 while "Part 1: " not in qa_string or "Part 2: " not in qa_string:
                     print("Regenerating 1")
@@ -116,11 +116,7 @@ def main():
                 print("Quality checking result: ", quality_checking_result)
             print("Quality checking result: ", quality_checking_result)
 
-        # Parse the json to get the question and answer as variables
-        # qa_parts = qa_string.split("End of Part")  # There was an error
-        # here where the LLM returned 'Part' not 'part' so the split
-        # failed. It just returned 'part'. What to do?
-
+        # Split the response into a list for each 'Part n: '
         qa_parts = re.split(r"\n*Part [123]:", qa_string)
 
         # Remove items created by extra '\n's
@@ -129,22 +125,17 @@ def main():
         # Log the data to terminal
         print(qa_parts)
 
-        # question = qa_parts[0][8:]  # Remove "Part 1: "
-        question = qa_parts[0]
-        # question = question[:12]  # Remove " End of part"
-
-        # answer = qa_parts[1][8:]  # Remove "Part 2: "
-        answer = qa_parts[1]
-        # question = answer[:12]  # ""
-
         if capability_type == "reasoning":
-            # evidence = qa_parts[2][8:]  # Remove "Part 3: "
+            question = qa_parts[0]
+            answer = qa_parts[1]
             evidence = qa_parts[2]
-            # evidence = evidence[:12]  # ""
 
             # Add data to data item
             data_item.extend((evidence, question, answer, capability_type))
         else:
+            question = "Plan the subsequent clinical course for this clinical scenario."  # TODO: put the planning prompt here
+            evidence = qa_parts[0]
+            answer = qa_parts[1]
             data_item.extend(("", question, answer, capability_type))
         # Add Q-A pair to dataframe
         data.loc[row] = data_item
