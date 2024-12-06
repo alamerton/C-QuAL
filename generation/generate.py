@@ -3,6 +3,7 @@ import sys
 import os
 from tqdm import tqdm
 import pandas as pd
+import re
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
@@ -23,6 +24,7 @@ PLANNING_Q_PROPORTION: int = 50
 # Variable for starting the generation from a specific row in MIMIC-III.
 # Default value is 0. Set to 0 if generating new dataset.
 CHECKPOINT: int = 0
+CHECKPOINT_INTERVAL: int = 1
 
 # Model for generating QA pairs
 QA_GENERATION_MODEL = "gpt-35-turbo-16k"
@@ -38,7 +40,7 @@ MAX_SUMMARIES: int = 3
 
 
 def main():
-    # create dataframe with question and expected answer columns
+    # Create dataframe with question and expected answer columns
     data = pd.DataFrame(
         columns=[
             "Evidence",
@@ -55,6 +57,7 @@ def main():
     # For loop for generating qa pairs
     print("Done\n\nGenerating Q-A pairs...")
 
+    # For the number of desired rows for the dataset:
     for row in tqdm(range(CHECKPOINT, NUMBER_OF_QA_PAIRS)):
         # Get date for naming the dataset and checkpoints
         date = datetime.now()
@@ -64,6 +67,7 @@ def main():
         data_item = []
         discharge_summary = discharge_summaries[row]
 
+        # Select the capability type based on its specified proportion.
         capability_type = select_capability_type(
             REASONING_Q_PROPORTION, PLANNING_Q_PROPORTION
         )
@@ -71,7 +75,7 @@ def main():
         quality_checking_result = ""
         while "1" not in quality_checking_result:
 
-            # Call LLM with discharge summary and prompt
+            # Call LLM with discharge summary and prompt.
             qa_string = call_gpt(
                 QA_GENERATION_MODEL, discharge_summary, capability_type
             )
@@ -80,16 +84,18 @@ def main():
 
             # Check correct columns are in response, regenerate until true
             if capability_type == "planning":
-                while "Question" not in qa_string or "Answer" not in qa_string:
+                while "Part 1: " not in qa_string or "Part 2: " not in qa_string:
+                    print("Regenerating 1")
                     qa_string = call_gpt(
                         QA_GENERATION_MODEL, discharge_summary, capability_type
                     )
             else:
                 while (
-                    "Question" not in qa_string
-                    or "Answer" not in qa_string
-                    or "Evidence" not in qa_string
+                    "Part 1: " not in qa_string
+                    or "Part 2: " not in qa_string
+                    or "Part 3: " not in qa_string
                 ):
+                    print("Regenerating 2")
                     qa_string = call_gpt(
                         QA_GENERATION_MODEL, discharge_summary, capability_type
                     )
@@ -103,20 +109,39 @@ def main():
                 "1" not in quality_checking_result
                 and "0" not in quality_checking_result
             ):
+                print("Regenerating quality checking result")
                 quality_checking_result = check_quality_with_gpt(
                     qa_string, QUALITY_CHECKING_MODEL, capability_type
                 )
                 print("Quality checking result: ", quality_checking_result)
+            print("Quality checking result: ", quality_checking_result)
 
         # Parse the json to get the question and answer as variables
-        qa_parts = qa_string.split("\n")
-        qa_parts = [item for item in qa_parts if item != ""]  # Remove
-        # items created by extra '\n's
-        print(qa_parts)  # Log the data to terminal
-        question = qa_parts[0][10:]  # Remove "Question: "
-        answer = qa_parts[1][8:]  # Remove "Answer: "
+        # qa_parts = qa_string.split("End of Part")  # There was an error
+        # here where the LLM returned 'Part' not 'part' so the split
+        # failed. It just returned 'part'. What to do?
+
+        qa_parts = re.split(r"\n*Part [123]:", qa_string)
+
+        # Remove items created by extra '\n's
+        qa_parts = [part.strip() for part in qa_parts if part.strip()]
+
+        # Log the data to terminal
+        print(qa_parts)
+
+        # question = qa_parts[0][8:]  # Remove "Part 1: "
+        question = qa_parts[0]
+        # question = question[:12]  # Remove " End of part"
+
+        # answer = qa_parts[1][8:]  # Remove "Part 2: "
+        answer = qa_parts[1]
+        # question = answer[:12]  # ""
+
         if capability_type == "reasoning":
-            evidence = qa_parts[2][10:]  # Remove "Evidence: "
+            # evidence = qa_parts[2][8:]  # Remove "Part 3: "
+            evidence = qa_parts[2]
+            # evidence = evidence[:12]  # ""
+
             # Add data to data item
             data_item.extend((evidence, question, answer, capability_type))
         else:
@@ -128,7 +153,7 @@ def main():
         print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
 
         checkpoint_directory_path = "data/generations/checkpoints/"
-        if (row + 1) % 3 == 0:
+        if (row + 1) % CHECKPOINT_INTERVAL == 0:
             if CHECKPOINT > 0:
                 checkpoint_name = f"rows-{CHECKPOINT}-{row+1}-{date}"
                 checkpoint_path = checkpoint_directory_path + checkpoint_name
