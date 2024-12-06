@@ -33,8 +33,8 @@ def get_planning_generation_prompt(question_type, discharge_summary_string):
 
             Please follow this format exactly:
 
-            Question: [Insert Initial Clinical Scenario here]\n
-            Answer: [Insert Subsequent Clinical Course here]\n
+            Part 1: [Insert Initial Clinical Scenario here]\n
+            Part 2: [Insert Subsequent Clinical Course here]\n
 
             Discharge Summary: {discharge_summary_string}
         """,
@@ -76,9 +76,9 @@ def get_reasoning_generation_prompt(question_type, discharge_summary_string):
 
             Please follow this format exactly:
 
-            Question: [Insert Clinical Reasoning Question here]\n
-            Answer: [Insert the Expected Answer here]\n
-            Evidence: [Insert the Relevant Evidence Chunks here]\n
+            Part 1: [Insert Clinical Reasoning Question here]\n
+            Part 2: [Insert the Expected Answer here]\n
+            Part 3: [Insert the Relevant Evidence Chunks here]\n
 
 
             Discharge Summary: {discharge_summary_string}
