@@ -95,6 +95,7 @@ def main():
             )
             # If the quality checking function returns a string that is
             # not either '0' or '1', retry until it is
+            # TODO: shouldn't this be while not 1??
             while (
                 "1" not in quality_checking_result
                 and "0" not in quality_checking_result
@@ -107,7 +108,7 @@ def main():
             print("Quality checking result: ", quality_checking_result)
 
         # Split the response into a list for each 'Part n: '
-        qa_parts = re.split(r"\n*Part [123]:", qa_string)
+        qa_parts = re.split(r"\n*Part [12]:", qa_string)
 
         # Remove items created by extra '\n's
         qa_parts = [part.strip() for part in qa_parts if part.strip()]
@@ -118,10 +119,9 @@ def main():
         if capability_type == "reasoning":
             question = qa_parts[0]
             answer = qa_parts[1]
-            evidence = qa_parts[2]
 
             # Add data to data item
-            data_item.extend((evidence, question, answer, capability_type))
+            data_item.extend((discharge_summary, question, answer, capability_type))
         else:
             # TODO: put the planning prompt here (not the prompt (what we want
             # the benchmark to ask the LLM to do)
