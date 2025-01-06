@@ -133,7 +133,9 @@ def main():
             # Add data to data item
             data_item.extend((evidence, question, answer, capability_type))
         else:
-            question = "Plan the subsequent clinical course for this clinical scenario."  # TODO: put the planning prompt here
+            # TODO: put the planning prompt here (not the prompt (what we want
+            # the benchmark to ask the LLM to do)
+            question = "Plan the subsequent clinical course for this clinical scenario."
             evidence = qa_parts[0]
             answer = qa_parts[1]
             data_item.extend(("", question, answer, capability_type))
