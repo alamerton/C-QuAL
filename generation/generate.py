@@ -71,79 +71,143 @@ def main():
             REASONING_Q_PROPORTION, PLANNING_Q_PROPORTION
         )
 
-        # Start generation and quality checking loop.
-        quality_checking_result = ""
-        while "1" not in quality_checking_result:
+        if capability_type == "reasoning":
+            # Generate 4 reasoning questions using from each discharge
+            # summary
+            for _ in range(0, 4):
+                # Start generation and quality checking loop.
+                quality_checking_result = ""
+                while "1" not in quality_checking_result:
 
-            # Call LLM with discharge summary and prompt.
-            qa_string = call_gpt(
-                QA_GENERATION_MODEL, discharge_summary, capability_type
-            )
+                    # Call LLM with discharge summary and prompt.
+                    qa_string = call_gpt(
+                        QA_GENERATION_MODEL, discharge_summary, capability_type
+                    )
 
-            print("QA String: ", qa_string)
+                    print("QA String: ", qa_string)
 
-            # Check the expected parts are in response, regenerate if
-            # not.
-            while "Part 1: " not in qa_string or "Part 2: " not in qa_string:
-                print("Regenerating...")
+                    # Check the expected parts are in response, regenerate if
+                    # not.
+                    while "Part 1: " not in qa_string or "Part 2: " not in qa_string:
+                        print("Regenerating...")
+                        qa_string = call_gpt(
+                            QA_GENERATION_MODEL, discharge_summary, capability_type
+                        )
+
+                    quality_checking_result = check_quality_with_gpt(
+                        qa_string, QUALITY_CHECKING_MODEL, capability_type
+                    )
+                    # If the quality checking function returns a string that is
+                    # not either '0' or '1', retry until it is
+                    # TODO: shouldn't this be while not 1??
+                    while (
+                        "1" not in quality_checking_result
+                        and "0" not in quality_checking_result
+                    ):
+                        print("Regenerating quality checking result")
+                        quality_checking_result = check_quality_with_gpt(
+                            qa_string, QUALITY_CHECKING_MODEL, capability_type
+                        )
+                        print("Quality checking result: ", quality_checking_result)
+                    print("Quality checking result: ", quality_checking_result)
+
+                # Split the response into a list for each 'Part n: '
+                qa_parts = re.split(r"\n*Part [12]:", qa_string)
+
+                # Remove items created by extra '\n's
+                qa_parts = [part.strip() for part in qa_parts if part.strip()]
+
+                # Log the data to terminal
+                print(qa_parts)
+
+                question = qa_parts[0]
+                answer = qa_parts[1]
+
+                # Add data to data item
+                data_item.extend((discharge_summary, question, answer, capability_type))
+
+                # Add Q-A pair to dataframe
+                data.loc[row] = data_item
+
+                # Output message to terminal
+                print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
+
+                checkpoint_directory_path = "data/generations/checkpoints/"
+                if (row + 1) % CHECKPOINT_INTERVAL == 0:
+                    if CHECKPOINT > 0:
+                        checkpoint_name = f"rows-{CHECKPOINT}-{row+1}-{date}"
+                        checkpoint_path = checkpoint_directory_path + checkpoint_name
+                    else:
+                        checkpoint_name = f"{row+1}-rows-{date}"
+                        checkpoint_path = checkpoint_directory_path + checkpoint_name
+                    data.to_csv(f"{checkpoint_path}.csv")
+        else:
+            # Start generation and quality checking loop.
+            quality_checking_result = ""
+            while "1" not in quality_checking_result:
+
+                # Call LLM with discharge summary and prompt.
                 qa_string = call_gpt(
                     QA_GENERATION_MODEL, discharge_summary, capability_type
                 )
 
-            quality_checking_result = check_quality_with_gpt(
-                qa_string, QUALITY_CHECKING_MODEL, capability_type
-            )
-            # If the quality checking function returns a string that is
-            # not either '0' or '1', retry until it is
-            # TODO: shouldn't this be while not 1??
-            while (
-                "1" not in quality_checking_result
-                and "0" not in quality_checking_result
-            ):
-                print("Regenerating quality checking result")
+                print("QA String: ", qa_string)
+
+                # Check the expected parts are in response, regenerate if
+                # not.
+                while "Part 1: " not in qa_string or "Part 2: " not in qa_string:
+                    print("Regenerating...")
+                    qa_string = call_gpt(
+                        QA_GENERATION_MODEL, discharge_summary, capability_type
+                    )
+
                 quality_checking_result = check_quality_with_gpt(
                     qa_string, QUALITY_CHECKING_MODEL, capability_type
                 )
+                # If the quality checking function returns a string that is
+                # not either '0' or '1', retry until it is
+                # TODO: shouldn't this be while not 1??
+                while (
+                    "1" not in quality_checking_result
+                    and "0" not in quality_checking_result
+                ):
+                    print("Regenerating quality checking result")
+                    quality_checking_result = check_quality_with_gpt(
+                        qa_string, QUALITY_CHECKING_MODEL, capability_type
+                    )
+                    print("Quality checking result: ", quality_checking_result)
                 print("Quality checking result: ", quality_checking_result)
-            print("Quality checking result: ", quality_checking_result)
 
-        # Split the response into a list for each 'Part n: '
-        qa_parts = re.split(r"\n*Part [12]:", qa_string)
+            # Split the response into a list for each 'Part n: '
+            qa_parts = re.split(r"\n*Part [12]:", qa_string)
 
-        # Remove items created by extra '\n's
-        qa_parts = [part.strip() for part in qa_parts if part.strip()]
+            # Remove items created by extra '\n's
+            qa_parts = [part.strip() for part in qa_parts if part.strip()]
 
-        # Log the data to terminal
-        print(qa_parts)
-
-        if capability_type == "reasoning":
-            question = qa_parts[0]
-            answer = qa_parts[1]
-
-            # Add data to data item
-            data_item.extend((discharge_summary, question, answer, capability_type))
-        else:
+            # Log the data to terminal
+            print(qa_parts)
             # TODO: put the planning prompt here (what we want
             # the benchmark to ask the LLM to do)
             question = "Plan the subsequent clinical course for this clinical scenario."
             evidence = qa_parts[0]
             answer = qa_parts[1]
             data_item.extend((evidence, question, answer, capability_type))
-        # Add Q-A pair to dataframe
-        data.loc[row] = data_item
 
-        # Output message to terminal
-        print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
+            # Add Q-A pair to dataframe
+            data.loc[row] = data_item
 
-        checkpoint_directory_path = "data/generations/checkpoints/"
-        if (row + 1) % CHECKPOINT_INTERVAL == 0:
-            if CHECKPOINT > 0:
-                checkpoint_name = f"rows-{CHECKPOINT}-{row+1}-{date}"
-                checkpoint_path = checkpoint_directory_path + checkpoint_name
-            else:
-                checkpoint_name = f"{row+1}-rows-{date}"
-                checkpoint_path = checkpoint_directory_path + checkpoint_name
-            data.to_csv(f"{checkpoint_path}.csv")
+            # Output message to terminal
+            print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
+
+            checkpoint_directory_path = "data/generations/checkpoints/"
+            if (row + 1) % CHECKPOINT_INTERVAL == 0:
+                if CHECKPOINT > 0:
+                    checkpoint_name = f"rows-{CHECKPOINT}-{row+1}-{date}"
+                    checkpoint_path = checkpoint_directory_path + checkpoint_name
+                else:
+                    checkpoint_name = f"{row+1}-rows-{date}"
+                    checkpoint_path = checkpoint_directory_path + checkpoint_name
+                data.to_csv(f"{checkpoint_path}.csv")
 
     print("Complete")
     print(data)
