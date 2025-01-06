@@ -84,22 +84,11 @@ def main():
 
             # Check the expected parts are in response, regenerate if
             # not.
-            if capability_type == "planning":
-                while "Part 1: " not in qa_string or "Part 2: " not in qa_string:
-                    print("Regenerating 1")
-                    qa_string = call_gpt(
-                        QA_GENERATION_MODEL, discharge_summary, capability_type
-                    )
-            else:
-                while (
-                    "Part 1: " not in qa_string
-                    or "Part 2: " not in qa_string
-                    or "Part 3: " not in qa_string
-                ):
-                    print("Regenerating 2")
-                    qa_string = call_gpt(
-                        QA_GENERATION_MODEL, discharge_summary, capability_type
-                    )
+            while "Part 1: " not in qa_string or "Part 2: " not in qa_string:
+                print("Regenerating...")
+                qa_string = call_gpt(
+                    QA_GENERATION_MODEL, discharge_summary, capability_type
+                )
 
             quality_checking_result = check_quality_with_gpt(
                 qa_string, QUALITY_CHECKING_MODEL, capability_type
