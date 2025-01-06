@@ -17,10 +17,22 @@ from utils.generation.prompts import (
 load_dotenv()
 
 
+def get_question_type():
+    question_types = [
+        "Yes/No/Maybe",
+        "Unanswerable",
+        "Temporal",
+        "Factual",
+        "Summarisation",
+    ]
+    return random.choice(question_types)
+
+
 def call_gpt(model_name, discharge_summary_string, capability_type):
 
     max_retries = 10
     retry_delay = 5
+    question_type = get_question_type()
 
     client = AzureOpenAI(
         azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
@@ -34,7 +46,7 @@ def call_gpt(model_name, discharge_summary_string, capability_type):
         )
     elif capability_type == "reasoning":
         system_message, user_prompt = get_reasoning_generation_prompt(
-            discharge_summary_string
+            question_type, discharge_summary_string
         )
     else:
         raise ValueError("Invalid capability type passed to")
