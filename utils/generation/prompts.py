@@ -21,6 +21,7 @@ def get_planning_generation_prompt(discharge_summary_string):
                 - Diagnostic findings
                 - Treatment modifications
                 - Patient progression
+                - Any medications administered
             - Include information that demonstrates how the initial clinical hypothesis was investigated and potentially modified
 
             Guidance:
@@ -40,7 +41,7 @@ def get_planning_generation_prompt(discharge_summary_string):
     )
 
 
-def get_reasoning_generation_prompt(discharge_summary_string):
+def get_reasoning_generation_prompt(question_type, discharge_summary_string):
     return (
         f"""You are a medical expert tasked with creating a sophisticated clinical reasoning benchmark using a discharge summary from the MIMIC-III database. Your objective is to design an assessment that captures the nuanced clinical decision-making process.""",
         f"""Your task is to generate two critical components:
@@ -53,6 +54,7 @@ def get_reasoning_generation_prompt(discharge_summary_string):
                 - Cannot be answered by simple fact retrieval
                 - Challenges the deep understanding of medical context
                 - Uses language that mimics authentic clinical reasoning
+                - Is of the following question type: {question_type}
 
             Part 2: Expected Answer
 
@@ -71,7 +73,7 @@ def get_reasoning_generation_prompt(discharge_summary_string):
 
             Part 1: [Insert Clinical Reasoning Question here]\n
             Part 2: [Insert the Expected Answer here]\n
-            
+
 
             Discharge Summary: {discharge_summary_string}
         """,
