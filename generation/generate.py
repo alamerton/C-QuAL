@@ -71,6 +71,7 @@ def main():
             REASONING_Q_PROPORTION, PLANNING_Q_PROPORTION
         )
 
+        # Start generation and quality checking loop.
         quality_checking_result = ""
         while "1" not in quality_checking_result:
 
