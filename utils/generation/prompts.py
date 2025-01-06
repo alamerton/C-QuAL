@@ -1,5 +1,4 @@
-# TODO: decide whether to still use randomly chosen question type in prompt
-def get_planning_generation_prompt(question_type, discharge_summary_string):
+def get_planning_generation_prompt(discharge_summary_string):
     return (
         f"""You are an expert medical annotator tasked with creating a clinical planning assessment using a discharge summary from the MIMIC-III database. Your goal is to extract and structure information that tests an LLM's ability to simulate clinical reasoning and planning.""",
         f"""Your task is to generate two critical components that capture the clinical decision-making trajectory:
