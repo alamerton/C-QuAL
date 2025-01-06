@@ -40,10 +40,10 @@ def get_planning_generation_prompt(discharge_summary_string):
     )
 
 
-def get_reasoning_generation_prompt(question_type, discharge_summary_string):
+def get_reasoning_generation_prompt(discharge_summary_string):
     return (
         f"""You are a medical expert tasked with creating a sophisticated clinical reasoning benchmark using a discharge summary from the MIMIC-III database. Your objective is to design an assessment that captures the nuanced clinical decision-making process.""",
-        f"""Your task is to generate three critical components:
+        f"""Your task is to generate two critical components:
 
             Part 1: Clinical Reasoning Question
 
@@ -61,24 +61,17 @@ def get_reasoning_generation_prompt(question_type, discharge_summary_string):
                 - Reflects the exact decision-making process used by the original clinician
                 - Is evidence-based and directly traceable to the discharge summary
 
-            Part 3: Relevant Evidence Chunks
-
-            - Identify and extract the precise textual evidence from the discharge summary
-            - Include only the most critical information needed to solve the reasoning challenge
-            - Ensure the evidence is sufficient but not overly explicit
-
             Guidance:
 
             - The question should be sufficiently complex to differentiate between surface-level information processing and genuine clinical reasoning
             - Avoid questions that can be answered through simple pattern matching
-            - Prioritize questions that require hypothesis generation, risk assessment, or complex diagnostic inference
+            - Prioritise questions that require hypothesis generation, risk assessment, or complex diagnostic inference
 
             Please follow this format exactly:
 
             Part 1: [Insert Clinical Reasoning Question here]\n
             Part 2: [Insert the Expected Answer here]\n
-            Part 3: [Insert the Relevant Evidence Chunks here]\n
-
+            
 
             Discharge Summary: {discharge_summary_string}
         """,
