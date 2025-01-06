@@ -123,12 +123,12 @@ def main():
             # Add data to data item
             data_item.extend((discharge_summary, question, answer, capability_type))
         else:
-            # TODO: put the planning prompt here (not the prompt (what we want
+            # TODO: put the planning prompt here (what we want
             # the benchmark to ask the LLM to do)
             question = "Plan the subsequent clinical course for this clinical scenario."
             evidence = qa_parts[0]
             answer = qa_parts[1]
-            data_item.extend(("", question, answer, capability_type))
+            data_item.extend((evidence, question, answer, capability_type))
         # Add Q-A pair to dataframe
         data.loc[row] = data_item
 
