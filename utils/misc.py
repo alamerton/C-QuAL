@@ -59,12 +59,18 @@ def calculate_max_discharge_summaries(model_name, limit=10):
     return biggest_ds_strings
 
 
-def select_capability_type(reasoning_proportion: int, planning_proportion: int) -> str:
+def select_capability_type(
+    fact_extract_proportion: int, plan_reason_proportion: int
+) -> str:
     # Calculate the total weight to allow arbitrary proportions
-    total_weight = reasoning_proportion + planning_proportion
+    total_weight = fact_extract_proportion + plan_reason_proportion
 
     # Generate a random number between 0 and the total weight
     random_value = random.randint(0, total_weight)
 
     # Determine the selection based on the random value
-    return "reasoning" if random_value <= reasoning_proportion else "planning"
+    return (
+        "Factual and Extraction"
+        if random_value <= fact_extract_proportion
+        else "Reasoning and Planning"
+    )

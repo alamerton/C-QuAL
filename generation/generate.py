@@ -18,8 +18,8 @@ NUMBER_OF_QA_PAIRS: int = 15
 # Control the ratio of reasoning and planning questions in the dataset
 # by setting the proportion of reasoning questions. They can be any
 # ratio.
-REASONING_Q_PROPORTION: int = 50
-PLANNING_Q_PROPORTION: int = 50
+FACT_EXTRACT_Q_PROPORTION: int = 50
+PLAN_REASON_Q_PROPORTION: int = 50
 
 # Variable for starting the generation from a specific row in MIMIC-III.
 # Default value is 0. Set to 0 if generating new dataset.
@@ -68,13 +68,16 @@ def main():
 
         # Select the capability type based on its specified proportion.
         capability_type = select_capability_type(
-            REASONING_Q_PROPORTION, PLANNING_Q_PROPORTION
+            FACT_EXTRACT_Q_PROPORTION, PLAN_REASON_Q_PROPORTION
         )
 
-        if capability_type == "reasoning":
+        if capability_type == "Factual and Extraction":
             # Generate 4 reasoning questions using from each discharge
             # summary
             for _ in range(0, 4):
+                # Clear data_item of its data each iteration
+                data_item = []
+
                 # Start generation and quality checking loop.
                 quality_checking_result = ""
                 while "1" not in quality_checking_result:
@@ -141,6 +144,9 @@ def main():
                         checkpoint_name = f"{row+1}-rows-{date}"
                         checkpoint_path = checkpoint_directory_path + checkpoint_name
                     data.to_csv(f"{checkpoint_path}.csv")
+
+                # Increment row to add next QA pair to next row in data
+                row += 1
         else:
             # Start generation and quality checking loop.
             quality_checking_result = ""

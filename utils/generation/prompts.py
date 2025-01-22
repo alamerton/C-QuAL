@@ -1,4 +1,4 @@
-def get_planning_generation_prompt(discharge_summary_string):
+def get_reasoning_planning_generation_prompt(discharge_summary_string):
     return (
         f"""You are an expert medical annotator tasked with creating a clinical planning assessment using a discharge summary from the MIMIC-III database. Your goal is to extract and structure information that tests an LLM's ability to simulate clinical reasoning and planning.""",
         f"""Your task is to generate two critical components that capture the clinical decision-making trajectory:
@@ -41,7 +41,7 @@ def get_planning_generation_prompt(discharge_summary_string):
     )
 
 
-def get_reasoning_generation_prompt(question_type, discharge_summary_string):
+def get_factual_extraction_generation_prompt(question_type, discharge_summary_string):
     return (
         f"""You are a medical expert tasked with creating a sophisticated clinical reasoning benchmark using a discharge summary from the MIMIC-III database. Your objective is to design an assessment that captures the nuanced clinical decision-making process.""",
         f"""Your task is to generate two critical components:
@@ -80,7 +80,7 @@ def get_reasoning_generation_prompt(question_type, discharge_summary_string):
     )
 
 
-def get_planning_qual_check_prompt(qa_string):
+def get_reasoning_planning_qual_check_prompt(qa_string):
     return (
         f"""You are a senior medical expert responsible for critically evaluating a clinical reasoning benchmark question-answer pair generated from a discharge summary.""",
         f""" Evaluation Criteria:
@@ -117,7 +117,7 @@ def get_planning_qual_check_prompt(qa_string):
     )
 
 
-def get_reasoning_qual_check_prompt(qa_string):
+def get_factual_extraction_qual_check_prompt(qa_string):
     return (
         f"""You are a senior medical expert responsible for critically evaluating a clinical reasoning benchmark question-answer pair generated from a discharge summary.""",
         f"""Evaluation Criteria:
