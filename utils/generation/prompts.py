@@ -31,7 +31,8 @@ def get_reasoning_generation_prompt(discharge_summary_string):
             - Demonstrate the complexity of medical problem-solving
             - Ensure both sections provide meaningful insights into clinical reasoning
 
-            Just include the information, DO NOT ADD ANY OTHER TEXT. Please follow this format EXACTLY:
+            Just include the information requested in part 1 and part 2, DO NOT ADD ANY OTHER TEXT. DO NOT INCLUDE ANY PREAMBLE.
+            Please follow this format EXACTLY:
 
             Part 1: [Insert part 1 here]\n
             Part 2: [Insert part 2 here]\n
@@ -69,10 +70,11 @@ def get_factual_generation_prompt(question_type, discharge_summary_string):
             - Avoid questions that can be answered through simple pattern matching
             - Prioritise questions that require hypothesis generation, risk assessment, or complex diagnostic inference
 
-            Just include the information, DO NOT ADD ANY OTHER TEXT. Please follow this format EXACTLY:
-
-            Part 1: [Insert part 1 here]\n
-            Part 2: [Insert part 2 here]\n
+            Just include the information requested in part 1 and part 2, DO NOT ADD ANY OTHER TEXT. DO NOT INCLUDE ANY PREAMBLE.
+            Please follow this format EXACTLY:
+            
+            Part 1: [information requested in part 1]\n
+            Part 2: [information requested in part 2]\n
 
 
             Discharge Summary: {discharge_summary_string}
