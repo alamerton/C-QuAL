@@ -3,7 +3,7 @@ def get_reasoning_generation_prompt(discharge_summary_string):
         f"""You are an expert medical annotator tasked with creating a clinical planning assessment using a discharge summary from the MIMIC-III database. Your goal is to extract and structure information that tests an LLM's ability to simulate clinical reasoning and planning.""",
         f"""Your task is to generate two critical components that capture the clinical decision-making trajectory:
 
-            Part 1: Initial Clinical Scenario
+            Part 1:
 
             - Select the initial section of the discharge summary that provides:
                 - Comprehensive reason for admission
@@ -13,7 +13,7 @@ def get_reasoning_generation_prompt(discharge_summary_string):
             - Ensure this section represents the decision point where a clinician would begin to develop a clinical plan
             - The information should be detailed enough to support sophisticated clinical reasoning without revealing subsequent interventions
 
-            Part 2: Subsequent Clinical Course
+            Part 2:
 
             - Extract the subsequent clinical information that reveals:
                 - Actual diagnostic steps taken
@@ -31,10 +31,10 @@ def get_reasoning_generation_prompt(discharge_summary_string):
             - Demonstrate the complexity of medical problem-solving
             - Ensure both sections provide meaningful insights into clinical reasoning
 
-            Please follow this format exactly:
+            Just include the information, DO NOT ADD ANY OTHER TEXT. Please follow this format EXACTLY:
 
-            Part 1: [Insert Initial Clinical Scenario here]\n
-            Part 2: [Insert Subsequent Clinical Course here]\n
+            Part 1: [Insert part 1 here]\n
+            Part 2: [Insert part 2 here]\n
 
             Discharge Summary: {discharge_summary_string}
         """,
@@ -46,7 +46,7 @@ def get_factual_generation_prompt(question_type, discharge_summary_string):
         f"""You are a medical expert tasked with creating a sophisticated clinical reasoning benchmark using a discharge summary from the MIMIC-III database. Your objective is to design an assessment that captures the nuanced clinical decision-making process.""",
         f"""Your task is to generate two critical components:
 
-            Part 1: Clinical Reasoning Question
+            Part 1:
 
             - Construct a question that:
                 - Directly reflects the key diagnostic or treatment reasoning in the discharge summary
@@ -56,7 +56,7 @@ def get_factual_generation_prompt(question_type, discharge_summary_string):
                 - Uses language that mimics authentic clinical reasoning
                 - Is of the following question type: {question_type}
 
-            Part 2: Expected Answer
+            Part 2:
 
             - Provide a concise, precise answer that:
                 - Demonstrates the specific clinical reasoning pathway
@@ -69,10 +69,10 @@ def get_factual_generation_prompt(question_type, discharge_summary_string):
             - Avoid questions that can be answered through simple pattern matching
             - Prioritise questions that require hypothesis generation, risk assessment, or complex diagnostic inference
 
-            Please follow this format exactly:
+            Just include the information, DO NOT ADD ANY OTHER TEXT. Please follow this format EXACTLY:
 
-            Part 1: [Insert Clinical Reasoning Question here]\n
-            Part 2: [Insert the Expected Answer here]\n
+            Part 1: [Insert part 1 here]\n
+            Part 2: [Insert part 2 here]\n
 
 
             Discharge Summary: {discharge_summary_string}

@@ -42,7 +42,7 @@ def call_gpt(model_name, discharge_summary_string, capability_type):
 
     if capability_type == "Factual QA":
         system_message, user_prompt = get_factual_generation_prompt(
-            discharge_summary_string
+            question_type, discharge_summary_string
         )
     elif capability_type == "Reasoning QA":
         system_message, user_prompt = get_reasoning_generation_prompt(
