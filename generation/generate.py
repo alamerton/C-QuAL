@@ -100,18 +100,7 @@ def main():
                     quality_checking_result = check_quality_with_gpt(
                         qa_string, QUALITY_CHECKING_MODEL, capability_type
                     )
-                    # If the quality checking function returns a string that is
-                    # not either '0' or '1', retry until it is
-                    # TODO: shouldn't this be while not 1??
-                    while (
-                        "1" not in quality_checking_result
-                        and "0" not in quality_checking_result
-                    ):
-                        print("Regenerating quality checking result")
-                        quality_checking_result = check_quality_with_gpt(
-                            qa_string, QUALITY_CHECKING_MODEL, capability_type
-                        )
-                        print("Quality checking result: ", quality_checking_result)
+
                     print("Quality checking result: ", quality_checking_result)
 
                 # Split the response into a list for each 'Part n: '

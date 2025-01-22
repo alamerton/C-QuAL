@@ -112,7 +112,9 @@ def get_reasoning_qual_check_prompt(qa_string):
             Output Format:
             [0 or 1]
 
-            Question-answer pair: {qa_string}
+            Here is the question-answer pair for you to work on:
+            
+            {qa_string}
         """,
     )
 
@@ -148,6 +150,8 @@ def get_factual_qual_check_prompt(qa_string):
             Output Format:
             [0 or 1]
         
-            Question-answer pair: {qa_string}
+            Here is the question-answer pair for you to work on:
+            
+            {qa_string}
         """,
     )

@@ -10,7 +10,7 @@ from openai import AzureOpenAI
 from dotenv import load_dotenv
 from azure.core.exceptions import HttpResponseError
 from utils.generation.prompts import (
-    get_planning_generation_prompt,
+    get_factual_generation_prompt,
     get_reasoning_generation_prompt,
 )
 
@@ -40,16 +40,16 @@ def call_gpt(model_name, discharge_summary_string, capability_type):
         api_version=os.getenv("AZURE_API_VERSION"),
     )
 
-    if capability_type == "planning":
-        system_message, user_prompt = get_planning_generation_prompt(
+    if capability_type == "Factual QA":
+        system_message, user_prompt = get_factual_generation_prompt(
             discharge_summary_string
         )
-    elif capability_type == "reasoning":
+    elif capability_type == "Reasoning QA":
         system_message, user_prompt = get_reasoning_generation_prompt(
-            question_type, discharge_summary_string
+            discharge_summary_string
         )
     else:
-        raise ValueError("Invalid capability type passed to")
+        raise ValueError("Invalid capability type passed to call_gpt")
 
     for i in range(0, max_retries):
         try:
