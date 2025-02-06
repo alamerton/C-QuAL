@@ -104,10 +104,25 @@ def main():
                     print("Quality checking result: ", quality_checking_result)
 
                 # Split the response into a list for each 'Part n: '
-                qa_parts = re.split(r"\n*Part [12]:", qa_string)
+                qa_parts = re.findall(
+                    r"(Initial_Presentation:|Subsequent_Course:|Clinical_Reasoning_Questions:)\s*(.*?)(?=\s*(?:Initial_Presentation:|Subsequent_Course:|Clinical_Reasoning_Questions:|\Z))",
+                    qa_string,
+                    re.DOTALL,
+                )
+
+                print("QA PARTS: ", qa_parts)
+
+                # Create a dictionary to store the results
+                result = {
+                    label.rstrip(":"): content.strip() for label, content in qa_parts
+                }
+
+                print("result: ", result)
 
                 # Remove items created by extra '\n's
                 qa_parts = [part.strip() for part in qa_parts if part.strip()]
+
+                print("qa parts 2: ", qa_parts)
 
                 # Log the data to terminal
                 print(qa_parts)

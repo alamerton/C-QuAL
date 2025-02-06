@@ -112,7 +112,9 @@ def get_reasoning_qual_check_prompt(qa_string):
             Please only respond with either the number 0 or 1, representing the score.
 
             Output Format:
-            [0 or 1]
+            $score 
+
+            Where $score is 0 or 1. DO NOT ADD ANY OTHER TEXT. DO NOT INCLUDE ANY PREAMBLE.
 
             Here is the question-answer pair for you to work on:
             
@@ -150,7 +152,9 @@ def get_factual_qual_check_prompt(qa_string):
             Please only respond with either the number 0 or 1, representing the score.
 
             Output Format:
-            [0 or 1]
+            $score 
+
+            Where $score is 0 or 1. DO NOT ADD ANY OTHER TEXT. DO NOT INCLUDE ANY PREAMBLE.
         
             Here is the question-answer pair for you to work on:
             
