@@ -1,44 +1,42 @@
 def get_reasoning_generation_prompt(discharge_summary_string):
     return (
-        """You are an expert medical annotator tasked with creating a clinical planning assessment using a discharge summary from the MIMIC-III database. Your goal is to extract and structure information that tests an LLM's ability to simulate clinical reasoning and planning.""",
-        f"""Your task is to generate two critical components that capture the clinical decision-making trajectory:
+        """You are an expert medical annotator tasked with creating a clinical planning assessment using a discharge summary from the MIMIC-III database. """,
+        f"""Your goal is to extract, structure, and generate questions that test an LLM's ability to simulate clinical reasoning and planning.
 
-            Part 1:
+        Part 1:
+        - Identify and extract the initial clinical presentation section that includes:
+            - Primary reason for admission
+            - Key presenting symptoms
+            - Critical background information
+            - Initial vital signs and relevant lab values
+        - This section should represent the initial decision point where clinical reasoning begins
+        - Extract only information available at admission, before any interventions
 
-            - Select the initial section of the discharge summary that provides:
-                - Comprehensive reason for admission
-                - Key presenting symptoms
-                - Critical patient background information
-                - Sufficient context for a skilled clinician to formulate initial diagnostic and treatment hypotheses
-            - Ensure this section represents the decision point where a clinician would begin to develop a clinical plan
-            - The information should be detailed enough to support sophisticated clinical reasoning without revealing subsequent interventions
+        Part 2:
+        - Extract ALL subsequent clinical information in chronological order, including:
+            - Diagnostic procedures performed
+            - Treatment decisions and modifications
+            - Clinical findings and results
+            - Patient response to interventions
+            - Final outcomes
+        - Organize this information to show the progression of clinical decision-making
 
-            Part 2:
+        Part 3:
+        Generate sequential reasoning questions that:
+        - Start with ONLY the information from Part 1
+        - For each major clinical decision or finding in Part 2:
+            Q: What would be the next appropriate clinical step?
+            A: [Actual step taken from Part 2]
+            Reasoning: [Clinical logic connecting Part 1 to this decision]
 
-            - Extract the subsequent clinical information that reveals:
-                - Actual diagnostic steps taken
-                - Treatments implemented
-                - Diagnostic findings
-                - Treatment modifications
-                - Patient progression
-                - Any medications administered
-            - Include information that demonstrates how the initial clinical hypothesis was investigated and potentially modified
+        Format your response EXACTLY as:
+        Initial_Presentation: $part1
+        Subsequent_Course: $part2
+        Clinical_Reasoning_Questions: $part3
 
-            Guidance:
+        DO NOT ADD ANY OTHER TEXT OR PREAMBLE.
 
-            - Focus on capturing the diagnostic and therapeutic reasoning process
-            - Highlight the evolution of clinical decision-making
-            - Demonstrate the complexity of medical problem-solving
-            - Ensure both sections provide meaningful insights into clinical reasoning
-
-            Please follow this format EXACTLY:
-            
-            Part 1: $part1\n
-            Part 2: $part2\n
-
-            Where $part1 is the information requested in part 1, and $part2 is the information requested in part 2. DO NOT ADD ANY OTHER TEXT. DO NOT INCLUDE ANY PREAMBLE.
-
-            Discharge Summary: {discharge_summary_string}
+        Discharge Summary: {discharge_summary_string}
         """,
     )
 
