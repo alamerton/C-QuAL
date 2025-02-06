@@ -1,6 +1,6 @@
 def get_reasoning_generation_prompt(discharge_summary_string):
     return (
-        f"""You are an expert medical annotator tasked with creating a clinical planning assessment using a discharge summary from the MIMIC-III database. Your goal is to extract and structure information that tests an LLM's ability to simulate clinical reasoning and planning.""",
+        """You are an expert medical annotator tasked with creating a clinical planning assessment using a discharge summary from the MIMIC-III database. Your goal is to extract and structure information that tests an LLM's ability to simulate clinical reasoning and planning.""",
         f"""Your task is to generate two critical components that capture the clinical decision-making trajectory:
 
             Part 1:
@@ -31,11 +31,12 @@ def get_reasoning_generation_prompt(discharge_summary_string):
             - Demonstrate the complexity of medical problem-solving
             - Ensure both sections provide meaningful insights into clinical reasoning
 
-            Just include the information requested in part 1 and part 2, DO NOT ADD ANY OTHER TEXT. DO NOT INCLUDE ANY PREAMBLE.
             Please follow this format EXACTLY:
+            
+            Part 1: $part1\n
+            Part 2: $part2\n
 
-            Part 1: [Insert part 1 here]\n
-            Part 2: [Insert part 2 here]\n
+            Where $part1 is the information requested in part 1, and $part2 is the information requested in part 2. DO NOT ADD ANY OTHER TEXT. DO NOT INCLUDE ANY PREAMBLE.
 
             Discharge Summary: {discharge_summary_string}
         """,
@@ -44,7 +45,7 @@ def get_reasoning_generation_prompt(discharge_summary_string):
 
 def get_factual_generation_prompt(question_type, discharge_summary_string):
     return (
-        f"""You are a medical expert tasked with creating a sophisticated clinical reasoning benchmark using a discharge summary from the MIMIC-III database. Your objective is to design an assessment that captures the nuanced clinical decision-making process.""",
+        """You are a medical expert tasked with creating a sophisticated clinical reasoning benchmark using a discharge summary from the MIMIC-III database. Your objective is to design an assessment that captures the nuanced clinical decision-making process.""",
         f"""Your task is to generate two critical components:
 
             Part 1:
@@ -70,12 +71,13 @@ def get_factual_generation_prompt(question_type, discharge_summary_string):
             - Avoid questions that can be answered through simple pattern matching
             - Prioritise questions that require hypothesis generation, risk assessment, or complex diagnostic inference
 
-            Just include the information requested in part 1 and part 2, DO NOT ADD ANY OTHER TEXT. DO NOT INCLUDE ANY PREAMBLE.
+            
             Please follow this format EXACTLY:
             
-            Part 1: [information requested in part 1]\n
-            Part 2: [information requested in part 2]\n
+            Part 1: $part1\n
+            Part 2: $part2\n
 
+            Where $part1 is the information requested in part 1, and $part2 is the information requested in part 2. DO NOT ADD ANY OTHER TEXT. DO NOT INCLUDE ANY PREAMBLE.
 
             Discharge Summary: {discharge_summary_string}
         """,
@@ -84,7 +86,7 @@ def get_factual_generation_prompt(question_type, discharge_summary_string):
 
 def get_reasoning_qual_check_prompt(qa_string):
     return (
-        f"""You are a senior medical expert responsible for critically evaluating a clinical reasoning benchmark question-answer pair generated from a discharge summary.""",
+        """You are a senior medical expert responsible for critically evaluating a clinical reasoning benchmark question-answer pair generated from a discharge summary.""",
         f""" Evaluation Criteria:
             1. Clinical Reasoning Depth (40%)
             - Does the question require sophisticated clinical inference?
@@ -123,7 +125,7 @@ def get_reasoning_qual_check_prompt(qa_string):
 
 def get_factual_qual_check_prompt(qa_string):
     return (
-        f"""You are a senior medical expert responsible for critically evaluating a clinical reasoning benchmark question-answer pair generated from a discharge summary.""",
+        """You are a senior medical expert responsible for critically evaluating a clinical reasoning benchmark question-answer pair generated from a discharge summary.""",
         f"""Evaluation Criteria:
             1. Initial Scenario Comprehensiveness (35%)
             - Does the initial section provide sufficient context for clinical reasoning?
