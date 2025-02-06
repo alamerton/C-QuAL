@@ -150,7 +150,11 @@ def main():
 
                 # Check the expected parts are in response, regenerate if
                 # not.
-                while "Part 1: " not in qa_string or "Part 2: " not in qa_string:
+                while (
+                    "Initial_Presentation: " not in qa_string
+                    or "Subsequent_Course: " not in qa_string
+                    or "Clinical_Reasoning_Questions: " not in qa_string
+                ):
                     print("Regenerating...")
                     qa_string = call_gpt(
                         QA_GENERATION_MODEL, discharge_summary, capability_type
@@ -159,18 +163,6 @@ def main():
                 quality_checking_result = check_quality_with_gpt(
                     qa_string, QUALITY_CHECKING_MODEL, capability_type
                 )
-                # If the quality checking function returns a string that is
-                # not either '0' or '1', retry until it is
-                # TODO: shouldn't this be while not 1??
-                while (
-                    "1" not in quality_checking_result
-                    and "0" not in quality_checking_result
-                ):
-                    print("Regenerating quality checking result")
-                    quality_checking_result = check_quality_with_gpt(
-                        qa_string, QUALITY_CHECKING_MODEL, capability_type
-                    )
-                    print("Quality checking result: ", quality_checking_result)
                 print("Quality checking result: ", quality_checking_result)
 
             # Split the response into a list for each 'Part n: '
