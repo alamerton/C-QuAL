@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 import sys
 import os
 from tqdm import tqdm
@@ -42,57 +43,33 @@ MAX_SUMMARIES: int = 3
 
 
 def main():
-    # Create dataframe with question and expected answer columns
-    data = pd.DataFrame(
-        columns=[
-            "Evidence",
-            "Question",
-            "Expected Answer",
-            "Capability",
-        ]
-    )
+    dataset = []
 
     print("Getting summaries for generation")
-
     discharge_summaries = call_mimic_iii(NUMBER_OF_QA_PAIRS, MAX_SUMMARIES)
 
-    # For loop for generating qa pairs
     print("Done\n\nGenerating Q-A pairs...")
 
-    # For the number of desired rows for the dataset:
     for row in tqdm(range(CHECKPOINT, NUMBER_OF_QA_PAIRS)):
-        # Get date for naming the dataset and checkpoints.
-        date = datetime.now()
-        date = date.strftime("%Y-%m-%d %H:%M:%S")
+        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        data_item = []
         discharge_summary = discharge_summaries[row]
-
-        # Select the capability type based on its specified proportion.
         capability_type = select_capability_type(
             FACTUAL_Q_PROPORTION, REASONING_Q_PROPORTION
         )
 
         if capability_type == "Factual QA":
-            # Generate 4 factual questions using from each discharge
-            # summary
+            # Generate 4 factual questions using the discharge summary
             for _ in range(0, 4):
-                # Clear data_item of its data each iteration
-                data_item = []
+                data_item = {}
 
-                # Start generation and quality checking loop.
                 quality_checking_result = ""
                 while "1" not in quality_checking_result:
-
-                    # Call LLM with discharge summary and prompt.
                     qa_string = call_gpt(
                         QA_GENERATION_MODEL, discharge_summary, capability_type
                     )
-
                     print("QA String: ", qa_string)
 
-                    # Check the expected parts are in response, regenerate if
-                    # not.
                     while "Part 1: " not in qa_string or "Part 2: " not in qa_string:
                         print("Regenerating...")
                         qa_string = call_gpt(
@@ -102,56 +79,42 @@ def main():
                     quality_checking_result = check_quality_with_gpt(
                         qa_string, QUALITY_CHECKING_MODEL, capability_type
                     )
-
                     print("Quality checking result: ", quality_checking_result)
 
-                # Split the response into a list for each 'Part n: '
                 qa_parts = re.split(r"\n*Part [12]:", qa_string)
-
-                # Remove items created by extra '\n's
                 qa_parts = [part.strip() for part in qa_parts if part.strip()]
 
-                # Log the data to terminal
                 print(qa_parts)
 
                 question = qa_parts[0]
                 answer = qa_parts[1]
 
-                # Add data to data item
-                data_item.extend((discharge_summary, question, answer, capability_type))
+                data_item = {
+                    "Evidence": discharge_summary,
+                    "Question": question,
+                    "Expected Answer": answer,
+                    "Capability": capability_type,
+                }
 
-                # Add Q-A pair to dataframe
-                data.loc[row] = data_item
+                dataset.append(data_item)
 
-                # Output message to terminal
                 print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
 
                 checkpoint_directory_path = "data/generations/checkpoints/"
                 if (row + 1) % CHECKPOINT_INTERVAL == 0:
-                    if CHECKPOINT > 0:
-                        checkpoint_name = f"rows-{CHECKPOINT}-{row+1}-{date}"
-                        checkpoint_path = checkpoint_directory_path + checkpoint_name
-                    else:
-                        checkpoint_name = f"{row+1}-rows-{date}"
-                        checkpoint_path = checkpoint_directory_path + checkpoint_name
-                    data.to_csv(f"{checkpoint_path}.csv")
-
-                # Increment row to add next QA pair to next row in data
-                row += 1
+                    checkpoint_name = f"{row+1}-rows-{date}"
+                    checkpoint_path = checkpoint_directory_path + checkpoint_name
+                    with open(f"{checkpoint_path}.json", "w") as json_file:
+                        json.dump(dataset, json_file, indent=4)
         else:
-            # Start generation and quality checking loop.
+            # Start generation and quality checking loop for nested properties
             quality_checking_result = ""
             while "1" not in quality_checking_result:
-
-                # Call LLM with discharge summary and prompt.
                 qa_string = call_gpt(
                     QA_GENERATION_MODEL, discharge_summary, capability_type
                 )
-
                 print("QA String: ", qa_string)
 
-                # Check the expected parts are in response, regenerate if
-                # not.
                 while (
                     "Initial_Presentation: " not in qa_string
                     or "Subsequent_Course: " not in qa_string
@@ -167,7 +130,6 @@ def main():
                 )
                 print("Quality checking result: ", quality_checking_result)
 
-            # Split the response into a list for each 'Part n: '
             qa_parts = re.findall(
                 r"(Initial_Presentation:|Subsequent_Course:|Clinical_Reasoning_Questions:)\s*(.*?)(?=\s*(?:Initial_Presentation:|Subsequent_Course:|Clinical_Reasoning_Questions:|\Z))",
                 qa_string,
@@ -176,51 +138,35 @@ def main():
 
             print("QA PARTS: ", qa_parts)
 
-            # Create a dictionary to store the results
+            # Create a nested dictionary structure
             result = {label.rstrip(":"): content.strip() for label, content in qa_parts}
-
             print("result: ", result)
 
-            # Remove items created by extra '\n's
-            qa_parts = [part.strip() for part in qa_parts if part.strip()]
+            data_item = {
+                "Evidence": discharge_summary,
+                "Details": result,
+                "Capability": capability_type,
+            }
 
-            print("qa parts 2: ", qa_parts)
+            dataset.append(data_item)
 
-            # Log the data to terminal
-            print(qa_parts)
-
-            question = "Plan the subsequent clinical course for this clinical scenario."
-            evidence = qa_parts[0]
-            answer = qa_parts[1]
-            data_item.extend((evidence, question, answer, capability_type))
-
-            # So this is where we want to split the individual
-            # questions and answers up, and pass them iteratively to
-            # the LLM. How best to construct that in the dataset?
-
-            # Add Q-A pair to dataframe
-            data.loc[row] = data_item
-
-            # Output message to terminal
             print(f"{row+1}/{NUMBER_OF_QA_PAIRS}")
 
             checkpoint_directory_path = "data/generations/checkpoints/"
             if (row + 1) % CHECKPOINT_INTERVAL == 0:
-                if CHECKPOINT > 0:
-                    checkpoint_name = f"rows-{CHECKPOINT}-{row+1}-{date}"
-                    checkpoint_path = checkpoint_directory_path + checkpoint_name
-                else:
-                    checkpoint_name = f"{row+1}-rows-{date}"
-                    checkpoint_path = checkpoint_directory_path + checkpoint_name
-                data.to_csv(f"{checkpoint_path}.csv")
+                checkpoint_name = f"{row+1}-rows-{date}"
+                checkpoint_path = checkpoint_directory_path + checkpoint_name
+                with open(f"{checkpoint_path}.json", "w") as json_file:
+                    json.dump(dataset, json_file, indent=4)
 
     print("Complete")
-    print(data)
+    print(dataset)
 
     # Write dataset to output directory
-    output_path = f"""data/generations/
-    {NUMBER_OF_QA_PAIRS}-QA-pairs-{date}"""
-    data.to_csv(f"{output_path}.csv")
+    output_path = f"""data/generations/{NUMBER_OF_QA_PAIRS}-QA-pairs-{date}"""
+    with open(f"{output_path}.json", "w") as json_file:
+        json.dump(dataset, json_file, indent=4)
+
     print("Dataset saved")
 
 
