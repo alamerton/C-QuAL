@@ -7,10 +7,12 @@ import re
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
+
 from utils.generation.call_gpt import call_gpt
 from utils.generation.call_mimic_iii import call_mimic_iii
 from utils.misc import select_capability_type
 from utils.generation.check_quality_with_gpt import check_quality_with_gpt
+
 
 # Dataset size
 NUMBER_OF_QA_PAIRS: int = 15
@@ -72,7 +74,7 @@ def main():
         )
 
         if capability_type == "Factual QA":
-            # Generate 4 reasoning questions using from each discharge
+            # Generate 4 factual questions using from each discharge
             # summary
             for _ in range(0, 4):
                 # Clear data_item of its data each iteration
@@ -186,12 +188,15 @@ def main():
 
             # Log the data to terminal
             print(qa_parts)
-            # TODO: put the planning prompt here (what we want
-            # the benchmark to ask the LLM to do)
+
             question = "Plan the subsequent clinical course for this clinical scenario."
             evidence = qa_parts[0]
             answer = qa_parts[1]
             data_item.extend((evidence, question, answer, capability_type))
+
+            # So this is where we want to split the individual
+            # questions and answers up, and pass them iteratively to
+            # the LLM. How best to construct that in the dataset?
 
             # Add Q-A pair to dataframe
             data.loc[row] = data_item

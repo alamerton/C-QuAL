@@ -1,6 +1,6 @@
 def get_reasoning_generation_prompt(discharge_summary_string):
     return (
-        """You are an expert medical annotator tasked with creating a clinical planning assessment using a discharge summary from the MIMIC-III database. """,
+        """You are an expert medical annotator tasked with creating a clinical planning evaluation using a discharge summary from the MIMIC-III database. """,
         f"""Your goal is to extract, structure, and generate questions that test an LLM's ability to simulate clinical reasoning and planning.
 
         Part 1:
@@ -30,11 +30,10 @@ def get_reasoning_generation_prompt(discharge_summary_string):
             Reasoning: [Clinical logic connecting Part 1 to this decision]
 
         Format your response EXACTLY as:
-        Initial_Presentation: $part1
+        'Initial_Presentation: $part1
         Subsequent_Course: $part2
-        Clinical_Reasoning_Questions: $part3
-
-        DO NOT ADD ANY OTHER TEXT OR PREAMBLE.
+        Clinical_Reasoning_Questions: $part3'
+        (without quotes) where $part1 is just the information requested in Part 1, $part2 is just the information requested in Part 2, and $part3 is just the information requested in Part 3. DO NOT ADD ANY OTHER TEXT OR PREAMBLE.
 
         Discharge Summary: {discharge_summary_string}
         """,
@@ -75,7 +74,7 @@ def get_factual_generation_prompt(question_type, discharge_summary_string):
             Part 1: $part1\n
             Part 2: $part2\n
 
-            Where $part1 is the information requested in part 1, and $part2 is the information requested in part 2. DO NOT ADD ANY OTHER TEXT. DO NOT INCLUDE ANY PREAMBLE.
+            Where $part1 is just the question requested in part 1, and $part2 is just the answer in part 2. DO NOT ADD ANY OTHER TEXT. DO NOT INCLUDE ANY PREAMBLE.
 
             Discharge Summary: {discharge_summary_string}
         """,
