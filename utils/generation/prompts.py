@@ -27,6 +27,7 @@ def get_reasoning_generation_prompt(discharge_summary_string):
         - For each major clinical decision or finding in Part 2:
             Q: What would be the next appropriate clinical step?
             A: [Actual step taken from Part 2]
+            Reasoning: [Clinical logic connecting Part 1 to this decision]
 
         Format your response EXACTLY as:
         'Initial_Presentation: $part1
