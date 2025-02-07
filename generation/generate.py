@@ -90,10 +90,10 @@ def main():
                 answer = qa_parts[1]
 
                 data_item = {
+                    "Capability": capability_type,
                     "Evidence": discharge_summary,
                     "Question": question,
                     "Expected Answer": answer,
-                    "Capability": capability_type,
                 }
 
                 dataset.append(data_item)
@@ -138,14 +138,27 @@ def main():
 
             print("QA PARTS: ", qa_parts)
 
-            # Create a nested dictionary structure
             result = {label.rstrip(":"): content.strip() for label, content in qa_parts}
             print("result: ", result)
 
+            clinical_reasoning_qa = re.findall(
+                r"Q: (.*?)\nA: (.*?)\nReasoning: (.*?)\n",
+                result["Clinical_Reasoning_Questions"],
+            )
+
+            sections = []
+            for question, answer, reasoning in clinical_reasoning_qa:
+                section = {
+                    "Evidence": result["Initial_Presentation"],
+                    "Question": question,
+                    "Expected Answer": answer,
+                }
+                sections.append(section)
+
             data_item = {
-                "Evidence": discharge_summary,
-                "Details": result,
                 "Capability": capability_type,
+                "Evidence": result["Initial_Presentation"],
+                "Sections": sections,
             }
 
             dataset.append(data_item)
