@@ -21,8 +21,8 @@ NUMBER_OF_QA_PAIRS: int = 15
 # Control the ratio of reasoning and planning questions in the dataset
 # by setting the proportion of reasoning questions. They can be any
 # ratio.
-FACTUAL_Q_PROPORTION: int = 50
-REASONING_Q_PROPORTION: int = 50
+FACTUAL_Q_PROPORTION: int = 0
+REASONING_Q_PROPORTION: int = 100
 
 # Variable for starting the generation from a specific row in MIMIC-III.
 # Default value is 0. Set to 0 if generating new dataset.
@@ -149,7 +149,9 @@ def main():
             sections = []
             for question, answer, reasoning in clinical_reasoning_qa:
                 section = {
-                    "Evidence": result["Initial_Presentation"],
+                    "Evidence": result[
+                        "Initial_Presentation"
+                    ],  # This might be where I need to append each section of evidence in case the LLM's context is wiped
                     "Question": question,
                     "Expected Answer": answer,
                 }
@@ -158,7 +160,7 @@ def main():
             data_item = {
                 "Capability": capability_type,
                 "Evidence": result["Initial_Presentation"],
-                "Sections": sections,
+                "Sections": sections,  # TODO: this doesn't seem to be populating
             }
 
             dataset.append(data_item)
