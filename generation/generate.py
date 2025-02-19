@@ -152,9 +152,7 @@ def main():
             previous_answer = ""
             for question, answer, reasoning in clinical_reasoning_qa:
                 section = {
-                    "Evidence": (
-                        "" if len(sections) == 0 else previous_answer
-                    ),  # if it's the first section, empty. Else expected answer of previous q
+                    "Evidence": ("" if len(sections) == 0 else previous_answer),
                     "Question": question,
                     "Expected Answer": answer,
                 }
@@ -164,7 +162,7 @@ def main():
             data_item = {
                 "Capability": capability_type,
                 "Evidence": result["Initial_Presentation"],
-                "Sections": sections,  # TODO: this doesn't seem to be populating
+                "Sections": sections,
             }
 
             dataset.append(data_item)
