@@ -146,15 +146,19 @@ def main():
                 result["Clinical_Reasoning_Questions"],
             )
 
+            # TODO: Might be good to add a 'because' {reason} if I want to include the reason
+
             sections = []
+            previous_answer = ""
             for question, answer, reasoning in clinical_reasoning_qa:
                 section = {
-                    "Evidence": result[
-                        "Initial_Presentation"
-                    ],  # This might be where I need to append each section of evidence in case the LLM's context is wiped
+                    "Evidence": (
+                        "" if len(sections) == 0 else previous_answer
+                    ),  # if it's the first section, empty. Else expected answer of previous q
                     "Question": question,
                     "Expected Answer": answer,
                 }
+                previous_answer += f"\nThe previous clinical step was: {answer}"
                 sections.append(section)
 
             data_item = {
