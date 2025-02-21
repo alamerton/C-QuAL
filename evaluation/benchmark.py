@@ -6,11 +6,17 @@ import numpy as np
 from rouge import Rouge
 import numpy as np
 from nltk.util import ngrams
+from nltk.translate.meteor_score import single_meteor_score
+from nltk.tokenize import word_tokenize
 from deepeval.metrics import GEval
 from deepeval.test_case import LLMTestCaseParams
 from deepeval.test_case import LLMTestCase
 from datetime import datetime
 import spacy
+import textstat
+import spacy
+from typing import Tuple, List, Set, Dict
+
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, parent_dir)
@@ -46,6 +52,17 @@ g_eval_metric = GEval(
     """,
     evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT],
 )
+
+CLINICAL_ENTITIES = {
+    "PROBLEM": ["DISEASE", "SYNDROME", "DIAGNOSIS", "SIGN", "SYMPTOM"],
+    "TREATMENT": ["PROCEDURE", "TREATMENT", "THERAPY"],
+    "MEDICATION": ["DRUG", "CHEMICAL", "PHARMACEUTICAL"],
+    "TEST": ["TEST", "LABORATORY", "DIAGNOSTIC_PROCEDURE"],
+    "ANATOMY": ["ANATOMICAL_STRUCTURE", "BODY_PART", "ORGAN"],
+    "VITAL": ["VITAL_SIGN", "MEASUREMENT"],
+    "DEMOGRAPHICS": ["AGE", "GENDER", "RACE", "ETHNICITY"],
+    "TEMPORAL": ["DATE", "TIME", "DURATION", "FREQUENCY"],
+}
 
 
 def record_model_answers(dataset_path, model_name):
@@ -160,6 +177,148 @@ def get_g_eval(expected_answer: str, model_answer: str):
     score = g_eval_metric.measure(test_case)
     # print(f"Debug: score = {score}")
     return score
+
+
+def get_flesch_reading_ease(df: pd.DataFrame):
+    fre_vals = []
+    for _, row in df.itterows():
+        question = row["Question"]
+        fre_vals.append(textstat.flesch_reading_ease(question))
+
+
+# We use entity recognition models (e.g., scispaCy) to extract medical terms, and calculate a relevance score: (Number of words matched concepts)/(total words).
+
+
+def calculate_clinical_relevance(
+    text: str, model: str = "en_core_sci_md"
+) -> Tuple[float, Dict[str, Set[str]], List[str]]:
+    """
+    Calculate clinical term relevance score and extract medical entities from text,
+    categorized by clinical domain.
+
+    Args:
+        text (str): Input text to analyze
+        model (str): Name of the spaCy model to use (default: en_core_sci_md)
+
+    Returns:
+        Tuple containing:
+        - float: Relevance score (matched concepts / total words)
+        - Dict[str, Set[str]]: Dictionary of entity categories and their found terms
+        - List[str]: List of all words in the text
+    """
+    try:
+        nlp = spacy.load(model)
+        doc = nlp(text)
+
+        # Extract all words (excluding punctuation and whitespace)
+        all_words = [
+            token.text.lower()
+            for token in doc
+            if not token.is_punct and not token.is_space
+        ]
+
+        # Initialize categories
+        entities_by_category = {
+            category: set() for category in CLINICAL_ENTITIES.keys()
+        }
+
+        # Extract and categorize entities
+        for ent in doc.ents:
+            for category, labels in CLINICAL_ENTITIES.items():
+                if ent.label_ in labels:
+                    entities_by_category[category].add(ent.text.lower())
+
+        # Calculate total unique medical entities
+        total_entities = sum(
+            len(entities) for entities in entities_by_category.values()
+        )
+
+        # Calculate the relevance score
+        total_words = len(all_words)
+        matched_concepts = sum(
+            1
+            for word in all_words
+            if any(word in entities for entities in entities_by_category.values())
+        )
+
+        relevance_score = matched_concepts / total_words if total_words > 0 else 0.0
+
+        return relevance_score, entities_by_category, all_words
+
+    except OSError as e:
+        raise Exception(
+            f"Failed to load spaCy model '{model}'. Please ensure it's installed: python -m spacy download {model}"
+        )
+
+
+def analyze_clinical_text(text: str) -> None:
+    """
+    Analyze clinical text and print detailed results by category.
+
+    Args:
+        text (str): Clinical text to analyze
+    """
+    try:
+        score, entities_by_category, words = calculate_clinical_relevance(text)
+
+        print("Clinical Text Analysis Results:")
+        print(f"Overall Relevance Score: {score:.2%}")
+        print(f"Total Words: {len(words)}")
+        print("\nEntities by Category:")
+
+        for category, terms in entities_by_category.items():
+            if terms:  # Only show categories with found terms
+                print(f"\n{category}:")
+                print(f"- {', '.join(sorted(terms))}")
+                print(f"- Count: {len(terms)}")
+
+    except Exception as e:
+        print(f"Error during processing: {str(e)}")
+
+
+def get_accuracy(expected_answers: list, model_answers: list) -> float:
+    if len(expected_answers) != len(model_answers):
+        raise ValueError("Expected and model answers must be same length")
+
+    correct = sum(1 for exp, mod in zip(expected_answers, model_answers) if exp == mod)
+    return correct / len(expected_answers)
+
+
+def get_recall(expected_answer: str, model_answer: str) -> float:
+    """
+    Calculate recall score between expected and model answers
+
+    Args:
+        expected_answer: Expected/ground truth answer
+        model_answer: Predicted/model answer
+
+    Returns:
+        float: Recall score between 0 and 1
+    """
+    # Convert to sets of words
+    expected_words = set(expected_answer.lower().split())
+    model_words = set(model_answer.lower().split())
+
+    if len(expected_words) == 0:
+        return 0.0
+
+    # Calculate recall: correct words / total expected words
+    correct_words = len(expected_words.intersection(model_words))
+    return correct_words / len(expected_words)
+
+
+def get_meteor(expected_answer: str, model_answer: str):
+    # Tokenize the strings into words
+    reference = word_tokenize(expected_answer.lower())
+    hypothesis = word_tokenize(model_answer.lower())
+
+    # Calculate the METEOR score
+    score = single_meteor_score(reference, hypothesis)
+
+    return score
+
+
+# Return a dataframe containing analysis results for a given dataset
 
 
 def score_model(dataset, model_name):
