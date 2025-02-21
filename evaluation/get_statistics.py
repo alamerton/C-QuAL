@@ -104,9 +104,6 @@ def get_lexical_richness(df: pd.DataFrame):
     return sum(lr_values) / len(lr_values)
 
 
-# Return a dataframe containing analysis results for a given dataset
-
-
 def get_statistics(dataset_path):
     dataset = pd.read_csv(dataset_path)
     dataset_length = len(dataset)

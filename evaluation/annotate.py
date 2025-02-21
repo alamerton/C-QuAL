@@ -19,7 +19,7 @@ date = date.strftime("%Y-%m-%d %H:%M:%S")
 def annotate_dataset(dataset_path, local: bool = False):
     print("Loading dataset")
 
-    dataset: pd.DataFrame = pd.read_csv(dataset_path)
+    dataset: pd.DataFrame = pd.read_json(dataset_path)
 
     for index, row in tqdm(
         dataset.iloc[CHECKPOINT:].iterrows(),
