@@ -19,11 +19,10 @@ load_dotenv()
 
 def get_question_type():
     question_types = [
-        "Yes/No/Maybe",
-        "Unanswerable",
-        "Temporal",
-        "Factual",
-        "Summarisation",
+        "Knowledge and Recall: Questions focused on factual information retrieval. For example: 'What is the normal range of blood pressure?'",
+        "Comprehension: Questions requiring conceptual understanding or interpretation. For example: 'Why is hypertension a risk factor for stroke?'",
+        "Application and Analysis: Questions involving clinical problem-solving or scenario-based reasoning. For example: 'What is the best initial treatment for a patient presenting with chest pain?'",
+        "Synthesis and Evaluation: Questions requiring complex decision-making and comparison. For example: 'Compare the risks of drug A and drug B for treating atrial fibrillation in elderly patients.'",
     ]
     return random.choice(question_types)
 
