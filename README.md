@@ -1,6 +1,6 @@
 # C-QuAL – A Clinical Question Answering Benchmark for Long-Context Large Language Models
 
-![Q-A-diagram (3)](https://github.com/user-attachments/assets/6f059669-6a81-47d6-829b-942d53e85008)
+![Q-A-diagram (4)](https://github.com/user-attachments/assets/8a620246-5957-4e57-8584-077bbf76d5f2)
 
 ## Project Overview
 
