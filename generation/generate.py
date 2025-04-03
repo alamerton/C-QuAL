@@ -13,7 +13,11 @@ from utils.generation.call_gpt import call_gpt
 from utils.generation.call_mimic_iii import call_mimic_iii
 from utils.misc import select_capability_type
 from utils.generation.check_quality_with_gpt import check_quality_with_gpt
-
+from utils.generation.reasoning_QA import (
+    extract_discharge_summary_sections,
+    get_initial_presentation,
+    get_subsequent_steps,
+)
 
 # Dataset size
 NUMBER_OF_QA_PAIRS: int = 15
@@ -107,62 +111,39 @@ def main():
                     with open(f"{checkpoint_path}.json", "w") as json_file:
                         json.dump(dataset, json_file, indent=4)
         else:
-            # Start generation and quality checking loop for nested properties
-            quality_checking_result = ""
-            while "1" not in quality_checking_result:
-                qa_string = call_gpt(
-                    QA_GENERATION_MODEL, discharge_summary, capability_type
-                )
-                print("QA String: ", qa_string)
+            # New approach: Extract sections using regex based on common MIMIC-III headings
+            sections = extract_discharge_summary_sections(discharge_summary)
 
-                while (
-                    "Initial_Presentation: " not in qa_string
-                    or "Subsequent_Course: " not in qa_string
-                    or "Clinical_Reasoning_Questions: " not in qa_string
-                ):
-                    print("Regenerating...")
-                    qa_string = call_gpt(
-                        QA_GENERATION_MODEL, discharge_summary, capability_type
-                    )
+            # Get the initial presentation (typically admission note or chief complaint)
+            initial_presentation = get_initial_presentation(sections)
 
-                quality_checking_result = check_quality_with_gpt(
-                    qa_string, QUALITY_CHECKING_MODEL, capability_type
-                )
-                print("Quality checking result: ", quality_checking_result)
+            # Get subsequent steps from relevant sections in chronological order
+            subsequent_steps = get_subsequent_steps(sections)
 
-            qa_parts = re.findall(
-                r"(Initial_Presentation:|Subsequent_Course:|Clinical_Reasoning_Questions:)\s*(.*?)(?=\s*(?:Initial_Presentation:|Subsequent_Course:|Clinical_Reasoning_Questions:|\Z))",
-                qa_string,
-                re.DOTALL,
-            )
+            # Create nested reasoning steps as JSON objects
+            reasoning_sections = []
+            previous_evidence = initial_presentation
 
-            print("QA PARTS: ", qa_parts)
+            for _, step in enumerate(subsequent_steps):
+                # For each step, create a question about what should be done next
+                question = "Based on the available information, what would be the next appropriate clinical step?"
 
-            result = {label.rstrip(":"): content.strip() for label, content in qa_parts}
-            print("result: ", result)
-
-            clinical_reasoning_qa = re.findall(
-                r"Q: (.*?)\nA: (.*?)\nReasoning: (.*?)\n",
-                result["Clinical_Reasoning_Questions"],
-            )
-
-            # TODO: Might be good to add a 'because' {reason} if I want to include the reason
-
-            sections = []
-            previous_answer = ""
-            for question, answer, reasoning in clinical_reasoning_qa:
                 section = {
-                    "Evidence": ("" if len(sections) == 0 else previous_answer),
+                    "Evidence": previous_evidence,
                     "Question": question,
-                    "Expected Answer": answer,
+                    "Expected Answer": step["content"],
                 }
-                previous_answer += f"\nThe previous clinical step was: {answer}"
-                sections.append(section)
+
+                # Update the evidence for the next question to include this step
+                previous_evidence += (
+                    f"\n\nThe previous clinical step was: {step['content']}"
+                )
+                reasoning_sections.append(section)
 
             data_item = {
                 "Capability": capability_type,
-                "Evidence": result["Initial_Presentation"],
-                "Sections": sections,
+                "Evidence": initial_presentation,
+                "Sections": reasoning_sections,
             }
 
             dataset.append(data_item)

@@ -56,9 +56,9 @@ def benchmark_with_azure(
             max_tokens=999,
             temperature=0,
         )
+        return result.choices[0].message.content
 
     elif "Llama-3" in model_name:
-
         llama_endpoint = os.getenv("AZURE_LLAMA_3_ENDPONT")
         llama_api_key = os.getenv("AZURE_LLAMA_3_API_KEY")
 
@@ -108,5 +108,3 @@ def benchmark_with_azure(
 
     else:
         raise ValueError("Model name not recognised by script.")
-
-    return result.choices[0].message.content

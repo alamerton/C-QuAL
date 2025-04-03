@@ -21,7 +21,7 @@ SUMMARIES_DESTINATION = "function"
 # Load query results into a dataframe containing subject_ids and notes
 def save_data(results):
     results_df = pd.DataFrame(results, columns=["subject_id", "note"])
-    results_df.to_csv(f"C-QuAL/data/mimic-iii-subset.csv")
+    results_df.to_csv("C-QuAL/data/mimic-iii-subset.csv")
 
 
 # Add a start and end tag to each discharge summary for the LLM to

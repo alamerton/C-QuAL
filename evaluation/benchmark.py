@@ -8,7 +8,8 @@ import numpy as np
 from nltk.util import ngrams
 from nltk.translate.meteor_score import single_meteor_score
 from nltk.tokenize import word_tokenize
-from deepeval.metrics import GEval
+
+# from deepeval.metrics import GEval
 from deepeval.test_case import LLMTestCaseParams
 from deepeval.test_case import LLMTestCase
 from datetime import datetime
@@ -16,6 +17,7 @@ import spacy
 import textstat
 import spacy
 from typing import Tuple, List, Set, Dict
+import json
 
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -24,8 +26,8 @@ from utils.evaluation.benchmark_with_azure import benchmark_with_azure
 from utils.evaluation.benchmark_locally import benchmark_locally
 from utils.misc import save_dataset
 
-DATASET_PATH = "data/processing/cqual-small.csv"
-MODEL_NAME = "Llama-2-70b-uvwrs"
+DATASET_PATH = "data/generations/checkpoints/checkpoint.json"
+MODEL_NAME = "gpt-35-turbo-16k"
 LOCAL = False
 CHECKPOINT = 0
 
@@ -35,23 +37,23 @@ date = date.strftime("%Y-%m-%d %H:%M:%S")
 
 nlp = spacy.load("en_core_web_md")
 rouge = Rouge()
-g_eval_metric = GEval(
-    name="g-eval",
-    criteria="""
-    Evaluate the quality of the generated text based on the ability of the LLM
-    to summarize, identify, and arrange text, ancondad answer specific questions 
-    related to:
-        1. Patient’s medical history
-        2. Diagnoses made
-        3. Procedures that were done
-        4. Outcomes of procedures
-        5. Changes in medication
-        6. Complications
-        7. Abnormalities
-        8. Tests the patient has undergone
-    """,
-    evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT],
-)
+# g_eval_metric = GEval(
+#     name="g-eval",
+#     criteria="""
+#     Evaluate the quality of the generated text based on the ability of the LLM
+#     to summarize, identify, and arrange text, ancondad answer specific questions
+#     related to:
+#         1. Patient’s medical history
+#         2. Diagnoses made
+#         3. Procedures that were done
+#         4. Outcomes of procedures
+#         5. Changes in medication
+#         6. Complications
+#         7. Abnormalities
+#         8. Tests the patient has undergone
+#     """,
+#     evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT],
+# )
 
 CLINICAL_ENTITIES = {
     "PROBLEM": ["DISEASE", "SYNDROME", "DIAGNOSIS", "SIGN", "SYMPTOM"],
@@ -67,36 +69,106 @@ CLINICAL_ENTITIES = {
 
 def record_model_answers(dataset_path, model_name):
     print("Loading dataset")
-    dataset = pd.read_csv(dataset_path)
+    date = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
-    for index, row in tqdm(
-        dataset.iterrows(), total=len(dataset), desc=f"Benchmarking model"
+    # Load JSON dataset and handle potential nesting
+    with open(dataset_path, "r") as file:
+        dataset = json.load(file)
+
+    # If dataset is stored under a key (e.g., "items"), adjust accordingly
+    if isinstance(dataset, dict) and "items" in dataset:
+        dataset = dataset["items"]
+
+    results = []
+
+    for index, item in tqdm(
+        enumerate(dataset), total=len(dataset), desc=f"Benchmarking model"
     ):
-        discharge_summary = row["Discharge Summaries"]
-        question = row["Question"]
+        if item["Capability"] == "Factual QA":
+            response = (benchmark_locally if LOCAL else benchmark_with_azure)(
+                model_name, item["Evidence"], item["Question"]
+            )
+            results.append(
+                {
+                    "Capability": "Factual QA",
+                    "Evidence": item["Evidence"],
+                    "Question": item["Question"],
+                    "Expected Answer": item["Expected Answer"],
+                    f"{model_name}_Response": response,
+                }
+            )
 
-        if LOCAL:
-            response = benchmark_locally(model_name, discharge_summary, question)
-        else:
-            response = benchmark_with_azure(model_name, discharge_summary, question)
+        elif item["Capability"] == "Reasoning QA":
+            section_results = []
+            for section in item.get("Sections", []):
+                response = (benchmark_locally if LOCAL else benchmark_with_azure)(
+                    model_name, section["Evidence"], section["Question"]
+                )
+                section_results.append(
+                    {
+                        "Evidence": section["Evidence"],
+                        "Question": section["Question"],
+                        "Expected Answer": section["Expected Answer"],
+                        f"{model_name}_Response": response,
+                    }
+                )
+            results.append(
+                {
+                    "Capability": "Reasoning QA",
+                    "Evidence": item["Evidence"],
+                    "Sections": section_results,
+                }
+            )
 
-        if "/" in model_name:
-            model_name.replace("/", "_")
+        if (index + 1) % 2 == 0:
+            checkpoint_directory = "data/model-answers/checkpoints/"
+            os.makedirs(checkpoint_directory, exist_ok=True)
+            checkpoint_name = (
+                f"{model_name.replace('/', '_')}-{index+1}-rows-{date}.json"
+            )
+            with open(
+                os.path.join(checkpoint_directory, checkpoint_name), "w"
+            ) as json_file:
+                json.dump(results, json_file, indent=4)
 
-        dataset.at[index, f"{model_name} Response"] = response
+    output_directory = "data/model-answers/"
+    os.makedirs(output_directory, exist_ok=True)
+    output_path = f"{output_directory}{model_name.replace('/', '_')}-{date}.json"
 
-        checkpoint_directory_path = "data/model-answers/checkpoints/"
+    with open(output_path, "w") as json_file:
+        json.dump(results, json_file, indent=4)
 
-        if (index + 1) % 10 == 0:
-            if CHECKPOINT > 0:
-                checkpoint_name = f"rows-{CHECKPOINT}-{index+1}-{date}"
-                checkpoint_path = checkpoint_directory_path + checkpoint_name
-            else:
-                checkpoint_name = f"{model_name}-{index+1}-rows-{date}"
-                checkpoint_path = checkpoint_directory_path + checkpoint_name
-            dataset.to_csv(f"{checkpoint_path}.csv")
+    results_df = flatten_results_to_dataframe(results, model_name)
+    results_df.to_csv(f"{output_path}.csv", index=False)
+    return results
 
-    return dataset
+
+def flatten_results_to_dataframe(results, model_name):
+    flattened_data = []
+    for item in results:
+        if item["Capability"] == "Factual QA":
+            flattened_data.append(
+                {
+                    "Capability": "Factual QA",
+                    "Evidence": item["Evidence"],
+                    "Question": item["Question"],
+                    "Expected Answer": item["Expected Answer"],
+                    f"{model_name}_Response": item[f"{model_name}_Response"],
+                }
+            )
+        elif item["Capability"] == "Reasoning QA":
+            for section in item["Sections"]:
+                flattened_data.append(
+                    {
+                        "Capability": "Reasoning QA",
+                        "Initial_Evidence": item["Evidence"],
+                        "Evidence": section["Evidence"],
+                        "Question": section["Question"],
+                        "Expected Answer": section["Expected Answer"],
+                        f"{model_name}_Response": section[f"{model_name}_Response"],
+                    }
+                )
+    return pd.DataFrame(flattened_data)
 
 
 def get_exact_match(expected_answer: str, model_answer: str):
@@ -169,14 +241,14 @@ def get_bleu(reference: str, candidate: str):
     return score
 
 
-def get_g_eval(expected_answer: str, model_answer: str):
-    # test_case = LLMTestCase(input=model_answer, actual_output=expected_answer)
-    test_case = LLMTestCase(input="Test input", actual_output="Expected output")
-    print(g_eval_metric.measure(test_case))  # Check if this returns a valid score
-    # print(f"Debug: test_case = {test_case}")
-    score = g_eval_metric.measure(test_case)
-    # print(f"Debug: score = {score}")
-    return score
+# def get_g_eval(expected_answer: str, model_answer: str):
+#     # test_case = LLMTestCase(input=model_answer, actual_output=expected_answer)
+#     test_case = LLMTestCase(input="Test input", actual_output="Expected output")
+#     print(g_eval_metric.measure(test_case))  # Check if this returns a valid score
+#     # print(f"Debug: test_case = {test_case}")
+#     score = g_eval_metric.measure(test_case)
+#     # print(f"Debug: score = {score}")
+#     return score
 
 
 def get_flesch_reading_ease(df: pd.DataFrame):
@@ -385,10 +457,10 @@ def score_model(dataset, model_name):
 def main():
     model_answers = record_model_answers(DATASET_PATH, MODEL_NAME)
     save_dataset(model_answers, directory="model-answers")
-    model_answers = pd.read_csv("data/model-answers/Mistral-large.csv")
-    benchmarking_results = score_model(model_answers, MODEL_NAME)
-    save_dataset(benchmarking_results, directory="benchmarking-results")
-    print(benchmarking_results)
+    # model_answers = pd.read_csv("data/model-answers/Mistral-large.csv")
+    # benchmarking_results = score_model(model_answers, MODEL_NAME)
+    # save_dataset(benchmarking_results, directory="benchmarking-results")
+    # print(benchmarking_results)
 
 
 if __name__ == "__main__":
